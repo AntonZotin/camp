@@ -10,13 +10,15 @@
 	import { MedicalVisitAdmin } from '$lib';
 	import { NotificationAdmin } from '$lib';
 	import { PaymentAdmin } from '$lib';
+	import { EmployeeAdmin } from '$lib';
+	import { ActivityLogAdmin } from '$lib';
 
 	let theme: 'light' | 'dark' = 'light';
 	const unsubTheme = themeStore.subscribe((t) => (theme = t));
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
-	let tab: 'users' | 'sessions' | 'menu' | 'medical-cards' | 'medical-visits' | 'notifications' | 'payments' | 'export' = 'users';
+	let tab: 'users' | 'sessions' | 'menu' | 'medical-cards' | 'medical-visits' | 'notifications' | 'payments' | 'employees' | 'activity-logs' | 'export' = 'users';
 
 	// Users
 	let users = [];
@@ -131,6 +133,8 @@
 		<button class:active={tab==='medical-visits'} on:click={() => tab='medical-visits'}>Медосмотры</button>
 		<button class:active={tab==='notifications'} on:click={() => tab='notifications'}>Уведомления</button>
 		<button class:active={tab==='payments'} on:click={() => tab='payments'}>Оплаты</button>
+		<button class:active={tab==='employees'} on:click={() => tab='employees'}>Сотрудники</button>
+		<button class:active={tab==='activity-logs'} on:click={() => tab='activity-logs'}>Журнал активности</button>
 		<button class:active={tab==='export'} on:click={() => tab='export'}><Download size={18}/> Экспорт</button>
 	</div>
 
@@ -240,6 +244,12 @@
 	{/if}
 	{#if tab === 'payments'}
 		<PaymentAdmin {user} {theme} />
+	{/if}
+	{#if tab === 'employees'}
+		<EmployeeAdmin {user} {theme} />
+	{/if}
+	{#if tab === 'activity-logs'}
+		<ActivityLogAdmin {user} {theme} />
 	{/if}
 	{#if tab === 'export'}
 		<AdminExport {user} {theme} />

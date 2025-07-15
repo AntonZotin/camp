@@ -5,3 +5,5 @@ export { default as MedicalCardAdmin } from './admin/MedicalCardAdmin.svelte';
 export { default as MedicalVisitAdmin } from './admin/MedicalVisitAdmin.svelte';
 export { default as NotificationAdmin } from './admin/NotificationAdmin.svelte';
 export { default as PaymentAdmin } from './admin/PaymentAdmin.svelte';
+export { default as EmployeeAdmin } from './admin/EmployeeAdmin.svelte';
+export { default as ActivityLogAdmin } from './admin/ActivityLogAdmin.svelte';
