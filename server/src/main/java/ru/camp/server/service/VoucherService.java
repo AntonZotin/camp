@@ -65,4 +65,8 @@ public class VoucherService {
             .distinct()
             .collect(Collectors.toList());
     }
+
+    public List<Voucher> getByParentId(Long parentId) {
+        return voucherRepository.findByChildParentId(parentId);
+    }
 } 

@@ -52,4 +52,9 @@ public class VoucherController {
     public ResponseEntity<List<ru.camp.server.model.Child>> getChildrenBySession(@PathVariable Long sessionId) {
         return ResponseEntity.ok(voucherService.getChildrenBySession(sessionId));
     }
+
+    @GetMapping("/parent/{parentId}")
+    public ResponseEntity<List<Voucher>> getByParentId(@PathVariable Long parentId) {
+        return ResponseEntity.ok(voucherService.getByParentId(parentId));
+    }
 } 
