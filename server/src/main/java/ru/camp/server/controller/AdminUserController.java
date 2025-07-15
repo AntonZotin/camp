@@ -36,6 +36,12 @@ public class AdminUserController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/bulk")
+    public ResponseEntity<Void> deleteMany(@RequestBody List<Long> ids) {
+        ids.forEach(userRepository::deleteById);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}/role")
     public ResponseEntity<User> updateRole(@PathVariable Long id, @RequestParam Role role) {
         return userRepository.findById(id)
@@ -45,5 +51,23 @@ public class AdminUserController {
                     return ResponseEntity.ok(user);
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/roles")
+    public ResponseEntity<Void> updateRoles(@RequestBody List<UserRoleUpdateRequest> updates) {
+        updates.forEach(update -> userRepository.findById(update.getUserId()).ifPresent(user -> {
+            user.setRole(update.getRole());
+            userRepository.save(user);
+        }));
+        return ResponseEntity.ok().build();
+    }
+
+    public static class UserRoleUpdateRequest {
+        private Long userId;
+        private Role role;
+        public Long getUserId() { return userId; }
+        public void setUserId(Long userId) { this.userId = userId; }
+        public Role getRole() { return role; }
+        public void setRole(Role role) { this.role = role; }
     }
 } 

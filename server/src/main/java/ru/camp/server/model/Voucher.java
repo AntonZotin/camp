@@ -32,4 +32,6 @@ public class Voucher {
     public void setBookingDate(LocalDate bookingDate) { this.bookingDate = bookingDate; }
     public Child getChild() { return child; }
     public CampSession getSession() { return session; }
+    public VoucherStatus getStatus() { return status; }
+    public java.time.LocalDate getBookingDate() { return bookingDate; }
 } 
