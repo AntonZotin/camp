@@ -5,13 +5,18 @@
 	import { Users, Trash2, Shield, Loader, AlertCircle, UserCog, Download } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 	import { AdminExport } from '$lib';
+	import { MenuAdmin } from '$lib';
+	import { MedicalCardAdmin } from '$lib';
+	import { MedicalVisitAdmin } from '$lib';
+	import { NotificationAdmin } from '$lib';
+	import { PaymentAdmin } from '$lib';
 
 	let theme: 'light' | 'dark' = 'light';
 	const unsubTheme = themeStore.subscribe((t) => (theme = t));
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
-	let tab: 'users' | 'sessions' | 'export' = 'users';
+	let tab: 'users' | 'sessions' | 'menu' | 'medical-cards' | 'medical-visits' | 'notifications' | 'payments' | 'export' = 'users';
 
 	// Users
 	let users = [];
@@ -121,6 +126,11 @@
 	<div class="tabs">
 		<button class:active={tab==='users'} on:click={() => tab='users'}><Users size={18}/> Пользователи</button>
 		<button class:active={tab==='sessions'} on:click={() => tab='sessions'}>Смены</button>
+		<button class:active={tab==='menu'} on:click={() => tab='menu'}>Меню</button>
+		<button class:active={tab==='medical-cards'} on:click={() => tab='medical-cards'}>Медкарты</button>
+		<button class:active={tab==='medical-visits'} on:click={() => tab='medical-visits'}>Медосмотры</button>
+		<button class:active={tab==='notifications'} on:click={() => tab='notifications'}>Уведомления</button>
+		<button class:active={tab==='payments'} on:click={() => tab='payments'}>Оплаты</button>
 		<button class:active={tab==='export'} on:click={() => tab='export'}><Download size={18}/> Экспорт</button>
 	</div>
 
@@ -215,6 +225,21 @@
 				</div>
 			{/if}
 		</div>
+	{/if}
+	{#if tab === 'menu'}
+		<MenuAdmin {user} {theme} />
+	{/if}
+	{#if tab === 'medical-cards'}
+		<MedicalCardAdmin {user} {theme} />
+	{/if}
+	{#if tab === 'medical-visits'}
+		<MedicalVisitAdmin {user} {theme} />
+	{/if}
+	{#if tab === 'notifications'}
+		<NotificationAdmin {user} {theme} />
+	{/if}
+	{#if tab === 'payments'}
+		<PaymentAdmin {user} {theme} />
 	{/if}
 	{#if tab === 'export'}
 		<AdminExport {user} {theme} />
