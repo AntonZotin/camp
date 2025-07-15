@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { Users, Trash2, Shield, Loader, AlertCircle, UserCog, Download } from 'lucide-svelte';
 	import { get } from 'svelte/store';
+	import { AdminExport } from '$lib';
 
 	let theme: 'light' | 'dark' = 'light';
 	const unsubTheme = themeStore.subscribe((t) => (theme = t));
@@ -51,7 +52,68 @@
 		await loadUsers();
 	}
 
-	onMount(() => { loadUsers(); return () => { unsubTheme(); unsubUser(); }; });
+	// Смены (CampSessions)
+	let sessions = [];
+	let loadingSessions = true;
+	let errorSessions = '';
+	let showSessionModal = false;
+	let editSession = null;
+	let sessionForm = { name: '', startDate: '', endDate: '', description: '' };
+
+	async function loadSessions() {
+		loadingSessions = true;
+		errorSessions = '';
+		try {
+			const res = await fetch('/api/sessions', {
+				headers: { Authorization: `Bearer ${user?.accessToken}` }
+			});
+			if (!res.ok) throw new Error('Ошибка загрузки смен');
+			sessions = await res.json();
+		} catch (e) {
+			errorSessions = e.message || 'Ошибка';
+		} finally {
+			loadingSessions = false;
+		}
+	}
+
+	function openSessionModal(session = null) {
+		showSessionModal = true;
+		editSession = session;
+		if (session) {
+			sessionForm = { ...session };
+		} else {
+			sessionForm = { name: '', startDate: '', endDate: '', description: '' };
+		}
+	}
+	function closeSessionModal() {
+		showSessionModal = false;
+		editSession = null;
+	}
+	async function saveSession() {
+		const method = editSession ? 'PUT' : 'POST';
+		const url = editSession ? `/api/sessions/${editSession.id}` : '/api/sessions';
+		const body = JSON.stringify(sessionForm);
+		await fetch(url, {
+			method,
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${user?.accessToken}`
+			},
+			body
+		});
+		await loadSessions();
+		closeSessionModal();
+	}
+	async function deleteSession(id: number) {
+		if (!confirm('Удалить смену?')) return;
+		await fetch(`/api/sessions/${id}`, {
+			method: 'DELETE',
+			headers: { Authorization: `Bearer ${user?.accessToken}` }
+		});
+		await loadSessions();
+	}
+
+	onMount(() => { loadUsers(); loadSessions(); return () => { unsubTheme(); unsubUser(); }; });
 </script>
 
 <div class="admin-page" data-theme={theme}>
@@ -102,7 +164,61 @@
 			{/if}
 		</div>
 	{/if}
-	<!-- Вкладки sessions и export будут реализованы далее -->
+	{#if tab === 'sessions'}
+		<div class="tab-content">
+			{#if loadingSessions}
+				<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
+			{:else if errorSessions}
+				<div class="error"><AlertCircle size={20}/> {errorSessions}</div>
+			{:else}
+				<button class="add-btn" on:click={() => openSessionModal()}>+ Новая смена</button>
+				<table class="sessions-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Название</th>
+							<th>Даты</th>
+							<th>Описание</th>
+							<th>Действия</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each sessions as s}
+							<tr>
+								<td>{s.id}</td>
+								<td>{s.name}</td>
+								<td>{s.startDate} — {s.endDate}</td>
+								<td>{s.description}</td>
+								<td>
+									<button class="icon-btn blue" title="Редактировать" on:click={() => openSessionModal(s)}><UserCog size={18}/></button>
+									<button class="icon-btn" title="Удалить" on:click={() => deleteSession(s.id)}><Trash2 size={18}/></button>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{/if}
+			{#if showSessionModal}
+				<div class="modal-backdrop" on:click={() => closeSessionModal()}></div>
+				<div class="modal" on:click|stopPropagation>
+					<h2>{editSession ? 'Редактировать смену' : 'Новая смена'}</h2>
+					<form on:submit|preventDefault={saveSession}>
+						<label>Название<input bind:value={sessionForm.name} required /></label>
+						<label>Дата начала<input type="date" bind:value={sessionForm.startDate} required /></label>
+						<label>Дата окончания<input type="date" bind:value={sessionForm.endDate} required /></label>
+						<label>Описание<textarea bind:value={sessionForm.description} rows="2" /></label>
+						<div class="modal-actions">
+							<button type="submit" class="save-btn">Сохранить</button>
+							<button type="button" class="cancel-btn" on:click={closeSessionModal}>Отмена</button>
+						</div>
+					</form>
+				</div>
+			{/if}
+		</div>
+	{/if}
+	{#if tab === 'export'}
+		<AdminExport {user} {theme} />
+	{/if}
 </div>
 
 <style>
@@ -200,4 +316,109 @@ h1 {
 }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
+.sessions-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 1rem;
+}
+.sessions-table th, .sessions-table td {
+	padding: 0.7rem 0.5rem;
+	text-align: left;
+	border-bottom: 1px solid #e0e0e0;
+}
+.sessions-table th {
+	color: var(--color-primary, #2d8cff);
+	font-size: 1.05rem;
+}
+.add-btn {
+	background: var(--color-primary, #2d8cff);
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 0.5rem 1.2rem;
+	font-size: 1rem;
+	margin-bottom: 1.2rem;
+	cursor: pointer;
+	transition: background 0.18s;
+}
+.add-btn:hover {
+	background: var(--color-accent, #ffb347);
+	color: #222;
+}
+.icon-btn.blue {
+	color: #2d8cff;
+}
+.modal-backdrop {
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: rgba(0,0,0,0.18);
+	z-index: 1000;
+}
+.modal {
+	position: fixed;
+	top: 50%; left: 50%;
+	transform: translate(-50%, -50%);
+	background: var(--color-card);
+	padding: 2rem 2.2rem;
+	border-radius: 16px;
+	box-shadow: 0 8px 32px rgba(45,140,255,0.13);
+	z-index: 1001;
+	min-width: 320px;
+	max-width: 95vw;
+}
+.modal h2 {
+	margin-bottom: 1.2rem;
+	font-size: 1.3rem;
+	color: var(--color-primary, #2d8cff);
+}
+.modal label {
+	display: block;
+	margin-bottom: 0.7rem;
+	font-size: 1rem;
+}
+.modal input, .modal textarea {
+	width: 100%;
+	padding: 0.5rem;
+	border-radius: 7px;
+	border: 1px solid #d0d7e2;
+	margin-top: 0.2rem;
+	margin-bottom: 0.7rem;
+	font-size: 1rem;
+	background: var(--color-bg);
+	color: var(--color-text);
+}
+.modal-actions {
+	display: flex;
+	gap: 1.2rem;
+	justify-content: flex-end;
+	margin-top: 1.2rem;
+}
+.save-btn {
+	background: var(--color-primary, #2d8cff);
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 0.5rem 1.2rem;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: background 0.18s;
+}
+.save-btn:hover {
+	background: var(--color-accent, #ffb347);
+	color: #222;
+}
+.cancel-btn {
+	background: #e0e0e0;
+	color: #222;
+	border: none;
+	border-radius: 8px;
+	padding: 0.5rem 1.2rem;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: background 0.18s;
+}
+.cancel-btn:hover {
+	background: #f8d7da;
+	color: #c0392b;
+}
 </style> 
