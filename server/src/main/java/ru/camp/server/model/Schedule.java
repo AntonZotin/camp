@@ -18,6 +18,10 @@ public class Schedule {
     @JoinColumn(name = "session_id")
     private CampSession session;
 
+    @ManyToOne
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
+
     @Column(nullable = false)
     private LocalTime time;
 
@@ -39,4 +43,6 @@ public class Schedule {
     public void setEventType(String eventType) { this.eventType = eventType; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public Employee getEmployee() { return employee; }
+    public void setEmployee(Employee employee) { this.employee = employee; }
 } 

@@ -27,6 +27,11 @@ public class DutyLogController {
         return ResponseEntity.ok(dutyLogService.getById(id));
     }
 
+    @GetMapping("/employee/{employeeId}")
+    public ResponseEntity<List<DutyLog>> getByEmployeeId(@PathVariable Long employeeId) {
+        return ResponseEntity.ok(dutyLogService.getByEmployeeId(employeeId));
+    }
+
     @PostMapping
     public ResponseEntity<DutyLog> create(@RequestBody DutyLog log) {
         return ResponseEntity.ok(dutyLogService.create(log));

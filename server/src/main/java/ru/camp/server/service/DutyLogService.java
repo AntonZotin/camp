@@ -35,4 +35,8 @@ public class DutyLogService {
     public void delete(Long id) {
         dutyLogRepository.deleteById(id);
     }
+
+    public List<DutyLog> getByEmployeeId(Long employeeId) {
+        return dutyLogRepository.findByEmployeeId(employeeId);
+    }
 } 

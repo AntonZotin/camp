@@ -35,4 +35,8 @@ public class ScheduleService {
     public void delete(Long id) {
         scheduleRepository.deleteById(id);
     }
+
+    public List<Schedule> getByEmployeeId(Long employeeId) {
+        return scheduleRepository.findByEmployeeId(employeeId);
+    }
 } 

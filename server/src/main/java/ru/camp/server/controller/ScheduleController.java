@@ -27,6 +27,11 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.getById(id));
     }
 
+    @GetMapping("/employee/{employeeId}")
+    public ResponseEntity<List<Schedule>> getByEmployeeId(@PathVariable Long employeeId) {
+        return ResponseEntity.ok(scheduleService.getByEmployeeId(employeeId));
+    }
+
     @PostMapping
     public ResponseEntity<Schedule> create(@RequestBody Schedule schedule) {
         return ResponseEntity.ok(scheduleService.create(schedule));
