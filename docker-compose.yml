@@ -24,5 +24,12 @@ services:
       SPRING_DATASOURCE_USERNAME: campuser
       SPRING_DATASOURCE_PASSWORD: camppass
 
+  frontend:
+    build: web
+    ports:
+      - "4173:4173"
+    depends_on:
+      - app
+
 volumes:
   pgdata: 
