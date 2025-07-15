@@ -42,4 +42,14 @@ public class VoucherController {
         voucherService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/book")
+    public ResponseEntity<Voucher> bookVoucher(@RequestParam Long childId, @RequestParam Long sessionId) {
+        return ResponseEntity.ok(voucherService.bookVoucher(childId, sessionId));
+    }
+
+    @GetMapping("/session/{sessionId}/children")
+    public ResponseEntity<List<ru.camp.server.model.Child>> getChildrenBySession(@PathVariable Long sessionId) {
+        return ResponseEntity.ok(voucherService.getChildrenBySession(sessionId));
+    }
 } 

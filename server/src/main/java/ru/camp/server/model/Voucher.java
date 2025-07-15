@@ -26,4 +26,10 @@ public class Voucher {
     // Геттеры и сеттеры
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public void setChild(Child child) { this.child = child; }
+    public void setSession(CampSession session) { this.session = session; }
+    public void setStatus(VoucherStatus status) { this.status = status; }
+    public void setBookingDate(LocalDate bookingDate) { this.bookingDate = bookingDate; }
+    public Child getChild() { return child; }
+    public CampSession getSession() { return session; }
 } 

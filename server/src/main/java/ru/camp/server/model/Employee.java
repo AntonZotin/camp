@@ -20,6 +20,8 @@ public class Employee {
     private User user;
 
     // Геттеры и сеттеры
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public void setFullName(String fullName) { this.fullName = fullName; }
     public void setPosition(String position) { this.position = position; }
     public void setUser(User user) { this.user = user; }
