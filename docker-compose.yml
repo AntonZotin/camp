@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: campdb
+      POSTGRES_USER: campuser
+      POSTGRES_PASSWORD: camppass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/campdb
+      SPRING_DATASOURCE_USERNAME: campuser
+      SPRING_DATASOURCE_PASSWORD: camppass
+
+volumes:
+  pgdata: 
