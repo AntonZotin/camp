@@ -221,7 +221,7 @@
 						<label>Название<input bind:value={sessionForm.name} required /></label>
 						<label>Дата начала<input type="date" bind:value={sessionForm.startDate} required /></label>
 						<label>Дата окончания<input type="date" bind:value={sessionForm.endDate} required /></label>
-						<label>Описание<textarea bind:value={sessionForm.description} rows="2" /></label>
+						<label>Описание<textarea bind:value={sessionForm.description} rows="2"></textarea></label>
 						<div class="modal-actions">
 							<button type="submit" class="save-btn">Сохранить</button>
 							<button type="button" class="cancel-btn" on:click={closeSessionModal}>Отмена</button>
