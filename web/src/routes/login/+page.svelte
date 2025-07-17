@@ -46,7 +46,7 @@
 
 <div class="auth-page" data-theme={theme}>
 	<header>
-		<div class="logo"><LogIn size={28}/> CampIT</div>
+		<a href="/" class="logo"><LogIn size={28}/> CampIT</a>
 		<button class="theme-toggle" on:click={toggleTheme} aria-label="Переключить тему">
 			{#if theme === 'dark'}<Moon size={22}/>{:else}<Sun size={22}/>{/if}
 		</button>
