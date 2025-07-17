@@ -214,8 +214,8 @@
 				</table>
 			{/if}
 			{#if showSessionModal}
-				<div class="modal-backdrop" on:click={() => closeSessionModal()}></div>
-				<div class="modal" on:click|stopPropagation>
+				<button type="button" class="modal-backdrop" on:click={closeSessionModal} aria-label="Закрыть модальное окно"></button>
+				<section class="modal" on:click|stopPropagation tabindex="0" role="dialog" aria-modal="true" on:keydown={e => { if (e.key === 'Escape') closeSessionModal(); }}>
 					<h2>{editSession ? 'Редактировать смену' : 'Новая смена'}</h2>
 					<form on:submit|preventDefault={saveSession}>
 						<label>Название<input bind:value={sessionForm.name} required /></label>
@@ -227,7 +227,7 @@
 							<button type="button" class="cancel-btn" on:click={closeSessionModal}>Отмена</button>
 						</div>
 					</form>
-				</div>
+				</section>
 			{/if}
 		</div>
 	{/if}

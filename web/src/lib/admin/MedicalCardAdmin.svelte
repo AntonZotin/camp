@@ -135,8 +135,8 @@
 		</table>
 	{/if}
 	{#if showModal}
-		<div class="modal-backdrop" on:click={closeModal}></div>
-		<div class="modal" on:click|stopPropagation>
+		<button type="button" class="modal-backdrop" on:click={closeModal} aria-label="Закрыть модальное окно"></button>
+		<section class="modal" on:click|stopPropagation tabindex="0" role="dialog" aria-modal="true" on:keydown={e => { if (e.key === 'Escape') closeModal(); }}>
 			<h3>{editCard ? 'Редактировать медкарту' : 'Новая медкарта'}</h3>
 			<form on:submit|preventDefault={saveCard}>
 				<label>Ребёнок
@@ -157,7 +157,7 @@
 					<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>
 				</div>
 			</form>
-		</div>
+		</section>
 	{/if}
 </div>
 
@@ -273,7 +273,7 @@
 	margin-bottom: 0.7rem;
 	font-size: 1rem;
 }
-.modal input, .modal textarea, .modal select {
+.modal textarea, .modal select {
 	width: 100%;
 	padding: 0.5rem;
 	border-radius: 7px;
