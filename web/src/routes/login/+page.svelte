@@ -23,7 +23,7 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/auth/login`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ username, password })
+				body: JSON.stringify({ usernameOrEmail: username, password })
 			});
 			if (!res.ok) {
 				const data = await res.json();
