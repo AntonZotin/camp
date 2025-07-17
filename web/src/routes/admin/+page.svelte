@@ -12,6 +12,7 @@
 	import { PaymentAdmin } from '$lib';
 	import { EmployeeAdmin } from '$lib';
 	import { ActivityLogAdmin } from '$lib';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	let theme: 'light' | 'dark' = 'light';
 	const unsubTheme = themeStore.subscribe((t) => (theme = t));
@@ -30,7 +31,7 @@
 		loadingUsers = true;
 		errorUsers = '';
 		try {
-			const res = await fetch('/api/admin/users', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки пользователей');
@@ -44,7 +45,7 @@
 
 	async function deleteUser(id: number) {
 		if (!confirm('Удалить пользователя?')) return;
-		await fetch(`/api/admin/users/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/admin/users/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});
@@ -52,7 +53,7 @@
 	}
 
 	async function changeRole(id: number, role: string) {
-		await fetch(`/api/admin/users/${id}/role?role=${role}`, {
+		await fetch(`${PUBLIC_API_URL}/api/admin/users/${id}/role?role=${role}`, {
 			method: 'PUT',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});
@@ -71,7 +72,7 @@
 		loadingSessions = true;
 		errorSessions = '';
 		try {
-			const res = await fetch('/api/sessions', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки смен');
@@ -98,7 +99,7 @@
 	}
 	async function saveSession() {
 		const method = editSession ? 'PUT' : 'POST';
-		const url = editSession ? `/api/sessions/${editSession.id}` : '/api/sessions';
+		const url = editSession ? `${PUBLIC_API_URL}/api/sessions/${editSession.id}` : `${PUBLIC_API_URL}/api/sessions`;
 		const body = JSON.stringify(sessionForm);
 		await fetch(url, {
 			method,
@@ -113,7 +114,7 @@
 	}
 	async function deleteSession(id: number) {
 		if (!confirm('Удалить смену?')) return;
-		await fetch(`/api/sessions/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/sessions/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});

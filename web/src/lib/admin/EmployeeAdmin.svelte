@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, Plus, Trash2, Edit, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -16,7 +17,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch('/api/employees', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/employees`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки сотрудников');
@@ -31,7 +32,7 @@
 	async function loadUsers() {
 		loadingUsers = true;
 		try {
-			const res = await fetch('/api/admin/users', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) users = await res.json();
@@ -59,7 +60,7 @@
 	}
 	async function saveEmployee() {
 		const method = editEmployee ? 'PUT' : 'POST';
-		const url = editEmployee ? `/api/employees/${editEmployee.id}` : '/api/employees';
+		const url = editEmployee ? `${PUBLIC_API_URL}/api/employees/${editEmployee.id}` : `${PUBLIC_API_URL}/api/employees`;
 		const body = JSON.stringify({
 			fullName: employeeForm.fullName,
 			position: employeeForm.position,
@@ -78,7 +79,7 @@
 	}
 	async function deleteEmployee(id: number) {
 		if (!confirm('Удалить сотрудника?')) return;
-		await fetch(`/api/employees/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/employees/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});

@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { loginUser } from '$lib/userStore';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	let theme: 'light' | 'dark' = 'light';
 	const unsubscribe = themeStore.subscribe((t) => (theme = t));
 	onMount(() => () => unsubscribe());
@@ -19,7 +20,7 @@
 		error = '';
 		loading = true;
 		try {
-			const res = await fetch('/api/auth/login', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/auth/login`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username, password })

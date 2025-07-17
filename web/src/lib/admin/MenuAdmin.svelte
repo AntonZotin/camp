@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, Plus, Trash2, Edit, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -16,7 +17,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch('/api/menus', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/menus`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки меню');
@@ -31,7 +32,7 @@
 	async function loadSessions() {
 		loadingSessions = true;
 		try {
-			const res = await fetch('/api/sessions', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) sessions = await res.json();
@@ -62,7 +63,7 @@
 	}
 	async function saveMenu() {
 		const method = editMenu ? 'PUT' : 'POST';
-		const url = editMenu ? `/api/menus/${editMenu.id}` : '/api/menus';
+		const url = editMenu ? `${PUBLIC_API_URL}/api/menus/${editMenu.id}` : `${PUBLIC_API_URL}/api/menus`;
 		const body = JSON.stringify({
 			date: menuForm.date,
 			session: sessions.find(s => s.id == menuForm.sessionId),
@@ -84,7 +85,7 @@
 	}
 	async function deleteMenu(id: number) {
 		if (!confirm('Удалить меню?')) return;
-		await fetch(`/api/menus/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/menus/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});

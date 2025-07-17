@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, Plus, Trash2, Edit, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -20,7 +21,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch('/api/payments', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/payments`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки оплат');
@@ -35,7 +36,7 @@
 	async function loadParents() {
 		loadingParents = true;
 		try {
-			const res = await fetch('/api/admin/users', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) parents = (await res.json()).filter(u => u.role === 'PARENT');
@@ -47,7 +48,7 @@
 	async function loadVouchers() {
 		loadingVouchers = true;
 		try {
-			const res = await fetch('/api/vouchers', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/vouchers`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) vouchers = await res.json();
@@ -79,7 +80,7 @@
 	}
 	async function savePayment() {
 		const method = editPayment ? 'PUT' : 'POST';
-		const url = editPayment ? `/api/payments/${editPayment.id}` : '/api/payments';
+		const url = editPayment ? `${PUBLIC_API_URL}/api/payments/${editPayment.id}` : `${PUBLIC_API_URL}/api/payments`;
 		const body = JSON.stringify({
 			parent: parents.find(p => p.id == paymentForm.parentId),
 			voucher: vouchers.find(v => v.id == paymentForm.voucherId),
@@ -102,7 +103,7 @@
 	}
 	async function deletePayment(id: number) {
 		if (!confirm('Удалить оплату?')) return;
-		await fetch(`/api/payments/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/payments/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});

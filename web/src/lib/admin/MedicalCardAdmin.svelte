@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, Plus, Trash2, Edit, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -16,7 +17,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch('/api/medical-cards', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/medical-cards`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки медкарт');
@@ -31,7 +32,7 @@
 	async function loadChildren() {
 		loadingChildren = true;
 		try {
-			const res = await fetch('/api/children', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/children`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) children = await res.json();
@@ -62,7 +63,7 @@
 	}
 	async function saveCard() {
 		const method = editCard ? 'PUT' : 'POST';
-		const url = editCard ? `/api/medical-cards/${editCard.id}` : '/api/medical-cards';
+		const url = editCard ? `${PUBLIC_API_URL}/api/medical-cards/${editCard.id}` : `${PUBLIC_API_URL}/api/medical-cards`;
 		const body = JSON.stringify({
 			child: children.find(c => c.id == cardForm.childId),
 			healthInfo: cardForm.healthInfo,
@@ -84,7 +85,7 @@
 	}
 	async function deleteCard(id: number) {
 		if (!confirm('Удалить медкарту?')) return;
-		await fetch(`/api/medical-cards/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/medical-cards/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});

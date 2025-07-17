@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, Download, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -10,7 +11,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch(`/api/admin/export/${type}/csv`, {
+			const res = await fetch(`${PUBLIC_API_URL}/api/admin/export/${type}/csv`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка экспорта');

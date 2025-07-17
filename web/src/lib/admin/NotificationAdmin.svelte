@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, Plus, Trash2, Edit, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -18,7 +19,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch('/api/notifications', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/notifications`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки уведомлений');
@@ -33,7 +34,7 @@
 	async function loadUsers() {
 		loadingUsers = true;
 		try {
-			const res = await fetch('/api/admin/users', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) users = await res.json();
@@ -63,7 +64,7 @@
 	}
 	async function saveNotification() {
 		const method = editNotification ? 'PUT' : 'POST';
-		const url = editNotification ? `/api/notifications/${editNotification.id}` : '/api/notifications';
+		const url = editNotification ? `${PUBLIC_API_URL}/api/notifications/${editNotification.id}` : `${PUBLIC_API_URL}/api/notifications`;
 		const body = JSON.stringify({
 			recipient: users.find(u => u.id == notificationForm.recipientId),
 			type: notificationForm.type,
@@ -84,7 +85,7 @@
 	}
 	async function deleteNotification(id: number) {
 		if (!confirm('Удалить уведомление?')) return;
-		await fetch(`/api/notifications/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/notifications/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});

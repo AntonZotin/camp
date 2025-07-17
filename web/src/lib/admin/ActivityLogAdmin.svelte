@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -11,7 +12,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch('/api/activity-logs', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/activity-logs`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки журнала');

@@ -30,6 +30,8 @@ services:
       - "4173:4173"
     depends_on:
       - app
+    environment:
+      PUBLIC_API_URL: http://app:8080
 
 volumes:
   pgdata: 

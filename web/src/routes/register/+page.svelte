@@ -3,6 +3,7 @@
 	import { UserPlus, User, Lock, Mail, Eye, EyeOff, Sun, Moon } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	let theme: 'light' | 'dark' = 'light';
 	const unsubscribe = themeStore.subscribe((t) => (theme = t));
 	onMount(() => () => unsubscribe());
@@ -26,7 +27,7 @@
 		}
 		loading = true;
 		try {
-			const res = await fetch('/api/auth/register', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/auth/register`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username, email, password, userType, role })

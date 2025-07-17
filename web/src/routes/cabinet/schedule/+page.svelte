@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { CalendarDays, Clock, Loader, AlertCircle } from 'lucide-svelte';
 	import { get } from 'svelte/store';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	let theme: 'light' | 'dark' = 'light';
 	const unsubTheme = themeStore.subscribe((t) => (theme = t));
@@ -17,7 +18,7 @@
 	onMount(async () => {
 		if (!user) return;
 		try {
-			const res = await fetch(`/api/schedules/employee/${user.userId}`, {
+			const res = await fetch(`${PUBLIC_API_URL}/api/schedules/employee/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки расписания');

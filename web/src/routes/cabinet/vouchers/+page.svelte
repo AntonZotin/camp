@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { Ticket, CalendarCheck, Loader, AlertCircle } from 'lucide-svelte';
 	import { get } from 'svelte/store';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	let theme: 'light' | 'dark' = 'light';
 	const unsubTheme = themeStore.subscribe((t) => (theme = t));
@@ -17,7 +18,7 @@
 	onMount(async () => {
 		if (!user) return;
 		try {
-			const res = await fetch(`/api/vouchers/parent/${user.userId}`, {
+			const res = await fetch(`${PUBLIC_API_URL}/api/vouchers/parent/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки путёвок');

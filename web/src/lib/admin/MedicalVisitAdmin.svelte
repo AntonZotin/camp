@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Loader, Plus, Trash2, Edit, AlertCircle } from 'lucide-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	export let user;
 	export let theme: 'light' | 'dark' = 'light';
 
@@ -18,7 +19,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch('/api/medical-visits', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/medical-visits`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки медосмотров');
@@ -33,7 +34,7 @@
 	async function loadChildren() {
 		loadingChildren = true;
 		try {
-			const res = await fetch('/api/children', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/children`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) children = await res.json();
@@ -45,7 +46,7 @@
 	async function loadDoctors() {
 		loadingDoctors = true;
 		try {
-			const res = await fetch('/api/employees', {
+			const res = await fetch(`${PUBLIC_API_URL}/api/employees`, {
 				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (res.ok) doctors = (await res.json()).filter(e => e.position?.toLowerCase().includes('врач') || e.position?.toLowerCase().includes('doctor'));
@@ -76,7 +77,7 @@
 	}
 	async function saveVisit() {
 		const method = editVisit ? 'PUT' : 'POST';
-		const url = editVisit ? `/api/medical-visits/${editVisit.id}` : '/api/medical-visits';
+		const url = editVisit ? `${PUBLIC_API_URL}/api/medical-visits/${editVisit.id}` : `${PUBLIC_API_URL}/api/medical-visits`;
 		const body = JSON.stringify({
 			date: visitForm.date,
 			child: children.find(c => c.id == visitForm.childId),
@@ -98,7 +99,7 @@
 	}
 	async function deleteVisit(id: number) {
 		if (!confirm('Удалить медосмотр?')) return;
-		await fetch(`/api/medical-visits/${id}`, {
+		await fetch(`${PUBLIC_API_URL}/api/medical-visits/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user?.accessToken}` }
 		});
