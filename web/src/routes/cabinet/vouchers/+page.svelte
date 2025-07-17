@@ -2,7 +2,7 @@
 	import { themeStore } from '$lib/themeStore';
 	import { userStore } from '$lib/userStore';
 	import { onMount } from 'svelte';
-	import { ClipboardList, CalendarCheck, Loader, AlertCircle } from 'lucide-svelte';
+	import { Ticket, CalendarCheck, Loader, AlertCircle } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 
 	let theme: 'light' | 'dark' = 'light';
@@ -10,18 +10,18 @@
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
-	let duties = [];
+	let vouchers = [];
 	let loading = true;
 	let error = '';
 
 	onMount(async () => {
 		if (!user) return;
 		try {
-			const res = await fetch(`/api/duty-logs/employee/${user.userId}`, {
+			const res = await fetch(`/api/vouchers/parent/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки дежурств');
-			duties = await res.json();
+			if (!res.ok) throw new Error('Ошибка загрузки путёвок');
+			vouchers = await res.json();
 		} catch (e) {
 			error = e.message || 'Ошибка';
 		} finally {
@@ -31,25 +31,27 @@
 	});
 </script>
 
-<div class="duties-page" data-theme={theme}>
-	<h1><ClipboardList size={28}/> Журнал дежурств</h1>
+<div class="vouchers-page" data-theme={theme}>
+	<h1><Ticket size={28}/> Мои путёвки</h1>
 	{#if loading}
 		<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
 	{:else if error}
 		<div class="error"><AlertCircle size={20}/> {error}</div>
-	{:else if duties.length === 0}
-		<div class="empty">У вас пока нет дежурств</div>
+	{:else if vouchers.length === 0}
+		<div class="empty">У вас пока нет путёвок</div>
 	{:else}
-		<div class="duties-list">
-			{#each duties as d}
-				<div class="duty-card">
+		<div class="vouchers-list">
+			{#each vouchers as v}
+				<div class="voucher-card">
 					<div class="top">
-						<CalendarCheck size={22}/>
-						<span>{d.date}</span>
+						<Ticket size={22}/>
+						<span>Путёвка #{v.id}</span>
 					</div>
 					<div class="info">
-						<p>Смена: <b>{d.session?.name}</b></p>
-						<p>Отчёт: <b>{d.report}</b></p>
+						<p>Ребёнок: <b>{v.child?.name}</b></p>
+						<p>Смена: <b>{v.session?.name}</b></p>
+						<p>Статус: <b>{v.status}</b></p>
+						<p>Дата бронирования: <b>{v.bookingDate}</b></p>
 					</div>
 				</div>
 			{/each}
@@ -58,18 +60,18 @@
 </div>
 
 <style>
-.duties-page {
+.vouchers-page {
 	padding: 2rem 1rem;
 	max-width: 700px;
 	margin: 0 auto;
 	color: var(--color-text, #222);
 }
-.duties-page[data-theme="dark"] {
+.vouchers-page[data-theme="dark"] {
 	--color-bg: #181c24;
 	--color-text: #f1f5f9;
 	--color-card: #23272f;
 }
-.duties-page[data-theme="light"] {
+.vouchers-page[data-theme="light"] {
 	--color-bg: #f8fafc;
 	--color-text: #222;
 	--color-card: #fff;
@@ -93,12 +95,12 @@ h1 {
 	justify-content: center;
 }
 .error { color: #e74c3c; }
-.duties-list {
+.vouchers-list {
 	display: flex;
 	flex-direction: column;
 	gap: 1.2rem;
 }
-.duty-card {
+.voucher-card {
 	background: var(--color-card);
 	border-radius: 16px;
 	box-shadow: 0 4px 16px rgba(45,140,255,0.09);
@@ -108,7 +110,7 @@ h1 {
 	gap: 0.7rem;
 	animation: fadeInUp 0.9s;
 }
-.duty-card .top {
+.voucher-card .top {
 	display: flex;
 	align-items: center;
 	gap: 0.7rem;
@@ -116,11 +118,11 @@ h1 {
 	color: var(--color-primary, #2d8cff);
 	margin-bottom: 0.3rem;
 }
-.duty-card .info p {
+.voucher-card .info p {
 	margin: 0.1rem 0;
 	font-size: 1.05rem;
 }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
-</style> 
+</style>

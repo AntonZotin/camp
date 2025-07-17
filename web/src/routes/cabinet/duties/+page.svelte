@@ -2,7 +2,7 @@
 	import { themeStore } from '$lib/themeStore';
 	import { userStore } from '$lib/userStore';
 	import { onMount } from 'svelte';
-	import { Users, Baby, Loader, AlertCircle } from 'lucide-svelte';
+	import { ClipboardList, CalendarCheck, Loader, AlertCircle } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 
 	let theme: 'light' | 'dark' = 'light';
@@ -10,18 +10,18 @@
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
-	let children = [];
+	let duties = [];
 	let loading = true;
 	let error = '';
 
 	onMount(async () => {
 		if (!user) return;
 		try {
-			const res = await fetch(`/api/children/parent/${user.userId}`, {
+			const res = await fetch(`/api/duty-logs/employee/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки детей');
-			children = await res.json();
+			if (!res.ok) throw new Error('Ошибка загрузки дежурств');
+			duties = await res.json();
 		} catch (e) {
 			error = e.message || 'Ошибка';
 		} finally {
@@ -31,25 +31,25 @@
 	});
 </script>
 
-<div class="children-page" data-theme={theme}>
-	<h1><Users size={28}/> Мои дети</h1>
+<div class="duties-page" data-theme={theme}>
+	<h1><ClipboardList size={28}/> Журнал дежурств</h1>
 	{#if loading}
 		<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
 	{:else if error}
 		<div class="error"><AlertCircle size={20}/> {error}</div>
-	{:else if children.length === 0}
-		<div class="empty">У вас пока нет добавленных детей</div>
+	{:else if duties.length === 0}
+		<div class="empty">У вас пока нет дежурств</div>
 	{:else}
-		<div class="children-list">
-			{#each children as c}
-				<div class="child-card">
+		<div class="duties-list">
+			{#each duties as d}
+				<div class="duty-card">
 					<div class="top">
-						<Baby size={22}/>
-						<span>{c.name}</span>
+						<CalendarCheck size={22}/>
+						<span>{d.date}</span>
 					</div>
 					<div class="info">
-						<p>Дата рождения: <b>{c.birthDate}</b></p>
-						<p>ID: <b>{c.id}</b></p>
+						<p>Смена: <b>{d.session?.name}</b></p>
+						<p>Отчёт: <b>{d.report}</b></p>
 					</div>
 				</div>
 			{/each}
@@ -58,18 +58,18 @@
 </div>
 
 <style>
-.children-page {
+.duties-page {
 	padding: 2rem 1rem;
 	max-width: 700px;
 	margin: 0 auto;
 	color: var(--color-text, #222);
 }
-.children-page[data-theme="dark"] {
+.duties-page[data-theme="dark"] {
 	--color-bg: #181c24;
 	--color-text: #f1f5f9;
 	--color-card: #23272f;
 }
-.children-page[data-theme="light"] {
+.duties-page[data-theme="light"] {
 	--color-bg: #f8fafc;
 	--color-text: #222;
 	--color-card: #fff;
@@ -93,12 +93,12 @@ h1 {
 	justify-content: center;
 }
 .error { color: #e74c3c; }
-.children-list {
+.duties-list {
 	display: flex;
 	flex-direction: column;
 	gap: 1.2rem;
 }
-.child-card {
+.duty-card {
 	background: var(--color-card);
 	border-radius: 16px;
 	box-shadow: 0 4px 16px rgba(45,140,255,0.09);
@@ -108,7 +108,7 @@ h1 {
 	gap: 0.7rem;
 	animation: fadeInUp 0.9s;
 }
-.child-card .top {
+.duty-card .top {
 	display: flex;
 	align-items: center;
 	gap: 0.7rem;
@@ -116,11 +116,11 @@ h1 {
 	color: var(--color-primary, #2d8cff);
 	margin-bottom: 0.3rem;
 }
-.child-card .info p {
+.duty-card .info p {
 	margin: 0.1rem 0;
 	font-size: 1.05rem;
 }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
-</style> 
+</style>

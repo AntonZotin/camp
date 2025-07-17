@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { themeStore, toggleTheme } from '$lib/themeStore';
-	import { userStore, logoutUser, UserRole } from '$lib/userStore';
+	import {userStore, logoutUser, type UserRole} from '$lib/userStore';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { User, LogOut, Sun, Moon, Shield, Users, HeartHandshake } from 'lucide-svelte';
@@ -211,4 +211,4 @@ main {
 .fade-in {
 	animation: fadeInUp 1.1s;
 }
-</style> 
+</style>
