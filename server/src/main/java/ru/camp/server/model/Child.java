@@ -1,8 +1,13 @@
 package ru.camp.server.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "children")
 public class Child {
@@ -19,9 +24,4 @@ public class Child {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private User parent;
-
-    // Геттеры и сеттеры
-    public void setName(String name) { this.name = name; }
-    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
-    public void setParent(User parent) { this.parent = parent; }
 } 

@@ -1,7 +1,11 @@
 package ru.camp.server.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -18,11 +22,4 @@ public class Employee {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    // Геттеры и сеттеры
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-    public void setPosition(String position) { this.position = position; }
-    public void setUser(User user) { this.user = user; }
 } 

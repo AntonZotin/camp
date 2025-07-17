@@ -1,8 +1,13 @@
 package ru.camp.server.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "payments")
 public class Payment {
@@ -32,21 +37,4 @@ public class Payment {
 
     @Column(length = 500)
     private String comment;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public User getParent() { return parent; }
-    public void setParent(User parent) { this.parent = parent; }
-    public Voucher getVoucher() { return voucher; }
-    public void setVoucher(Voucher voucher) { this.voucher = voucher; }
-    public Double getAmount() { return amount; }
-    public void setAmount(Double amount) { this.amount = amount; }
-    public LocalDateTime getDate() { return date; }
-    public void setDate(LocalDateTime date) { this.date = date; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public String getMethod() { return method; }
-    public void setMethod(String method) { this.method = method; }
-    public String getComment() { return comment; }
-    public void setComment(String comment) { this.comment = comment; }
 } 

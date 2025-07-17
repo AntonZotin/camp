@@ -1,8 +1,13 @@
 package ru.camp.server.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "activity_logs")
 public class ActivityLog {
@@ -23,14 +28,4 @@ public class ActivityLog {
     @Column(length = 1000)
     private String description;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-    public String getAction() { return action; }
-    public void setAction(String action) { this.action = action; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-} 
+}

@@ -1,8 +1,13 @@
 package ru.camp.server.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "notifications")
 public class Notification {
@@ -28,21 +33,4 @@ public class Notification {
 
     private LocalDateTime createdAt;
     private LocalDateTime sentAt;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public User getRecipient() { return recipient; }
-    public void setRecipient(User recipient) { this.recipient = recipient; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-    public String getSubject() { return subject; }
-    public void setSubject(String subject) { this.subject = subject; }
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public LocalDateTime getSentAt() { return sentAt; }
-    public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
 } 

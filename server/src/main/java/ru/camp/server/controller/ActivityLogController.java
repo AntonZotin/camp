@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.model.ActivityLog;
 import ru.camp.server.service.ActivityLogService;
+
 import java.util.List;
 
 @RestController

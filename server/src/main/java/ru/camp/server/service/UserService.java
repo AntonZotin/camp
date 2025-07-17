@@ -14,7 +14,9 @@ import ru.camp.server.repository.EmployeeRepository;
 import ru.camp.server.model.Child;
 import ru.camp.server.model.Employee;
 import ru.camp.server.dto.ChildDto;
+
 import java.util.HashSet;
+
 import ru.camp.server.model.UserType;
 
 @Service
@@ -41,7 +43,6 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
         user.setUserType(request.getUserType());
-        // Обработка детей для родителя
         if (request.getUserType() == UserType.PARENT && request.getChildren() != null) {
             HashSet<Child> children = new HashSet<>();
             for (ChildDto childDto : request.getChildren()) {
@@ -53,7 +54,6 @@ public class UserService {
             }
             user.setChildren(children);
         }
-        // Обработка сотрудника
         if (request.getUserType() == UserType.EMPLOYEE) {
             Employee employee = new Employee();
             employee.setFullName(request.getFullName());
@@ -62,11 +62,8 @@ public class UserService {
             user.setEmployee(employee);
         }
         User savedUser = userRepository.save(user);
-        // Сохраняем детей и сотрудника после сохранения пользователя
         if (savedUser.getChildren() != null) {
-            for (Child child : savedUser.getChildren()) {
-                childRepository.save(child);
-            }
+            childRepository.saveAll(savedUser.getChildren());
         }
         if (savedUser.getEmployee() != null) {
             employeeRepository.save(savedUser.getEmployee());
@@ -83,9 +80,7 @@ public class UserService {
     }
 
     public AuthResponse authenticate(UserLoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsernameOrEmail())
-                .or(() -> userRepository.findByEmail(request.getUsernameOrEmail()))
-                .orElse(null);
+        User user = userRepository.findByUsername(request.getUsernameOrEmail()).or(() -> userRepository.findByEmail(request.getUsernameOrEmail())).orElse(null);
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
