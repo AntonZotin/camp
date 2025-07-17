@@ -36,7 +36,7 @@ public class UserService {
         this.employeeRepository = employeeRepository;
     }
 
-    public User registerUser(UserRegistrationRequest request) {
+    public void registerUser(UserRegistrationRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -68,7 +68,6 @@ public class UserService {
         if (savedUser.getEmployee() != null) {
             employeeRepository.save(savedUser.getEmployee());
         }
-        return savedUser;
     }
 
     public User findByUsername(String username) {

@@ -14,6 +14,8 @@
 	let showPassword = false;
 	let loading = false;
 	let error = '';
+	let userType = 'PARENT';
+	let role = 'PARENT';
 
 	async function handleRegister(e: Event) {
 		e.preventDefault();
@@ -27,7 +29,7 @@
 			const res = await fetch('/api/auth/register', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ username, email, password })
+				body: JSON.stringify({ username, email, password, userType, role })
 			});
 			if (!res.ok) {
 				const data = await res.json();
