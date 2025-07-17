@@ -147,11 +147,11 @@
 						{/each}
 					</select>
 				</label>
-				<label>Здоровье<textarea bind:value={cardForm.healthInfo} rows="2" /></label>
-				<label>Хронические<textarea bind:value={cardForm.chronicDiseases} rows="2" /></label>
-				<label>Аллергии<textarea bind:value={cardForm.allergies} rows="2" /></label>
-				<label>Прививки<textarea bind:value={cardForm.vaccinations} rows="2" /></label>
-				<label>Примечания<textarea bind:value={cardForm.notes} rows="2" /></label>
+				<label>Здоровье<textarea bind:value={cardForm.healthInfo} rows="2"></textarea></label>
+				<label>Хронические<textarea bind:value={cardForm.chronicDiseases} rows="2"></textarea></label>
+				<label>Аллергии<textarea bind:value={cardForm.allergies} rows="2"></textarea></label>
+				<label>Прививки<textarea bind:value={cardForm.vaccinations} rows="2"></textarea></label>
+				<label>Примечания<textarea bind:value={cardForm.notes} rows="2"></textarea></label>
 				<div class="modal-actions">
 					<button type="submit" class="save-btn">Сохранить</button>
 					<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>

@@ -191,7 +191,7 @@
 						{/each}
 					</select>
 				</label>
-				<label>Комментарий<textarea bind:value={paymentForm.comment} rows="2" /></label>
+				<label>Комментарий<textarea bind:value={paymentForm.comment} rows="2"></textarea></label>
 				<div class="modal-actions">
 					<button type="submit" class="save-btn">Сохранить</button>
 					<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>

@@ -170,9 +170,9 @@
 						{/each}
 					</select>
 				</label>
-				<label>Описание<textarea bind:value={visitForm.description} rows="2" /></label>
-				<label>Рекомендации<textarea bind:value={visitForm.recommendations} rows="2" /></label>
-				<label>Лекарства<textarea bind:value={visitForm.medications} rows="2" /></label>
+				<label>Описание<textarea bind:value={visitForm.description} rows="2"></textarea></label>
+				<label>Рекомендации<textarea bind:value={visitForm.recommendations} rows="2"></textarea></label>
+				<label>Лекарства<textarea bind:value={visitForm.medications} rows="2"></textarea></label>
 				<div class="modal-actions">
 					<button type="submit" class="save-btn">Сохранить</button>
 					<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>

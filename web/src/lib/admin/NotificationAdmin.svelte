@@ -157,7 +157,7 @@
 					</select>
 				</label>
 				<label>Тема<input bind:value={notificationForm.subject} required /></label>
-				<label>Сообщение<textarea bind:value={notificationForm.message} rows="2" required /></label>
+				<label>Сообщение<textarea bind:value={notificationForm.message} rows="2" required></textarea></label>
 				<label>Статус
 					<select bind:value={notificationForm.status} required>
 						{#each statuses as s}
