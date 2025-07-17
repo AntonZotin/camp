@@ -142,7 +142,7 @@
 	{#if tab === 'users'}
 		<div class="tab-content">
 			{#if loadingUsers}
-				<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
+				<div class="loader spin"><Loader size={24}/> Загрузка...</div>
 			{:else if errorUsers}
 				<div class="error"><AlertCircle size={20}/> {errorUsers}</div>
 			{:else}
@@ -182,7 +182,7 @@
 	{#if tab === 'sessions'}
 		<div class="tab-content">
 			{#if loadingSessions}
-				<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
+				<div class="loader spin"><Loader size={24}/> Загрузка...</div>
 			{:else if errorSessions}
 				<div class="error"><AlertCircle size={20}/> {errorSessions}</div>
 			{:else}

@@ -37,10 +37,22 @@
 	<h2><Download size={22}/> Экспорт данных</h2>
 	<div class="export-actions">
 		<button class="export-btn" on:click={() => exportCsv('users')} disabled={loading}>
-			{loading ? <Loader size={18} class="spin"/> : <Download size={18}/>} Экспорт пользователей
+			{#if loading}
+				<div class="spin">
+					<Loader size={18}/>
+				</div>
+			{:else}
+				<Download size={18}/>} Экспорт пользователей
+			{/if}
 		</button>
 		<button class="export-btn" on:click={() => exportCsv('vouchers')} disabled={loading}>
-			{loading ? <Loader size={18} class="spin"/> : <Download size={18}/>} Экспорт путёвок
+			{#if loading}
+				<div class="spin">
+					<Loader size={18}/>
+				</div>
+			{:else}
+				<Download size={18}/>
+			{/if} Экспорт путёвок
 		</button>
 	</div>
 	{#if error}

@@ -2,6 +2,14 @@ package ru.camp.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.camp.server.model.User;
+import ru.camp.server.model.Role;
+import ru.camp.server.model.UserType;
+import ru.camp.server.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 public class ServerApplication {
@@ -10,4 +18,19 @@ public class ServerApplication {
 		SpringApplication.run(ServerApplication.class, args);
 	}
 
+	@Bean
+	public CommandLineRunner createAdminUser(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+		return args -> {
+			if (userRepository.findByUsername("admin").isEmpty()) {
+				User admin = new User();
+				admin.setUsername("admin");
+				admin.setEmail("admin@example.org");
+				admin.setPassword(passwordEncoder.encode("admin"));
+				admin.setRole(Role.ADMIN);
+				admin.setUserType(UserType.ADMIN);
+				userRepository.save(admin);
+				System.out.println("[INFO] Default admin user created: login=admin, password=admin");
+			}
+		};
+	}
 }

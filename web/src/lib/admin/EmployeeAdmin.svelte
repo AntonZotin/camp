@@ -93,7 +93,7 @@
 <div class="employee-admin" data-theme={theme}>
 	<h2>Сотрудники</h2>
 	{#if loading}
-		<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
+		<div class="loader spin"><Loader size={24}/> Загрузка...</div>
 	{:else if error}
 		<div class="error"><AlertCircle size={20}/> {error}</div>
 	{:else}
@@ -123,8 +123,8 @@
 		</table>
 	{/if}
 	{#if showModal}
-		<div class="modal-backdrop" on:click={closeModal}></div>
-		<div class="modal" on:click|stopPropagation>
+		<button type="button" class="modal-backdrop" on:click={closeModal} aria-label="Закрыть модальное окно"></button>
+		<section class="modal" on:click|stopPropagation tabindex="-1" role="dialog" aria-modal="true" on:keydown={() => {}}>
 			<h3>{editEmployee ? 'Редактировать сотрудника' : 'Новый сотрудник'}</h3>
 			<form on:submit|preventDefault={saveEmployee}>
 				<label>ФИО<input bind:value={employeeForm.fullName} required /></label>
@@ -142,7 +142,7 @@
 					<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>
 				</div>
 			</form>
-		</div>
+		</section>
 	{/if}
 </div>
 

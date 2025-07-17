@@ -35,7 +35,7 @@
 <div class="vouchers-page" data-theme={theme}>
 	<h1><Ticket size={28}/> Мои путёвки</h1>
 	{#if loading}
-		<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
+		<div class="loader spin"><Loader size={24}/> Загрузка...</div>
 	{:else if error}
 		<div class="error"><AlertCircle size={20}/> {error}</div>
 	{:else if vouchers.length === 0}

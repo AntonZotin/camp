@@ -35,7 +35,7 @@
 <div class="children-page" data-theme={theme}>
 	<h1><Users size={28}/> Мои дети</h1>
 	{#if loading}
-		<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
+		<div class="loader spin"><Loader size={24}/> Загрузка...</div>
 	{:else if error}
 		<div class="error"><AlertCircle size={20}/> {error}</div>
 	{:else if children.length === 0}

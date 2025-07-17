@@ -31,7 +31,7 @@
 <div class="activity-log-admin" data-theme={theme}>
 	<h2>Журнал активности</h2>
 	{#if loading}
-		<div class="loader"><Loader size={24} class="spin"/> Загрузка...</div>
+		<div class="loader spin"><Loader size={24}/> Загрузка...</div>
 	{:else if error}
 		<div class="error"><AlertCircle size={20}/> {error}</div>
 	{:else}
