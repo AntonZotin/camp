@@ -1,5 +1,6 @@
 package ru.camp.server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,5 +24,6 @@ public class Child {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private User parent;
 } 
