@@ -70,14 +70,6 @@ public class UserService {
         }
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
-    }
-
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
-    }
-
     public AuthResponse authenticate(UserLoginRequest request) {
         User user = userRepository.findByUsername(request.getUsernameOrEmail()).or(() -> userRepository.findByEmail(request.getUsernameOrEmail())).orElse(null);
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {

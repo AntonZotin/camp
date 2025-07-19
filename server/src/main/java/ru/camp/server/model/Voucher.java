@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "vouchers")
 public class Voucher {
-    // Геттеры и сеттеры
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

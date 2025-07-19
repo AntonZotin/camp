@@ -20,7 +20,7 @@ public class Notification {
     private User recipient;
 
     @Column(nullable = false, length = 50)
-    private String type; // email, internal, telegram
+    private String type;
 
     @Column(nullable = false, length = 200)
     private String subject;
@@ -29,7 +29,7 @@ public class Notification {
     private String message;
 
     @Column(nullable = false, length = 30)
-    private String status; // sent, pending, failed
+    private String status;
 
     private LocalDateTime createdAt;
     private LocalDateTime sentAt;

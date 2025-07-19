@@ -32,11 +32,9 @@ public class User {
     @Column(nullable = false)
     private UserType userType;
 
-    // Для родителей: связь с детьми
     @OneToMany(mappedBy = "parent")
     private Set<Child> children;
 
-    // Для сотрудников: связь с Employee
     @OneToOne(mappedBy = "user")
     private Employee employee;
 } 

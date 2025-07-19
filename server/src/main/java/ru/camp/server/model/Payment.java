@@ -30,10 +30,10 @@ public class Payment {
     private LocalDateTime date;
 
     @Column(nullable = false, length = 30)
-    private String status; // paid, pending, cancelled
+    private String status;
 
     @Column(length = 30)
-    private String method; // card, cash, etc.
+    private String method;
 
     @Column(length = 500)
     private String comment;

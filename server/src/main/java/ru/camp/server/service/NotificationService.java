@@ -53,7 +53,6 @@ public class NotificationService {
         notificationRepository.deleteById(id);
     }
 
-    // Заглушка для отправки email
     public void sendEmailNotification(Notification notification) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(notification.getRecipient().getEmail());
