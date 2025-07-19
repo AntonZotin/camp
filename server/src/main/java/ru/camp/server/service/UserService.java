@@ -83,7 +83,7 @@ public class UserService {
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
         AuthResponse response = new AuthResponse();
         response.setAccessToken(token);
         response.setUserId(user.getId());

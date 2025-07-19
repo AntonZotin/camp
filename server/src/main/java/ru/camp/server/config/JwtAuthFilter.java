@@ -4,14 +4,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -32,8 +33,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             username = jwtUtil.getUsernameFromJwtToken(token);
         }
         if (username != null && jwtUtil.validateJwtToken(token)) {
+            String role = jwtUtil.getRoleFromJwtToken(token);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                username, null, null // TODO: добавить роли
+                username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
             );
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
