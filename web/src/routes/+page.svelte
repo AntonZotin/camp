@@ -76,7 +76,7 @@
 
 <style>
   .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/camp-hero.jpg');
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/src/images/camp-hero.png');
     background-size: cover;
     background-position: center;
     color: white;
