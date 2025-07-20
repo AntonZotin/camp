@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { themeStore, toggleTheme } from '$lib/stores/themeStore';
-	import { Eye, EyeOff, LogIn, User, Lock, Sun, Moon } from 'lucide-svelte';
+	import { themeStore } from '$lib/stores/themeStore';
+	import { Eye, EyeOff, User, Lock } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { loginUser } from '$lib/stores/userStore';
 	import { PUBLIC_API_URL } from '$env/static/public';
+
 	let theme: 'light' | 'dark' = 'light';
 	const unsubscribe = themeStore.subscribe((t) => (theme = t));
 	onMount(() => () => unsubscribe());
@@ -45,12 +46,6 @@
 </script>
 
 <div class="auth-page" data-theme={theme}>
-	<header>
-		<a href="/" class="logo"><LogIn size={28}/> CampIT</a>
-		<button class="theme-toggle" on:click={toggleTheme} aria-label="Переключить тему">
-			{#if theme === 'dark'}<Moon size={22}/>{:else}<Sun size={22}/>{/if}
-		</button>
-	</header>
 	<main>
 		<form class="auth-form" on:submit={handleLogin}>
 			<h1>Вход</h1>
@@ -79,63 +74,8 @@
 </div>
 
 <style>
-.auth-page {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	min-height: 100vh;
-	background: var(--color-bg, #f8fafc);
-	color: var(--color-text, #222);
-	transition: background 0.3s, color 0.3s;
-}
-.auth-page[data-theme="dark"] {
-	--color-bg: #181c24;
-	--color-text: #f1f5f9;
-	--color-primary: #2d8cff;
-	--color-accent: #ffb347;
-	--color-card: #23272f;
-}
-.auth-page[data-theme="light"] {
-	--color-bg: #f8fafc;
-	--color-text: #222;
-	--color-primary: #2d8cff;
-	--color-accent: #ffb347;
-	--color-card: #fff;
-}
-header {
-	width: 100%;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.2rem 2.5rem 0.5rem 2.5rem;
-}
-.logo {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-size: 1.5rem;
-	font-weight: bold;
-	color: var(--color-primary);
-}
-.theme-toggle {
-	background: none;
-	border: none;
-	font-size: 1.3rem;
-	cursor: pointer;
-	color: var(--color-primary);
-	transition: color 0.2s;
-	display: flex;
-	align-items: center;
-}
-main {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-}
 .auth-form {
-	background: var(--color-card);
+	background: var(--bg-footer);
 	border-radius: 18px;
 	box-shadow: 0 6px 32px rgba(45,140,255,0.10);
 	padding: 2.5rem 2rem 2rem 2rem;
@@ -149,7 +89,7 @@ main {
 .auth-form h1 {
 	text-align: center;
 	font-size: 2rem;
-	color: var(--color-primary);
+	color: var(--primary);
 	margin-bottom: 0.5rem;
 }
 .input-group {
@@ -168,13 +108,13 @@ main {
 	background: transparent;
 	outline: none;
 	font-size: 1.08rem;
-	color: var(--color-text);
+	color: var(--text-primary);
 }
 .eye-btn {
 	background: none;
 	border: none;
 	cursor: pointer;
-	color: var(--color-primary);
+	color: var(--primary);
 	padding: 0 0.2rem;
 	display: flex;
 	align-items: center;
@@ -188,7 +128,7 @@ main {
 	font-size: 1rem;
 }
 .submit-btn {
-	background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+	background: linear-gradient(90deg, var(--primary), var(--secondary));
 	color: #fff;
 	border: none;
 	border-radius: 12px;
@@ -209,15 +149,11 @@ main {
 	margin-top: 0.5rem;
 }
 .switch-link a {
-	color: var(--color-primary);
+	color: var(--primary);
 	text-decoration: underline;
 	transition: color 0.2s;
 }
 .switch-link a:hover {
-	color: var(--color-accent);
-}
-@keyframes fadeInUp {
-	from { opacity: 0; transform: translateY(60px); }
-	to { opacity: 1; transform: none; }
+	color: var(--secondary);
 }
 </style>

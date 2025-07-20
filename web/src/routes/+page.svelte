@@ -188,9 +188,6 @@
     align-items: center;
     gap: 0.5rem;
   }
-  .stat-icon {
-    margin-bottom: 0.5rem;
-  }
   .stat-value {
     display: block;
     font-size: 2.5rem;

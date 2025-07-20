@@ -122,8 +122,4 @@
     color: var(--primary);
     cursor: pointer;
   }
-
-  .icon {
-    flex-shrink: 0;
-  }
 </style> 
