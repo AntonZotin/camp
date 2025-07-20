@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { themeStore, toggleTheme } from '$lib/themeStore';
+	import { themeStore, toggleTheme } from '$lib/stores/themeStore';
 	import { UserPlus, User, Lock, Mail, Eye, EyeOff, Sun, Moon } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';

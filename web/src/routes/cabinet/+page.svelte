@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { themeStore, toggleTheme } from '$lib/themeStore';
-	import {userStore, logoutUser, type UserRole} from '$lib/userStore';
+	import { themeStore, toggleTheme } from '$lib/stores/themeStore';
+	import {userStore, logoutUser, type UserRole} from '$lib/stores/userStore';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { User, LogOut, Sun, Moon, Shield, Users, HeartHandshake } from 'lucide-svelte';

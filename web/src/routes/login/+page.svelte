@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { themeStore, toggleTheme } from '$lib/themeStore';
+	import { themeStore, toggleTheme } from '$lib/stores/themeStore';
 	import { Eye, EyeOff, LogIn, User, Lock, Sun, Moon } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { loginUser } from '$lib/userStore';
+	import { loginUser } from '$lib/stores/userStore';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	let theme: 'light' | 'dark' = 'light';
 	const unsubscribe = themeStore.subscribe((t) => (theme = t));

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { themeStore } from '$lib/themeStore';
-	import { userStore } from '$lib/userStore';
+	import { themeStore } from '$lib/stores/themeStore';
+	import { userStore } from '$lib/stores/userStore';
 	import { onMount } from 'svelte';
 	import { Users, Trash2, Shield, Loader, AlertCircle, UserCog, Download } from 'lucide-svelte';
 	import { get } from 'svelte/store';
