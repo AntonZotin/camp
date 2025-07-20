@@ -30,7 +30,7 @@
 
     <div class="actions">
       <ThemeToggle {currentTheme} {toggleTheme} />
-      <a href="/auth" class="button primary">
+      <a href="/login" class="button primary">
         <LogIn size={18} class="icon" />
         <span>Войти</span>
       </a>
