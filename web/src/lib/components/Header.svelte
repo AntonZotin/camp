@@ -22,8 +22,11 @@
     <nav>
       {#each navLinks as link}
         <a href={link.href} class="nav-link">
-          <svelte:component this={link.icon} size={18} class="icon" />
-          <span>{link.name}</span>
+          <div class="icon">
+            <svelte:component this={link.icon} size={18}/>
+          </div>
+          <span class="nav-text">{link.name}</span>
+          <div class="nav-highlight"></div>
         </a>
       {/each}
     </nav>
@@ -71,26 +74,49 @@
 
   nav {
     display: flex;
-    gap: 1.5rem;
+    gap: 0.5rem;
   }
 
   .nav-link {
+    position: relative;
     color: var(--text-primary);
     text-decoration: none;
     font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
     transition: var(--transition);
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0;
   }
 
   .nav-link:hover {
-    color: var(--primary);
+    background: var(--bg-hover);
   }
 
-  .icon {
-    flex-shrink: 0;
+  .nav-highlight {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 3px 3px 0 0;
+    transition: var(--transition);
+  }
+
+  .nav-link:hover .nav-highlight {
+    width: 70%;
+  }
+
+  .nav-link .icon {
+    transition: transform 0.2s ease;
+  }
+
+  .nav-link:hover .icon {
+    transform: scale(1.1);
+    color: var(--primary);
   }
 
   .actions {
@@ -99,34 +125,14 @@
     gap: 1rem;
   }
 
-  .button {
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-    text-decoration: none;
-    font-weight: 500;
+  .nav-text {
+    position: relative;
     transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .primary {
-    background: var(--primary);
-    color: white;
-  }
-
-  .primary:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
   }
 
   @media (max-width: 768px) {
     nav {
       display: none;
     }
-
-    .container {
-      justify-content: space-between;
-    }
   }
-</style> 
+</style>
