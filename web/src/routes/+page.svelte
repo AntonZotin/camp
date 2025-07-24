@@ -1,8 +1,7 @@
 <script>
   import { fade, fly } from 'svelte/transition';
-  import { Tent, Utensils, Palette, Medal, HeartPulse, Mountain, Trees, Activity, Users, Star, Calendar, MapPin, Phone } from 'lucide-svelte';
+  import { Tent, Utensils, Palette, Medal, HeartPulse, Trees, Activity, Users, Star, Calendar } from 'lucide-svelte';
 
-  // Основные фичи
   const features = [
     {
       icon: Tent,
@@ -23,10 +22,19 @@
       icon: Activity,
       title: 'Спортивные программы',
       description: 'Бассейн, скалодром, веревочный парк и многое другое'
+    },
+    {
+      icon: Users,
+      title: 'Опытные вожатые',
+      description: 'Профессиональные педагоги с большим опытом работы'
+    },
+    {
+      icon: HeartPulse,
+      title: 'Безопасность',
+      description: 'Круглосуточная охрана и медицинское сопровождение'
     }
   ];
 
-  // Статистика
   const stats = [
     { value: '15+', label: 'Лет успешной работы', icon: Medal },
     { value: '1000+', label: 'Довольных детей', icon: HeartPulse },
@@ -34,7 +42,6 @@
     { value: '24/7', label: 'Медсопровождение', icon: HeartPulse }
   ];
 
-  // Программы
   const programs = [
     {
       title: 'Творческая смена',
@@ -53,7 +60,6 @@
     }
   ];
 
-  // Расписание дня
   const schedule = [
     { time: '08:00', activity: 'Подъем, зарядка' },
     { time: '09:00', activity: 'Завтрак' },
@@ -66,8 +72,7 @@
   ];
 </script>
 
-<div class="stars-bg" />
-
+<div class="stars-bg"></div>
 <section class="hero">
   <div class="container">
     <div class="hero-content" in:fly={{ y: 50, duration: 800 }}>
@@ -166,7 +171,9 @@
       {#each stats as stat, i (stat.label)}
         <div class="stat-item" in:fly={{ y: 50, duration: 500, delay: i * 150 }}>
           {#if stat.icon}
-            <svelte:component this={stat.icon} size={48} class="stat-icon" />
+            <div class="stat-icon">
+              <svelte:component this={stat.icon} size={48} />
+            </div>
           {/if}
           <span class="stat-value">{stat.value}</span>
           <span class="stat-label">{stat.label}</span>
@@ -206,17 +213,15 @@
 </section>
 
 <style>
-  /* Глобальные стили уже определены в app.css */
-
   .stars-bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='gradient' cx='50%25' cy='50%25' r='50%25' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='transparent'/%3E%3Cstop offset='100%25' stop-color='%234f46e5'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gradient)' opacity='0.1'/%3E%3C/svg%3E");
+    background: url("/src/images/star.png");
     z-index: -1;
-    animation: pulse 8s infinite alternate;
+    opacity: 0.3;
   }
 
   .hero {
@@ -266,6 +271,21 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     animation: float 6s ease-in-out infinite;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-actions .button {
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .floating-elements {
@@ -321,7 +341,7 @@
   .features-grid {
     padding: 0 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
   }
 
@@ -435,6 +455,12 @@
     background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
     animation: gradientBG 15s ease infinite;
     background-size: 200% 200%;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
   }
 
   .stat-item {
@@ -623,6 +649,24 @@
 
     .cta-card {
       padding: 2rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero-actions .button {
+      width: 100%;
+      max-width: 300px;
     }
   }
 </style>
