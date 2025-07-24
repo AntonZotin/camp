@@ -89,7 +89,7 @@
           <Calendar size={18} class="icon" />
           <span>Забронировать путёвку</span>
         </a>
-        <a href="#programs" class="button secondary">
+        <a href="/programs" class="button secondary">
           <span>Узнать о программах</span>
         </a>
       </div>

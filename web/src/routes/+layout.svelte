@@ -2,20 +2,36 @@
   import { page } from '$app/stores';
   import Header from '$lib/components/Header.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import { ArrowUp } from 'lucide-svelte';
   import { onMount } from 'svelte';
 
   let currentTheme = 'light';
+  let showScrollButton = false;
 
   onMount(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     currentTheme = savedTheme;
     document.documentElement.setAttribute('data-theme', currentTheme);
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   });
 
   const toggleTheme = () => {
     currentTheme = currentTheme === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', currentTheme);
     localStorage.setItem('theme', currentTheme);
+  };
+
+  const handleScroll = () => {
+    showScrollButton = window.scrollY > 300;
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 </script>
 
@@ -34,6 +50,15 @@
   {#if !$page.url.pathname.startsWith('/auth')}
     <Footer />
   {/if}
+
+  <button
+    class="scroll-top-button"
+    class:visible={showScrollButton}
+    on:click={scrollToTop}
+    aria-label="Прокрутить наверх"
+  >
+    <ArrowUp size={20} />
+  </button>
 </div>
 
 <style>
@@ -77,6 +102,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
   main {
     flex: 1;
@@ -87,4 +113,34 @@
     align-items: center;
     justify-content: center;
   }
-</style> 
+  .scroll-top-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    z-index: 100;
+  }
+  .scroll-top-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-5px);
+  }
+  .scroll-top-button.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+</style>
