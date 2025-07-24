@@ -194,7 +194,7 @@
       {#each schedule as item, i (item.time)}
         <div class="timeline-item" in:fly={{ y: 30, duration: 500, delay: i * 100 }}>
           <div class="timeline-time">{item.time}</div>
-          <div class="timeline-dot" />
+          <div class="timeline-dot"></div>
           <div class="timeline-content">{item.activity}</div>
         </div>
       {/each}
@@ -539,9 +539,8 @@
 
   .timeline-content {
     width: 45%;
-    padding-left: 2rem;
     background: var(--bg-primary);
-    padding: 1rem;
+    padding: 1rem 1rem 1rem 2rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
   }
@@ -581,9 +580,9 @@
   }
 
   @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
+    0% { background-position: 0 50%; }
     50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    100% { background-position: 0 50%; }
   }
 
   @media (max-width: 1024px) {
