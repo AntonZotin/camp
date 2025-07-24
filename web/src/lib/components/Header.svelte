@@ -7,9 +7,9 @@
 
   const navLinks = [
     { name: 'Главная', href: '/', icon: Home },
-    { name: 'О лагере', href: '#about', icon: Info },
-    { name: 'Программы', href: '#programs', icon: Calendar },
-    { name: 'Контакты', href: '#contacts', icon: Phone }
+    { name: 'О лагере', href: '/about', icon: Info },
+    { name: 'Программы', href: '/programs', icon: Calendar },
+    { name: 'Контакты', href: '/contacts', icon: Phone }
   ];
 </script>
 
