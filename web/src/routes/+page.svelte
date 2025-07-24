@@ -1,41 +1,106 @@
 <script>
-  import { fade } from 'svelte/transition';
-  import { Tent, Utensils, Palette, Medal, HeartPulse } from 'lucide-svelte';
+  import { fade, fly } from 'svelte/transition';
+  import { Tent, Utensils, Palette, Medal, HeartPulse, Mountain, Trees, Activity, Users, Star, Calendar, MapPin, Phone } from 'lucide-svelte';
 
+  // Основные фичи
   const features = [
     {
       icon: Tent,
       title: 'Комфортное проживание',
-      description: 'Уютные домики и современные корпуса'
+      description: 'Современные корпуса с удобствами, раздельные комнаты по возрастам'
     },
     {
       icon: Utensils,
-      title: 'Питание',
-      description: 'Сбалансированное 5-разовое питание'
+      title: '5-разовое питание',
+      description: 'Сбалансированное меню от профессиональных поваров'
     },
     {
       icon: Palette,
-      title: 'Развитие',
-      description: 'Творческие и спортивные занятия'
+      title: 'Творческое развитие',
+      description: 'Мастер-классы, кружки и студии на любой вкус'
+    },
+    {
+      icon: Activity,
+      title: 'Спортивные программы',
+      description: 'Бассейн, скалодром, веревочный парк и многое другое'
     }
   ];
 
+  // Статистика
   const stats = [
-    { value: '15+', label: 'Лет опыта', icon: Medal },
+    { value: '15+', label: 'Лет успешной работы', icon: Medal },
     { value: '1000+', label: 'Довольных детей', icon: HeartPulse },
-    { value: '50+', label: 'Профессиональных вожатых' },
-    { value: '24/7', label: 'Медицинское сопровождение' }
+    { value: '50+', label: 'Профессиональных вожатых', icon: Users },
+    { value: '24/7', label: 'Медсопровождение', icon: HeartPulse }
+  ];
+
+  // Программы
+  const programs = [
+    {
+      title: 'Творческая смена',
+      description: 'Театр, живопись, музыка и танцы',
+      icon: Palette
+    },
+    {
+      title: 'Спортивная смена',
+      description: 'Соревнования, эстафеты и тренировки',
+      icon: Activity
+    },
+    {
+      title: 'Научная смена',
+      description: 'Эксперименты, квесты и исследования',
+      icon: Star
+    }
+  ];
+
+  // Расписание дня
+  const schedule = [
+    { time: '08:00', activity: 'Подъем, зарядка' },
+    { time: '09:00', activity: 'Завтрак' },
+    { time: '10:00', activity: 'Основные занятия' },
+    { time: '13:00', activity: 'Обед' },
+    { time: '14:00', activity: 'Тихий час' },
+    { time: '16:00', activity: 'Кружки и секции' },
+    { time: '19:00', activity: 'Ужин' },
+    { time: '20:00', activity: 'Вечерние мероприятия' }
   ];
 </script>
 
+<div class="stars-bg" />
+
 <section class="hero">
   <div class="container">
-    <div class="hero-content">
-      <h1 transition:fade>Летний отдых для вашего ребенка</h1>
-      <p transition:fade={{ delay: 100 }}>Создаём незабываемые каникулы с 2008 года</p>
-      <div class="hero-actions" transition:fade={{ delay: 200 }}>
-        <a href="#booking" class="button primary">Забронировать путёвку</a>
-        <a href="#about" class="button secondary">Узнать больше</a>
+    <div class="hero-content" in:fly={{ y: 50, duration: 800 }}>
+      <h1 transition:fade>
+        <span class="gradient-text">Sunny Camp</span> -<br>
+        место, где рождаются<br>
+        <span class="highlight">счастливые воспоминания</span>
+      </h1>
+      <p transition:fade={{ delay: 200 }}>
+        Премиальный детский лагерь с 15-летним опытом организации незабываемого отдыха
+      </p>
+      <div class="hero-actions" transition:fade={{ delay: 400 }}>
+        <a href="#booking" class="button primary">
+          <Calendar size={18} class="icon" />
+          <span>Забронировать путёвку</span>
+        </a>
+        <a href="#programs" class="button secondary">
+          <span>Узнать о программах</span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-image" in:fly={{ x: 50, duration: 800, delay: 200 }}>
+      <img src="/src/images/camp-hero.png" alt="Дети в лагере" class="hero-img" />
+      <div class="floating-elements">
+        <div class="floating-icon" style="--delay: 0s">
+          <Tent size={32} />
+        </div>
+        <div class="floating-icon" style="--delay: 1s">
+          <Trees size={32} />
+        </div>
+        <div class="floating-icon" style="--delay: 2s">
+          <Activity size={32} />
+        </div>
       </div>
     </div>
   </div>
@@ -43,15 +108,52 @@
 
 <section class="features" id="about">
   <div class="container">
-    <h2>Почему выбирают нас</h2>
+    <h2 class="title" in:fly={{ y: 30 }}>Почему родители <span class="gradient-text">выбирают нас</span></h2>
+    <p class="section-description">
+      15 лет мы создаем идеальные условия для детского отдыха, сочетая безопасность, развитие и развлечения
+    </p>
+
     <div class="features-grid">
-      {#each features as feature}
-        <div class="feature-card" transition:fade>
+      {#each features as feature, i (feature.title)}
+        <div class="feature-card"
+             in:fly={{ y: 50, duration: 500, delay: i * 100 }}>
           <div class="feature-icon">
-            <svelte:component this={feature.icon} size={32} />
+            <svelte:component this={feature.icon} size={40} />
           </div>
           <h3>{feature.title}</h3>
           <p>{feature.description}</p>
+          <div class="feature-hover-bg"></div>
+        </div>
+      {/each}
+    </div>
+  </div>
+</section>
+
+<section class="programs" id="programs">
+  <div class="container">
+    <h2 class="title" in:fly={{ y: 30 }}>Наши <span class="gradient-text">программы</span></h2>
+    <p class="section-description">
+      Каждая смена - это уникальное приключение с тематическими занятиями и мероприятиями
+    </p>
+
+    <div class="programs-grid">
+      {#each programs as program, i (program.title)}
+        <div class="program-card" in:fly={{ y: 50, duration: 500, delay: i * 150 }}>
+          <div class="program-icon">
+            <svelte:component this={program.icon} size={48} />
+          </div>
+          <h3>{program.title}</h3>
+          <p>{program.description}</p>
+          <div class="program-details">
+            <div class="detail-item">
+              <Calendar size={16} />
+              <span>Июнь-Август</span>
+            </div>
+            <div class="detail-item">
+              <Users size={16} />
+              <span>7-15 лет</span>
+            </div>
+          </div>
         </div>
       {/each}
     </div>
@@ -61,10 +163,10 @@
 <section class="stats">
   <div class="container">
     <div class="stats-grid">
-      {#each stats as stat}
-        <div class="stat-item" transition:fade>
+      {#each stats as stat, i (stat.label)}
+        <div class="stat-item" in:fly={{ y: 50, duration: 500, delay: i * 150 }}>
           {#if stat.icon}
-            <svelte:component this={stat.icon} size={32} class="stat-icon" />
+            <svelte:component this={stat.icon} size={48} class="stat-icon" />
           {/if}
           <span class="stat-value">{stat.value}</span>
           <span class="stat-label">{stat.label}</span>
@@ -74,145 +176,453 @@
   </div>
 </section>
 
+<section class="schedule">
+  <div class="container">
+    <h2 class="title" in:fly={{ y: 30 }}>Типичный <span class="gradient-text">день в лагере</span></h2>
+    <p class="section-description">
+      Продуманный режим дня сочетает активность, отдых и развитие
+    </p>
+
+    <div class="timeline">
+      {#each schedule as item, i (item.time)}
+        <div class="timeline-item" in:fly={{ y: 30, duration: 500, delay: i * 100 }}>
+          <div class="timeline-time">{item.time}</div>
+          <div class="timeline-dot" />
+          <div class="timeline-content">{item.activity}</div>
+        </div>
+      {/each}
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container">
+    <div class="cta-card">
+      <h2>Готовы к незабываемым каникулам?</h2>
+      <p>Оставьте заявку и мы подберем идеальную программу для вашего ребенка</p>
+      <a href="#booking" class="button primary">Забронировать сейчас</a>
+    </div>
+  </div>
+</section>
+
 <style>
+  /* Глобальные стили уже определены в app.css */
+
+  .stars-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='gradient' cx='50%25' cy='50%25' r='50%25' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0%25' stop-color='transparent'/%3E%3Cstop offset='100%25' stop-color='%234f46e5'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gradient)' opacity='0.1'/%3E%3C/svg%3E");
+    z-index: -1;
+    animation: pulse 8s infinite alternate;
+  }
+
   .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/src/images/camp-hero.png');
-    background-size: cover;
-    background-position: center;
-    color: white;
-    padding: 8rem 2rem;
-    text-align: center;
+    padding: 6rem 0;
+    position: relative;
+    overflow: hidden;
   }
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
+
+  .hero .container {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
   }
+
   .hero-content {
-    max-width: 800px;
-    margin: 0 auto;
+    flex: 1;
   }
+
   .hero h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
     line-height: 1.2;
   }
+
+  .highlight {
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   .hero p {
     font-size: 1.25rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    max-width: 500px;
     opacity: 0.9;
   }
-  .hero-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
+
+  .hero-image {
+    flex: 1;
+    position: relative;
   }
-  .button {
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius);
-    text-decoration: none;
-    font-weight: 500;
-    transition: var(--transition);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .primary {
-    background: var(--primary);
-    color: white;
-  }
-  .primary:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-  }
-  .secondary {
-    background: transparent;
-    color: white;
-    border: 1px solid white;
-  }
-  .secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-  }
-  .features {
-    padding: 5rem 2rem;
-    background: var(--bg-secondary);
-  }
-  h2 {
-    text-align: center;
-    margin-bottom: 3rem;
-    font-size: 2rem;
-    color: var(--text-primary);
-  }
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-  }
-  .feature-card {
-    background: var(--bg-primary);
-    padding: 2rem;
+
+  .hero-img {
+    width: 100%;
+    max-width: 600px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    transition: var(--transition);
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .floating-icon {
+    position: absolute;
+    background: var(--bg-primary);
+    padding: 0.75rem;
+    border-radius: 50%;
+    box-shadow: var(--shadow);
+    animation: float 4s ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+
+  .floating-icon:nth-child(1) {
+    top: 10%;
+    left: 10%;
+  }
+
+  .floating-icon:nth-child(2) {
+    top: 70%;
+    left: 15%;
+  }
+
+  .floating-icon:nth-child(3) {
+    top: 40%;
+    right: 10%;
+  }
+
+  .title {
     text-align: center;
   }
-  .feature-card:hover {
-    transform: translateY(-5px);
+
+  .section-description {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
   }
+
+  .features {
+    padding: 6rem 0;
+    background: var(--bg-secondary);
+  }
+
+  .features-grid {
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    z-index: 1;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+
   .feature-icon {
     margin-bottom: 1.5rem;
     color: var(--primary);
   }
+
   .feature-card h3 {
+    font-size: 1.5rem;
     margin-bottom: 1rem;
-    color: var(--text-primary);
   }
-  .feature-card p {
-    color: var(--text-secondary);
+
+  .feature-hover-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(79, 70, 229, 0.05) 0%, transparent 70%);
+    z-index: -1;
+    opacity: 0;
+    transition: var(--transition);
   }
-  .stats {
-    padding: 4rem 2rem;
-    background: var(--primary);
-    color: white;
+
+  .feature-card:hover .feature-hover-bg {
+    opacity: 1;
   }
-  .stats-grid {
+
+  .programs {
+    padding: 6rem 0;
+  }
+
+  .programs-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
+  }
+
+  .program-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius);
+    padding: 2rem;
+    transition: var(--transition);
+    border: 1px solid var(--border);
     text-align: center;
   }
-  .stat-item {
+
+  .program-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+  }
+
+  .program-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(79, 70, 229, 0.1);
+    border-radius: 50%;
+    color: var(--primary);
+  }
+
+  .program-details {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .detail-item {
+    display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
   }
+
+  .stats {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stats::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    animation: gradientBG 15s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  .stat-item {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .stat-icon {
+    color: white;
+    margin-bottom: 1rem;
+    animation: float 4s ease-in-out infinite;
+  }
+
   .stat-value {
     display: block;
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     font-weight: 700;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    color: white;
   }
+
   .stat-label {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .schedule {
+    padding: 6rem 0;
+    background: var(--bg-secondary);
+  }
+
+  .timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background: var(--primary);
+  }
+
+  .timeline-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .timeline-time {
+    width: 45%;
+    text-align: right;
+    padding-right: 2rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid var(--bg-secondary);
+  }
+
+  .timeline-content {
+    width: 45%;
+    padding-left: 2rem;
+    background: var(--bg-primary);
+    padding: 1rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .cta {
+    padding: 6rem 0;
+  }
+
+  .cta-card {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 4rem;
+    border-radius: var(--radius);
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: var(--shadow);
+  }
+
+  .cta-card h2 {
+    margin-bottom: 1rem;
+  }
+
+  .cta-card p {
+    margin-bottom: 2rem;
     opacity: 0.9;
   }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @media (max-width: 1024px) {
+    .hero .container {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .hero-content {
+      margin-bottom: 3rem;
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .timeline::before {
+      left: 30px;
+    }
+
+    .timeline-item {
+      flex-direction: column;
+      align-items: flex-start;
+      padding-left: 60px;
+    }
+
+    .timeline-time,
+    .timeline-content {
+      width: 100%;
+      text-align: left;
+      padding: 0;
+    }
+
+    .timeline-time {
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-dot {
+      left: 22px;
+    }
+  }
+
   @media (max-width: 768px) {
     .hero {
-      padding: 6rem 1.5rem;
+      padding: 4rem 0;
     }
+
     .hero h1 {
       font-size: 2rem;
     }
+
     .hero p {
       font-size: 1rem;
     }
-    .features {
-      padding: 3rem 1.5rem;
+
+    .section-description {
+      margin-bottom: 2rem;
     }
-    .features-grid {
-      grid-template-columns: 1fr;
+
+    .cta-card {
+      padding: 2rem;
     }
   }
 </style>
