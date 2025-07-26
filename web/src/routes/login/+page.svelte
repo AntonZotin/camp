@@ -1,15 +1,9 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition';
-  import { themeStore } from '$lib/stores/themeStore';
   import { Eye, EyeOff, User, Lock, LogIn, ArrowRight } from 'lucide-svelte';
-  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { loginUser } from '$lib/stores/userStore';
   import { PUBLIC_API_URL } from '$env/static/public';
-
-  let theme: 'light' | 'dark' = 'light';
-  const unsubscribe = themeStore.subscribe((t) => (theme = t));
-  onMount(() => () => unsubscribe());
 
   let username = '';
   let password = '';
