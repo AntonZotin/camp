@@ -8,7 +8,8 @@ import ru.camp.server.dto.UserLoginRequest;
 import ru.camp.server.dto.AuthResponse;
 import ru.camp.server.service.UserService;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import ru.camp.server.dto.ForgotPasswordRequest;
+import ru.camp.server.dto.ResetPasswordRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -50,6 +51,30 @@ public class AuthController {
             return ResponseEntity.status(401).body("Неверный логин или пароль");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Ошибка входа: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        try {
+            userService.processForgotPassword(request);
+            return ResponseEntity.ok().body("Инструкции по восстановлению пароля отправлены на email, если он зарегистрирован.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Ошибка восстановления пароля: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            userService.resetPassword(request);
+            return ResponseEntity.ok().body("Пароль успешно сброшен");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Ошибка сброса пароля: " + e.getMessage());
         }
     }
 } 

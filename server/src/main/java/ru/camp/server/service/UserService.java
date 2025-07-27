@@ -14,10 +14,17 @@ import ru.camp.server.repository.EmployeeRepository;
 import ru.camp.server.model.Child;
 import ru.camp.server.model.Employee;
 import ru.camp.server.dto.ChildDto;
+import ru.camp.server.dto.ForgotPasswordRequest;
+import ru.camp.server.model.Notification;
+import ru.camp.server.dto.ResetPasswordRequest;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
 
 import ru.camp.server.model.UserType;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class UserService {
@@ -26,14 +33,20 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final ChildRepository childRepository;
     private final EmployeeRepository employeeRepository;
+    private final NotificationService notificationService;
+    private final ConcurrentHashMap<String, String> resetTokens = new ConcurrentHashMap<>();
+
+    @Value("${frontend.url:http://localhost:5173}")
+    private String frontendUrl;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ChildRepository childRepository, EmployeeRepository employeeRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ChildRepository childRepository, EmployeeRepository employeeRepository, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.childRepository = childRepository;
         this.employeeRepository = employeeRepository;
+        this.notificationService = notificationService;
     }
 
     public void registerUser(UserRegistrationRequest request) {
@@ -81,5 +94,39 @@ public class UserService {
         response.setUserId(user.getId());
         response.setRole(user.getRole());
         return response;
+    }
+
+    public void processForgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("Пользователь с таким email не найден");
+        }
+        String token = UUID.randomUUID().toString();
+        resetTokens.put(user.getEmail(), token);
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+        Notification notification = new Notification();
+        notification.setRecipient(user);
+        notification.setType("email");
+        notification.setSubject("Восстановление пароля Sunny Camp");
+        notification.setMessage("Здравствуйте!\n\nВы запросили восстановление пароля. Перейдите по ссылке для сброса пароля: " + resetLink + "\n\nЕсли это были не вы, проигнорируйте это письмо.");
+        notificationService.create(notification);
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        String email = resetTokens.entrySet().stream()
+            .filter(e -> e.getValue().equals(request.getToken()))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
+        if (email == null) {
+            throw new RuntimeException("Недействительный или истекший токен");
+        }
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("Пользователь не найден");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        resetTokens.remove(email);
     }
 } 
