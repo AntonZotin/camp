@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { themeStore } from '$lib/stores/themeStore';
+	import { fade, fly } from 'svelte/transition';
 	import { userStore } from '$lib/stores/userStore';
 	import { onMount } from 'svelte';
-	import { Users, Trash2, Shield, Loader, AlertCircle, UserCog, Download } from 'lucide-svelte';
+	import { Users, Trash2, Shield, Loader, AlertCircle, UserCog, Download, Plus, Calendar, Activity, Settings } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 	import { AdminExport } from '$lib';
 	import { MenuAdmin } from '$lib';
@@ -14,8 +14,6 @@
 	import { ActivityLogAdmin } from '$lib';
 	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let theme: 'light' | 'dark' = 'light';
-	const unsubTheme = themeStore.subscribe((t) => (theme = t));
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
@@ -121,340 +119,542 @@
 		await loadSessions();
 	}
 
-	onMount(() => { loadUsers(); loadSessions(); return () => { unsubTheme(); unsubUser(); }; });
+	onMount(() => { loadUsers(); loadSessions(); return () => { unsubUser(); }; });
 </script>
 
-<div class="admin-page" data-theme={theme}>
-	<h1><Shield size={28}/> Админ-панель</h1>
-	<div class="tabs">
-		<button class:active={tab==='users'} on:click={() => tab='users'}><Users size={18}/> Пользователи</button>
-		<button class:active={tab==='sessions'} on:click={() => tab='sessions'}>Смены</button>
-		<button class:active={tab==='menu'} on:click={() => tab='menu'}>Меню</button>
-		<button class:active={tab==='medical-cards'} on:click={() => tab='medical-cards'}>Медкарты</button>
-		<button class:active={tab==='medical-visits'} on:click={() => tab='medical-visits'}>Медосмотры</button>
-		<button class:active={tab==='notifications'} on:click={() => tab='notifications'}>Уведомления</button>
-		<button class:active={tab==='payments'} on:click={() => tab='payments'}>Оплаты</button>
-		<button class:active={tab==='employees'} on:click={() => tab='employees'}>Сотрудники</button>
-		<button class:active={tab==='activity-logs'} on:click={() => tab='activity-logs'}>Журнал активности</button>
-		<button class:active={tab==='export'} on:click={() => tab='export'}><Download size={18}/> Экспорт</button>
-	</div>
+<div class="stars-bg"></div>
 
-	{#if tab === 'users'}
-		<div class="tab-content">
-			{#if loadingUsers}
-				<div class="loader spin"><Loader size={24}/> Загрузка...</div>
-			{:else if errorUsers}
-				<div class="error"><AlertCircle size={20}/> {errorUsers}</div>
-			{:else}
-				<table class="users-table">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Логин</th>
-							<th>Email</th>
-							<th>Роль</th>
-							<th>Действия</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each users as u}
-							<tr>
-								<td>{u.id}</td>
-								<td>{u.username}</td>
-								<td>{u.email}</td>
-								<td>
-									<select bind:value={u.role} on:change={(e) => changeRole(u.id, e.target.value)}>
-										{#each roles as r}
-											<option value={r}>{r}</option>
-										{/each}
-									</select>
-								</td>
-								<td>
-									<button class="icon-btn" title="Удалить" on:click={() => deleteUser(u.id)}><Trash2 size={18}/></button>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			{/if}
+<section class="admin-section" transition:fade>
+	<div class="container">
+		<div class="admin-container" in:fly={{ y: 50 }}>
+			<div class="admin-hero">
+				<div class="logo">
+					<span class="gradient-text">Sunny Camp</span>
+				</div>
+				<h1>Админ-панель</h1>
+				<p>Управление системой лагеря, пользователями и контентом</p>
+				<div class="admin-image">
+					<img src="/src/images/camp-hero.png" alt="Администрирование" />
+				</div>
+			</div>
+
+			<div class="admin-content">
+				<div class="tabs" in:fly={{ y: 30, delay: 200 }}>
+					<button class:active={tab==='users'} on:click={() => tab='users'}>
+						<Users size={18} />
+						<span>Пользователи</span>
+					</button>
+					<button class:active={tab==='sessions'} on:click={() => tab='sessions'}>
+						<Calendar size={18} />
+						<span>Смены</span>
+					</button>
+					<button class:active={tab==='menu'} on:click={() => tab='menu'}>
+						<Settings size={18} />
+						<span>Меню</span>
+					</button>
+					<button class:active={tab==='medical-cards'} on:click={() => tab='medical-cards'}>
+						<Shield size={18} />
+						<span>Медкарты</span>
+					</button>
+					<button class:active={tab==='medical-visits'} on:click={() => tab='medical-visits'}>
+						<Activity size={18} />
+						<span>Медосмотры</span>
+					</button>
+					<button class:active={tab==='notifications'} on:click={() => tab='notifications'}>
+						<Settings size={18} />
+						<span>Уведомления</span>
+					</button>
+					<button class:active={tab==='payments'} on:click={() => tab='payments'}>
+						<Settings size={18} />
+						<span>Оплаты</span>
+					</button>
+					<button class:active={tab==='employees'} on:click={() => tab='employees'}>
+						<Users size={18} />
+						<span>Сотрудники</span>
+					</button>
+					<button class:active={tab==='activity-logs'} on:click={() => tab='activity-logs'}>
+						<Activity size={18} />
+						<span>Журнал активности</span>
+					</button>
+					<button class:active={tab==='export'} on:click={() => tab='export'}>
+						<Download size={18} />
+						<span>Экспорт</span>
+					</button>
+				</div>
+
+				<div class="tab-content" in:fly={{ y: 30, delay: 400 }}>
+					{#if tab === 'users'}
+						{#if loadingUsers}
+							<div class="loader">
+								<Loader size={24} />
+								<span>Загрузка...</span>
+							</div>
+						{:else if errorUsers}
+							<div class="error">
+								<AlertCircle size={20} />
+								<span>{errorUsers}</span>
+							</div>
+						{:else}
+							<table class="data-table">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Логин</th>
+										<th>Email</th>
+										<th>Роль</th>
+										<th>Действия</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each users as u}
+										<tr>
+											<td>{u.id}</td>
+											<td>{u.username}</td>
+											<td>{u.email}</td>
+											<td>
+												<select bind:value={u.role} on:change={(e) => changeRole(u.id, e.target.value)}>
+													{#each roles as r}
+														<option value={r}>{r}</option>
+													{/each}
+												</select>
+											</td>
+											<td>
+												<button class="icon-btn delete" title="Удалить" on:click={() => deleteUser(u.id)}>
+													<Trash2 size={18} />
+												</button>
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						{/if}
+					{/if}
+
+					{#if tab === 'sessions'}
+						{#if loadingSessions}
+							<div class="loader">
+								<Loader size={24} />
+								<span>Загрузка...</span>
+							</div>
+						{:else if errorSessions}
+							<div class="error">
+								<AlertCircle size={20} />
+								<span>{errorSessions}</span>
+							</div>
+						{:else}
+							<button class="add-btn" on:click={() => openSessionModal()}>
+								<Plus size={18} />
+								<span>Новая смена</span>
+							</button>
+							<table class="data-table">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Название</th>
+										<th>Даты</th>
+										<th>Описание</th>
+										<th>Действия</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each sessions as s}
+										<tr>
+											<td>{s.id}</td>
+											<td>{s.name}</td>
+											<td>{s.startDate} — {s.endDate}</td>
+											<td>{s.description}</td>
+											<td>
+												<button class="icon-btn edit" title="Редактировать" on:click={() => openSessionModal(s)}>
+													<UserCog size={18} />
+												</button>
+												<button class="icon-btn delete" title="Удалить" on:click={() => deleteSession(s.id)}>
+													<Trash2 size={18} />
+												</button>
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						{/if}
+					{/if}
+
+					{#if tab === 'menu'}
+						<MenuAdmin {user} />
+					{/if}
+					{#if tab === 'medical-cards'}
+						<MedicalCardAdmin {user} />
+					{/if}
+					{#if tab === 'medical-visits'}
+						<MedicalVisitAdmin {user} />
+					{/if}
+					{#if tab === 'notifications'}
+						<NotificationAdmin {user} />
+					{/if}
+					{#if tab === 'payments'}
+						<PaymentAdmin {user} />
+					{/if}
+					{#if tab === 'employees'}
+						<EmployeeAdmin {user} />
+					{/if}
+					{#if tab === 'activity-logs'}
+						<ActivityLogAdmin {user} />
+					{/if}
+					{#if tab === 'export'}
+						<AdminExport {user} />
+					{/if}
+				</div>
+			</div>
 		</div>
-	{/if}
-	{#if tab === 'sessions'}
-		<div class="tab-content">
-			{#if loadingSessions}
-				<div class="loader spin"><Loader size={24}/> Загрузка...</div>
-			{:else if errorSessions}
-				<div class="error"><AlertCircle size={20}/> {errorSessions}</div>
-			{:else}
-				<button class="add-btn" on:click={() => openSessionModal()}>+ Новая смена</button>
-				<table class="sessions-table">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Название</th>
-							<th>Даты</th>
-							<th>Описание</th>
-							<th>Действия</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each sessions as s}
-							<tr>
-								<td>{s.id}</td>
-								<td>{s.name}</td>
-								<td>{s.startDate} — {s.endDate}</td>
-								<td>{s.description}</td>
-								<td>
-									<button class="icon-btn blue" title="Редактировать" on:click={() => openSessionModal(s)}><UserCog size={18}/></button>
-									<button class="icon-btn" title="Удалить" on:click={() => deleteSession(s.id)}><Trash2 size={18}/></button>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			{/if}
-			{#if showSessionModal}
-				<button type="button" class="modal-backdrop" on:click={closeSessionModal} aria-label="Закрыть модальное окно"></button>
-				<section class="modal" on:click|stopPropagation tabindex="0" role="dialog" aria-modal="true" on:keydown={e => { if (e.key === 'Escape') closeSessionModal(); }}>
-					<h2>{editSession ? 'Редактировать смену' : 'Новая смена'}</h2>
-					<form on:submit|preventDefault={saveSession}>
-						<label>Название<input bind:value={sessionForm.name} required /></label>
-						<label>Дата начала<input type="date" bind:value={sessionForm.startDate} required /></label>
-						<label>Дата окончания<input type="date" bind:value={sessionForm.endDate} required /></label>
-						<label>Описание<textarea bind:value={sessionForm.description} rows="2"></textarea></label>
-						<div class="modal-actions">
-							<button type="submit" class="save-btn">Сохранить</button>
-							<button type="button" class="cancel-btn" on:click={closeSessionModal}>Отмена</button>
-						</div>
-					</form>
-				</section>
-			{/if}
-		</div>
-	{/if}
-	{#if tab === 'menu'}
-		<MenuAdmin {user} {theme} />
-	{/if}
-	{#if tab === 'medical-cards'}
-		<MedicalCardAdmin {user} {theme} />
-	{/if}
-	{#if tab === 'medical-visits'}
-		<MedicalVisitAdmin {user} {theme} />
-	{/if}
-	{#if tab === 'notifications'}
-		<NotificationAdmin {user} {theme} />
-	{/if}
-	{#if tab === 'payments'}
-		<PaymentAdmin {user} {theme} />
-	{/if}
-	{#if tab === 'employees'}
-		<EmployeeAdmin {user} {theme} />
-	{/if}
-	{#if tab === 'activity-logs'}
-		<ActivityLogAdmin {user} {theme} />
-	{/if}
-	{#if tab === 'export'}
-		<AdminExport {user} {theme} />
-	{/if}
-</div>
+	</div>
+</section>
+
+{#if showSessionModal}
+	<div class="modal-backdrop" on:click={closeSessionModal}></div>
+	<div class="modal" in:fly={{ y: 30 }}>
+		<h2>{editSession ? 'Редактировать смену' : 'Новая смена'}</h2>
+		<form on:submit|preventDefault={saveSession}>
+			<div class="form-group">
+				<label for="name">Название</label>
+				<input id="name" bind:value={sessionForm.name} required />
+			</div>
+			<div class="form-group">
+				<label for="startDate">Дата начала</label>
+				<input id="startDate" type="date" bind:value={sessionForm.startDate} required />
+			</div>
+			<div class="form-group">
+				<label for="endDate">Дата окончания</label>
+				<input id="endDate" type="date" bind:value={sessionForm.endDate} required />
+			</div>
+			<div class="form-group">
+				<label for="description">Описание</label>
+				<textarea id="description" bind:value={sessionForm.description} rows="3"></textarea>
+			</div>
+			<div class="modal-actions">
+				<button type="submit" class="button primary">Сохранить</button>
+				<button type="button" class="button secondary" on:click={closeSessionModal}>Отмена</button>
+			</div>
+		</form>
+	</div>
+{/if}
 
 <style>
-.admin-page {
-	padding: 2rem 1rem;
-	max-width: 1100px;
-	margin: 0 auto;
-	color: var(--color-text, #222);
-}
-.admin-page[data-theme="dark"] {
-	--color-bg: #181c24;
-	--color-text: #f1f5f9;
-	--color-card: #23272f;
-}
-.admin-page[data-theme="light"] {
-	--color-bg: #f8fafc;
-	--color-text: #222;
-	--color-card: #fff;
-}
-h1 {
-	display: flex;
-	align-items: center;
-	gap: 0.7rem;
-	font-size: 1.7rem;
-	color: var(--color-primary, #2d8cff);
-	margin-bottom: 2rem;
-}
-.tabs {
-	display: flex;
-	gap: 1.2rem;
-	margin-bottom: 2rem;
-}
-.tabs button {
-	background: none;
-	border: none;
-	font-size: 1.1rem;
-	font-weight: 500;
-	color: var(--color-primary, #2d8cff);
-	padding: 0.7rem 1.5rem;
-	border-radius: 10px 10px 0 0;
-	cursor: pointer;
-	transition: background 0.18s, color 0.18s;
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-.tabs button.active, .tabs button:hover {
-	background: var(--color-card);
-	color: var(--color-accent, #ffb347);
-}
-.tab-content {
-	background: var(--color-card);
-	border-radius: 0 0 18px 18px;
-	box-shadow: 0 4px 16px rgba(45,140,255,0.09);
-	padding: 2rem 1.5rem;
-}
-.loader, .error {
-	text-align: center;
-	margin-top: 2.5rem;
-	font-size: 1.1rem;
-	color: #888;
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	justify-content: center;
-}
-.error { color: #e74c3c; }
-.users-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 1rem;
-}
-.users-table th, .users-table td {
-	padding: 0.7rem 0.5rem;
-	text-align: left;
-	border-bottom: 1px solid #e0e0e0;
-}
-.users-table th {
-	color: var(--color-primary, #2d8cff);
-	font-size: 1.05rem;
-}
-.icon-btn {
-	background: none;
-	border: none;
-	color: #e74c3c;
-	cursor: pointer;
-	padding: 0.2rem 0.5rem;
-	border-radius: 6px;
-	transition: background 0.18s;
-	display: flex;
-	align-items: center;
-}
-.icon-btn:hover {
-	background: #ffeaea;
-}
-.spin { animation: spin 1s linear infinite; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-.sessions-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 1rem;
-}
-.sessions-table th, .sessions-table td {
-	padding: 0.7rem 0.5rem;
-	text-align: left;
-	border-bottom: 1px solid #e0e0e0;
-}
-.sessions-table th {
-	color: var(--color-primary, #2d8cff);
-	font-size: 1.05rem;
-}
-.add-btn {
-	background: var(--color-primary, #2d8cff);
-	color: #fff;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	margin-bottom: 1.2rem;
-	cursor: pointer;
-	transition: background 0.18s;
-}
-.add-btn:hover {
-	background: var(--color-accent, #ffb347);
-	color: #222;
-}
-.icon-btn.blue {
-	color: #2d8cff;
-}
-.modal-backdrop {
-	position: fixed;
-	top: 0; left: 0; right: 0; bottom: 0;
-	background: rgba(0,0,0,0.18);
-	z-index: 1000;
-}
-.modal {
-	position: fixed;
-	top: 50%; left: 50%;
-	transform: translate(-50%, -50%);
-	background: var(--color-card);
-	padding: 2rem 2.2rem;
-	border-radius: 16px;
-	box-shadow: 0 8px 32px rgba(45,140,255,0.13);
-	z-index: 1001;
-	min-width: 320px;
-	max-width: 95vw;
-}
-.modal h2 {
-	margin-bottom: 1.2rem;
-	font-size: 1.3rem;
-	color: var(--color-primary, #2d8cff);
-}
-.modal label {
-	display: block;
-	margin-bottom: 0.7rem;
-	font-size: 1rem;
-}
-.modal input, .modal textarea {
-	width: 100%;
-	padding: 0.5rem;
-	border-radius: 7px;
-	border: 1px solid #d0d7e2;
-	margin-top: 0.2rem;
-	margin-bottom: 0.7rem;
-	font-size: 1rem;
-	background: var(--color-bg);
-	color: var(--color-text);
-}
-.modal-actions {
-	display: flex;
-	gap: 1.2rem;
-	justify-content: flex-end;
-	margin-top: 1.2rem;
-}
-.save-btn {
-	background: var(--color-primary, #2d8cff);
-	color: #fff;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	cursor: pointer;
-	transition: background 0.18s;
-}
-.save-btn:hover {
-	background: var(--color-accent, #ffb347);
-	color: #222;
-}
-.cancel-btn {
-	background: #e0e0e0;
-	color: #222;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	cursor: pointer;
-	transition: background 0.18s;
-}
-.cancel-btn:hover {
-	background: #f8d7da;
-	color: #c0392b;
-}
+	.stars-bg {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: url("/src/images/star.png");
+		z-index: -1;
+		opacity: 0.3;
+	}
+
+	.admin-section {
+		min-height: 100vh;
+		display: flex;
+		padding: 2rem 0;
+	}
+
+	.container {
+		width: 100%;
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+
+	.admin-container {
+		display: grid;
+		grid-template-columns: 300px 1fr;
+		background: var(--bg-primary);
+		border-radius: var(--radius);
+		overflow: hidden;
+		box-shadow: var(--shadow);
+	}
+
+	.admin-hero {
+		background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+		color: white;
+		padding: 2rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.logo {
+		font-size: 1.5rem;
+		font-weight: 700;
+		margin-bottom: 1.5rem;
+	}
+
+	.admin-hero h1 {
+		font-size: 2rem;
+		margin-bottom: 0.5rem;
+		line-height: 1.2;
+	}
+
+	.admin-hero p {
+		opacity: 0.9;
+		margin-bottom: 1.5rem;
+		font-size: 0.9rem;
+	}
+
+	.admin-image {
+		margin-top: auto;
+		text-align: center;
+	}
+
+	.admin-image img {
+		max-width: 100%;
+		height: auto;
+		border-radius: var(--radius);
+		opacity: 0.8;
+	}
+
+	.admin-content {
+		padding: 2rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 2rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.tabs button {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: 0.75rem 1rem;
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--text-secondary);
+		cursor: pointer;
+		transition: var(--transition);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.tabs button:hover {
+		background: var(--bg-hover);
+		color: var(--text-primary);
+	}
+
+	.tabs button.active {
+		background: var(--primary);
+		color: white;
+		border-color: var(--primary);
+	}
+
+	.tab-content {
+		flex: 1;
+	}
+
+	.loader, .error {
+		text-align: center;
+		margin: 2rem 0;
+		font-size: 1rem;
+		color: var(--text-secondary);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		justify-content: center;
+	}
+
+	.error {
+		color: var(--error);
+	}
+
+	.data-table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 1rem;
+		background: var(--bg-primary);
+		border-radius: var(--radius);
+		overflow: hidden;
+		box-shadow: var(--shadow);
+	}
+
+	.data-table th, .data-table td {
+		padding: 0.75rem 1rem;
+		text-align: left;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.data-table th {
+		background: var(--bg-secondary);
+		color: var(--text-primary);
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+
+	.data-table td {
+		color: var(--text-primary);
+		font-size: 0.9rem;
+	}
+
+	.data-table select {
+		padding: 0.25rem 0.5rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		font-size: 0.8rem;
+	}
+
+	.icon-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0.25rem;
+		border-radius: var(--radius);
+		transition: var(--transition);
+		display: inline-flex;
+		align-items: center;
+		margin-right: 0.5rem;
+	}
+
+	.icon-btn.edit {
+		color: var(--primary);
+	}
+
+	.icon-btn.delete {
+		color: var(--error);
+	}
+
+	.icon-btn:hover {
+		background: var(--bg-hover);
+	}
+
+	.add-btn {
+		background: var(--primary);
+		color: white;
+		border: none;
+		border-radius: var(--radius);
+		padding: 0.75rem 1.5rem;
+		font-size: 0.9rem;
+		font-weight: 500;
+		margin-bottom: 1rem;
+		cursor: pointer;
+		transition: var(--transition);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.add-btn:hover {
+		background: var(--primary-dark);
+		transform: translateY(-2px);
+	}
+
+	.modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 1000;
+	}
+
+	.modal {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: var(--bg-primary);
+		padding: 2rem;
+		border-radius: var(--radius);
+		box-shadow: var(--shadow);
+		z-index: 1001;
+		min-width: 400px;
+		max-width: 90vw;
+		max-height: 90vh;
+		overflow-y: auto;
+	}
+
+	.modal h2 {
+		margin-bottom: 1.5rem;
+		font-size: 1.5rem;
+		color: var(--primary);
+	}
+
+	.form-group {
+		margin-bottom: 1rem;
+	}
+
+	.form-group label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 500;
+		color: var(--text-primary);
+	}
+
+	.form-group input, .form-group textarea {
+		width: 100%;
+		padding: 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		font-size: 0.9rem;
+		transition: var(--transition);
+	}
+
+	.form-group input:focus, .form-group textarea:focus {
+		border-color: var(--primary);
+		box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+	}
+
+	.modal-actions {
+		display: flex;
+		gap: 1rem;
+		justify-content: flex-end;
+		margin-top: 1.5rem;
+	}
+
+	@media (max-width: 1024px) {
+		.admin-container {
+			grid-template-columns: 1fr;
+		}
+
+		.admin-hero {
+			display: none;
+		}
+
+		.admin-content {
+			padding: 1.5rem;
+		}
+
+		.tabs {
+			justify-content: center;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.admin-section {
+			padding: 1rem 0;
+		}
+
+		.admin-hero h1 {
+			font-size: 1.5rem;
+		}
+
+		.tabs {
+			flex-direction: column;
+		}
+
+		.tabs button {
+			justify-content: center;
+		}
+
+		.modal {
+			min-width: 300px;
+			margin: 1rem;
+		}
+	}
 </style>

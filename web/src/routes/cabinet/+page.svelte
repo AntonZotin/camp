@@ -1,19 +1,17 @@
 <script lang="ts">
-	import { themeStore, toggleTheme } from '$lib/stores/themeStore';
-	import {userStore, logoutUser, type UserRole} from '$lib/stores/userStore';
+	import { fade, fly } from 'svelte/transition';
+	import { userStore, logoutUser, type UserRole } from '$lib/stores/userStore';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { User, LogOut, Sun, Moon, Shield, Users, HeartHandshake } from 'lucide-svelte';
+	import { User, LogOut, Shield, Users, HeartHandshake, Calendar, Activity, Settings } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 
-	let theme: 'light' | 'dark' = 'light';
-	const unsubTheme = themeStore.subscribe((t) => (theme = t));
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
 	onMount(() => {
 		if (!user) goto('/login');
-		return () => { unsubTheme(); unsubUser(); };
+		return () => { unsubUser(); };
 	});
 
 	function handleLogout() {
@@ -29,186 +27,252 @@
 	}
 </script>
 
-{#if user}
-<div class="cabinet" data-theme={theme}>
-	<header>
-		<div class="logo"><User size={26}/> Личный кабинет</div>
-		<nav>
-			<button class="theme-toggle" on:click={toggleTheme} aria-label="Переключить тему">
-				{#if theme === 'dark'}<Moon size={20}/>{:else}<Sun size={20}/>{/if}
-			</button>
-			<button class="logout-btn" on:click={handleLogout} aria-label="Выйти"><LogOut size={20}/> Выйти</button>
-		</nav>
-	</header>
-	<main>
-		<section class="profile-card fade-in">
-			<div class="avatar"><User size={40}/></div>
-			<div class="info">
-				<h2>Здравствуйте, {getRoleLabel(user.role)}!</h2>
-				<p>ID: {user.userId}</p>
-				<p>Ваша роль: <b>{getRoleLabel(user.role)}</b></p>
+<div class="stars-bg"></div>
+
+<section class="cabinet-section" transition:fade>
+	<div class="container">
+		<div class="cabinet-container" in:fly={{ y: 50 }}>
+			<div class="cabinet-hero">
+				<div class="logo">
+					<span class="gradient-text">Sunny Camp</span>
+				</div>
+				<h1>Личный кабинет</h1>
+				<p>Управляйте бронированием, следите за расписанием и получайте персональные предложения</p>
+				<div class="cabinet-image">
+					<img src="/src/images/camp-hero.png" alt="Дети в лагере" />
+				</div>
 			</div>
-		</section>
-		<section class="cabinet-menu fade-in">
-			{#if user.role === 'ADMIN'}
-				<a class="menu-item" href="/admin"><Shield size={22}/> Админ-панель</a>
-			{/if}
-			{#if user.role === 'PARENT'}
-				<a class="menu-item" href="/cabinet/vouchers"><HeartHandshake size={22}/> Мои путёвки</a>
-				<a class="menu-item" href="/cabinet/children"><Users size={22}/> Мои дети</a>
-			{/if}
-			{#if user.role === 'EMPLOYEE'}
-				<a class="menu-item" href="/cabinet/duties"><Shield size={22}/> Журнал дежурств</a>
-				<a class="menu-item" href="/cabinet/schedule"><Users size={22}/> Моё расписание</a>
-			{/if}
-			<!-- Можно добавить больше пунктов для всех ролей -->
-		</section>
-	</main>
-</div>
-{/if}
+
+			<div class="cabinet-content">
+				<div class="profile-card" in:fly={{ y: 30, delay: 200 }}>
+					<div class="avatar">
+						<User size={40} />
+					</div>
+					<div class="info">
+						<h2>Здравствуйте, {getRoleLabel(user.role)}!</h2>
+						<p>ID: {user.userId}</p>
+						<p>Ваша роль: <strong>{getRoleLabel(user.role)}</strong></p>
+					</div>
+				</div>
+
+				<div class="cabinet-menu" in:fly={{ y: 30, delay: 400 }}>
+					{#if user.role === 'ADMIN'}
+						<a class="menu-item" href="/admin">
+							<Shield size={22} />
+							<span>Админ-панель</span>
+						</a>
+					{/if}
+					{#if user.role === 'PARENT'}
+						<a class="menu-item" href="/cabinet/vouchers">
+							<HeartHandshake size={22} />
+							<span>Мои путёвки</span>
+						</a>
+						<a class="menu-item" href="/cabinet/children">
+							<Users size={22} />
+							<span>Мои дети</span>
+						</a>
+					{/if}
+					{#if user.role === 'EMPLOYEE'}
+						<a class="menu-item" href="/cabinet/duties">
+							<Activity size={22} />
+							<span>Журнал дежурств</span>
+						</a>
+						<a class="menu-item" href="/cabinet/schedule">
+							<Calendar size={22} />
+							<span>Моё расписание</span>
+						</a>
+					{/if}
+					<a class="menu-item" href="/cabinet/settings">
+						<Settings size={22} />
+						<span>Настройки</span>
+					</a>
+					<button class="menu-item logout-btn" on:click={handleLogout}>
+						<LogOut size={22} />
+						<span>Выйти</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
 
 <style>
-.cabinet {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
-	background: var(--color-bg, #f8fafc);
-	color: var(--color-text, #222);
-	transition: background 0.3s, color 0.3s;
-}
-.cabinet[data-theme="dark"] {
-	--color-bg: #181c24;
-	--color-text: #f1f5f9;
-	--color-primary: #2d8cff;
-	--color-accent: #ffb347;
-	--color-card: #23272f;
-}
-.cabinet[data-theme="light"] {
-	--color-bg: #f8fafc;
-	--color-text: #222;
-	--color-primary: #2d8cff;
-	--color-accent: #ffb347;
-	--color-card: #fff;
-}
-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.2rem 2.5rem 0.5rem 2.5rem;
-}
-.logo {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-size: 1.5rem;
-	font-weight: bold;
-	color: var(--color-primary);
-}
-nav {
-	display: flex;
-	align-items: center;
-	gap: 1.2rem;
-}
-.theme-toggle {
-	background: none;
-	border: none;
-	font-size: 1.3rem;
-	cursor: pointer;
-	color: var(--color-primary);
-	transition: color 0.2s;
-	display: flex;
-	align-items: center;
-}
-.logout-btn {
-	background: none;
-	border: none;
-	color: var(--color-primary);
-	font-size: 1.05rem;
-	font-weight: 500;
-	display: flex;
-	align-items: center;
-	gap: 0.3rem;
-	cursor: pointer;
-	transition: color 0.2s;
-	padding: 0.3rem 0.7rem;
-	border-radius: 8px;
-}
-.logout-btn:hover {
-	background: var(--color-primary);
-	color: #fff;
-}
-main {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 2rem 1rem 3rem 1rem;
-}
-.profile-card {
-	background: var(--color-card);
-	border-radius: 18px;
-	box-shadow: 0 6px 32px rgba(45,140,255,0.10);
-	padding: 2.5rem 2rem 2rem 2rem;
-	max-width: 400px;
-	width: 100%;
-	display: flex;
-	gap: 1.5rem;
-	align-items: center;
-	margin-bottom: 2.5rem;
-	animation: fadeInUp 1.1s;
-}
-.avatar {
-	background: linear-gradient(135deg, var(--color-primary) 60%, var(--color-accent) 100%);
-	border-radius: 50%;
-	width: 64px;
-	height: 64px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #fff;
-	font-size: 2.2rem;
-}
-.info h2 {
-	margin: 0 0 0.5rem 0;
-	font-size: 1.3rem;
-	color: var(--color-primary);
-}
-.info p {
-	margin: 0.1rem 0;
-	font-size: 1.05rem;
-}
-.cabinet-menu {
-	margin-top: 1.5rem;
-	display: flex;
-	flex-direction: column;
-	gap: 1.2rem;
-	max-width: 400px;
-	width: 100%;
-}
-.menu-item {
-	display: flex;
-	align-items: center;
-	gap: 0.7rem;
-	background: var(--color-card);
-	border-radius: 14px;
-	box-shadow: 0 4px 16px rgba(45,140,255,0.09);
-	padding: 1.1rem 1.2rem;
-	font-size: 1.08rem;
-	font-weight: 500;
-	color: var(--color-primary);
-	text-decoration: none;
-	transition: background 0.18s, color 0.18s, transform 0.18s;
-}
-.menu-item:hover {
-	background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-	color: #fff;
-	transform: translateY(-2px) scale(1.03);
-}
-@keyframes fadeInUp {
-	from { opacity: 0; transform: translateY(60px); }
-	to { opacity: 1; transform: none; }
-}
-.fade-in {
-	animation: fadeInUp 1.1s;
-}
+	.stars-bg {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: url("/src/images/star.png");
+		z-index: -1;
+		opacity: 0.3;
+	}
+
+	.cabinet-section {
+		min-height: 100vh;
+		display: flex;
+		padding: 2rem 0;
+	}
+
+	.container {
+		width: 100%;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+
+	.cabinet-container {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		background: var(--bg-primary);
+		border-radius: var(--radius);
+		overflow: hidden;
+		box-shadow: var(--shadow);
+	}
+
+	.cabinet-hero {
+		background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+		color: white;
+		padding: 4rem;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.logo {
+		font-size: 1.75rem;
+		font-weight: 700;
+		margin-bottom: 2rem;
+	}
+
+	.cabinet-hero h1 {
+		font-size: 2.5rem;
+		margin-bottom: 1rem;
+		line-height: 1.2;
+	}
+
+	.cabinet-hero p {
+		opacity: 0.9;
+		margin-bottom: 2rem;
+	}
+
+	.cabinet-image {
+		margin-top: auto;
+		text-align: center;
+	}
+
+	.cabinet-image img {
+		max-width: 100%;
+		height: auto;
+		border-radius: var(--radius);
+	}
+
+	.cabinet-content {
+		padding: 4rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.profile-card {
+		background: var(--bg-secondary);
+		border-radius: var(--radius);
+		padding: 2rem;
+		margin-bottom: 2rem;
+		display: flex;
+		gap: 1.5rem;
+		align-items: center;
+		border: 1px solid var(--border);
+	}
+
+	.avatar {
+		background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+		border-radius: 50%;
+		width: 64px;
+		height: 64px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		flex-shrink: 0;
+	}
+
+	.info h2 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.3rem;
+		color: var(--primary);
+	}
+
+	.info p {
+		margin: 0.1rem 0;
+		font-size: 1rem;
+		color: var(--text-secondary);
+	}
+
+	.cabinet-menu {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.menu-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		background: var(--bg-primary);
+		border-radius: var(--radius);
+		padding: 1rem 1.5rem;
+		font-size: 1rem;
+		font-weight: 500;
+		color: var(--text-primary);
+		text-decoration: none;
+		transition: var(--transition);
+		border: 1px solid var(--border);
+		cursor: pointer;
+	}
+
+	.menu-item:hover {
+		background: var(--bg-hover);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow);
+	}
+
+	.logout-btn {
+		background: rgba(239, 68, 68, 0.1);
+		color: var(--error);
+		border-color: var(--error);
+	}
+
+	.logout-btn:hover {
+		background: var(--error);
+		color: white;
+	}
+
+	@media (max-width: 1024px) {
+		.cabinet-container {
+			grid-template-columns: 1fr;
+		}
+
+		.cabinet-hero {
+			display: none;
+		}
+
+		.cabinet-content {
+			padding: 2rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.cabinet-section {
+			padding: 1rem 0;
+		}
+
+		.cabinet-hero h1 {
+			font-size: 2rem;
+		}
+
+		.profile-card {
+			flex-direction: column;
+			text-align: center;
+		}
+	}
 </style>
