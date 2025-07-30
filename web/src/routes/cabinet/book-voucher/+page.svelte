@@ -4,9 +4,12 @@
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { userStore } from '$lib/stores/userStore';
+	import { get } from 'svelte/store';
+	import { onMount } from 'svelte';
 
-	export let user: UserSession;
+	let user = get(userStore);
+	const unsubUser = userStore.subscribe((u) => (user = u));
 
 	let loading = true;
 	let submitting = false;
@@ -17,6 +20,12 @@
 	let sessions: any[] = [];
 	let selectedChild: string = '';
 	let selectedSession: string = '';
+
+	onMount(() => {
+		if (!user) goto('/login');
+		loadData();
+		return () => { unsubUser(); };
+	});
 
 	async function loadData() {
 		loading = true;
@@ -82,9 +91,6 @@
 			submitting = false;
 		}
 	}
-
-	import { onMount } from 'svelte';
-	onMount(() => { loadData(); });
 </script>
 
 <div class="book-voucher-page">

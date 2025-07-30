@@ -88,7 +88,7 @@
         Премиальный детский лагерь с 15-летним опытом организации незабываемого отдыха
       </p>
       <div class="hero-actions" transition:fade={{ delay: 400 }}>
-        <a href="#booking" class="button primary">
+        <a href="/cabinet/book-voucher" class="button primary">
           <Calendar size={18} class="icon" />
           <span>Забронировать путёвку</span>
         </a>

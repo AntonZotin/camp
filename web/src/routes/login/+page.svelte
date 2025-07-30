@@ -33,7 +33,7 @@
       });
       goto('/cabinet');
     } catch (e) {
-      error = e.message || 'Ошибка входа';
+      error = (e as Error).message || 'Ошибка входа';
     } finally {
       loading = false;
     }
