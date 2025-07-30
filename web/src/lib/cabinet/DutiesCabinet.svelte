@@ -13,7 +13,7 @@
 		loading = true;
 		error = '';
 		try {
-			const res = await fetch(`${PUBLIC_API_URL}/api/duties/employee/${user.userId}`, {
+			const res = await fetch(`${PUBLIC_API_URL}/api/duty-logs/employee/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки дежурств');
