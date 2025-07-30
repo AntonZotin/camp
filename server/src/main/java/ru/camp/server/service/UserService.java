@@ -129,4 +129,16 @@ public class UserService {
         userRepository.save(user);
         resetTokens.remove(email);
     }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
 } 

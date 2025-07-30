@@ -175,6 +175,7 @@
 </div>
 
 {#if showModal}
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 	<div class="modal-backdrop" on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editSession ? 'Редактировать смену' : 'Добавить смену'}</h3>
@@ -410,7 +411,7 @@
 		color: var(--text-primary);
 	}
 
-	.form-group input, .form-group select, .form-group textarea {
+	.form-group input, .form-group textarea {
 		width: 100%;
 		padding: 0.75rem;
 		border: 1px solid var(--border);
@@ -421,7 +422,7 @@
 		transition: var(--transition);
 	}
 
-	.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+	.form-group input:focus, .form-group textarea:focus {
 		border-color: var(--primary);
 		box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 	}

@@ -40,6 +40,22 @@
 		}
 	}
 
+	async function loadSettings() {
+		try {
+			const res = await fetch(`${PUBLIC_API_URL}/api/users/settings`, {
+				headers: { Authorization: `Bearer ${user.accessToken}` }
+			});
+			if (res.ok) {
+				const settings = await res.json();
+				settingsForm.emailNotifications = settings.emailNotifications || true;
+				settingsForm.smsNotifications = settings.smsNotifications || false;
+				settingsForm.theme = settings.theme || 'auto';
+			}
+		} catch (e) {
+			console.error('Ошибка загрузки настроек:', e);
+		}
+	}
+
 	async function updateProfile() {
 		loading = true;
 		error = '';
@@ -144,7 +160,10 @@
 	}
 
 	import { onMount } from 'svelte';
-	onMount(() => { loadProfile(); });
+	onMount(() => { 
+		loadProfile(); 
+		loadSettings();
+	});
 </script>
 
 <div class="settings-cabinet">

@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Loader, Plus, Trash2, Edit, AlertCircle } from 'lucide-svelte';
+	import { fade, fly } from 'svelte/transition';
+	import { Loader, Plus, Trash2, Edit, AlertCircle, Bell } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
-	export let user;
-	export let theme: 'light' | 'dark' = 'light';
+	import type { UserSession } from '$lib/stores/userStore';
+	export let user: UserSession;
 
 	let notifications = [];
 	let loading = true;
@@ -20,12 +21,12 @@
 		error = '';
 		try {
 			const res = await fetch(`${PUBLIC_API_URL}/api/notifications`, {
-				headers: { Authorization: `Bearer ${user?.accessToken}` }
+				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
 			if (!res.ok) throw new Error('Ошибка загрузки уведомлений');
 			notifications = await res.json();
 		} catch (e) {
-			error = e.message || 'Ошибка';
+			error = (e as Error).message || 'Ошибка';
 		} finally {
 			loading = false;
 		}
@@ -35,7 +36,7 @@
 		loadingUsers = true;
 		try {
 			const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
-				headers: { Authorization: `Bearer ${user?.accessToken}` }
+				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
 			if (res.ok) users = await res.json();
 		} finally {
@@ -58,10 +59,12 @@
 			notificationForm = { recipientId: '', type: 'internal', subject: '', message: '', status: 'pending' };
 		}
 	}
+
 	function closeModal() {
 		showModal = false;
 		editNotification = null;
 	}
+
 	async function saveNotification() {
 		const method = editNotification ? 'PUT' : 'POST';
 		const url = editNotification ? `${PUBLIC_API_URL}/api/notifications/${editNotification.id}` : `${PUBLIC_API_URL}/api/notifications`;
@@ -76,18 +79,19 @@
 			method,
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${user?.accessToken}`
+				Authorization: `Bearer ${user.accessToken}`
 			},
 			body
 		});
 		await loadNotifications();
 		closeModal();
 	}
+
 	async function deleteNotification(id: number) {
 		if (!confirm('Удалить уведомление?')) return;
 		await fetch(`${PUBLIC_API_URL}/api/notifications/${id}`, {
 			method: 'DELETE',
-			headers: { Authorization: `Bearer ${user?.accessToken}` }
+			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
 		await loadNotifications();
 	}
@@ -96,241 +100,357 @@
 	onMount(() => { loadNotifications(); loadUsers(); });
 </script>
 
-<div class="notification-admin" data-theme={theme}>
-	<h2>Уведомления</h2>
+<div class="notification-admin">
+	<div class="header">
+		<h2>
+			<Bell size={24} />
+			<span>Управление уведомлениями</span>
+		</h2>
+		<button class="add-btn" on:click={() => openModal()}>
+			<Plus size={18} />
+			<span>Добавить уведомление</span>
+		</button>
+	</div>
+
 	{#if loading}
-		<div class="loader spin"><Loader size={24}/> Загрузка...</div>
+		<div class="loader">
+			<Loader size={24} />
+			<span>Загрузка...</span>
+		</div>
 	{:else if error}
-		<div class="error"><AlertCircle size={20}/> {error}</div>
+		<div class="error">
+			<AlertCircle size={20} />
+			<span>{error}</span>
+		</div>
 	{:else}
-		<button class="add-btn" on:click={() => openModal()}><Plus size={18}/> Новое уведомление</button>
-		<table class="notification-table">
-			<thead>
-				<tr>
-					<th>Получатель</th>
-					<th>Тип</th>
-					<th>Тема</th>
-					<th>Сообщение</th>
-					<th>Статус</th>
-					<th>Создано</th>
-					<th>Отправлено</th>
-					<th>Действия</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each notifications as n}
+		<div class="notification-table">
+			<table>
+				<thead>
 					<tr>
-						<td>{n.recipient?.username}</td>
-						<td>{n.type}</td>
-						<td>{n.subject}</td>
-						<td>{n.message}</td>
-						<td>{n.status}</td>
-						<td>{n.createdAt}</td>
-						<td>{n.sentAt}</td>
-						<td>
-							<button class="icon-btn blue" title="Редактировать" on:click={() => openModal(n)}><Edit size={16}/></button>
-							<button class="icon-btn" title="Удалить" on:click={() => deleteNotification(n.id)}><Trash2 size={16}/></button>
-						</td>
+						<th>ID</th>
+						<th>Получатель</th>
+						<th>Тип</th>
+						<th>Тема</th>
+						<th>Сообщение</th>
+						<th>Статус</th>
+						<th>Создано</th>
+						<th>Отправлено</th>
+						<th>Действия</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each notifications as n}
+						<tr>
+							<td>{n.id}</td>
+							<td>{n.recipient?.username}</td>
+							<td>{n.type}</td>
+							<td>{n.subject}</td>
+							<td>{n.message}</td>
+							<td>{n.status}</td>
+							<td>{n.createdAt}</td>
+							<td>{n.sentAt}</td>
+							<td>
+								<button class="icon-btn edit" title="Редактировать" on:click={() => openModal(n)}>
+									<Edit size={16} />
+								</button>
+								<button class="icon-btn delete" title="Удалить" on:click={() => deleteNotification(n.id)}>
+									<Trash2 size={16} />
+								</button>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	{/if}
-	{#if showModal}
-		<button type="button" class="modal-backdrop" on:click={closeModal} aria-label="Закрыть модальное окно"></button>
-		<section class="modal" on:click|stopPropagation tabindex="0" role="dialog" aria-modal="true" on:keydown={e => { if (e.key === 'Escape') closeModal(); }}>
-			<h3>{editNotification ? 'Редактировать уведомление' : 'Новое уведомление'}</h3>
-			<form on:submit|preventDefault={saveNotification}>
-				<label>Получатель
-					<select bind:value={notificationForm.recipientId} required>
+</div>
+
+{#if showModal}
+	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal" in:fly={{ y: 30 }}>
+		<h3>{editNotification ? 'Редактировать уведомление' : 'Добавить уведомление'}</h3>
+		<form on:submit|preventDefault={saveNotification}>
+			<div class="form-row">
+				<div class="form-group">
+					<label for="recipientId">Получатель</label>
+					<select id="recipientId" bind:value={notificationForm.recipientId} required>
 						<option value="" disabled>Выберите пользователя</option>
 						{#each users as u}
 							<option value={u.id}>{u.username}</option>
 						{/each}
 					</select>
-				</label>
-				<label>Тип
-					<select bind:value={notificationForm.type} required>
+				</div>
+				<div class="form-group">
+					<label for="type">Тип</label>
+					<select id="type" bind:value={notificationForm.type} required>
 						{#each types as t}
 							<option value={t}>{t}</option>
 						{/each}
 					</select>
-				</label>
-				<label>Тема<input bind:value={notificationForm.subject} required /></label>
-				<label>Сообщение<textarea bind:value={notificationForm.message} rows="2" required></textarea></label>
-				<label>Статус
-					<select bind:value={notificationForm.status} required>
-						{#each statuses as s}
-							<option value={s}>{s}</option>
-						{/each}
-					</select>
-				</label>
-				<div class="modal-actions">
-					<button type="submit" class="save-btn">Сохранить</button>
-					<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>
 				</div>
-			</form>
-		</section>
-	{/if}
-</div>
+			</div>
+
+			<div class="form-group">
+				<label for="subject">Тема</label>
+				<input id="subject" bind:value={notificationForm.subject} required />
+			</div>
+
+			<div class="form-group">
+				<label for="message">Сообщение</label>
+				<textarea id="message" bind:value={notificationForm.message} rows="3" required placeholder="Текст уведомления..."></textarea>
+			</div>
+
+			<div class="form-group">
+				<label for="status">Статус</label>
+				<select id="status" bind:value={notificationForm.status} required>
+					{#each statuses as s}
+						<option value={s}>{s}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="modal-actions">
+				<button type="submit" class="save-btn">Сохранить</button>
+				<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>
+			</div>
+		</form>
+	</div>
+{/if}
 
 <style>
-.notification-admin {
-	padding: 2rem 1.5rem;
-	background: var(--color-card);
-	border-radius: 18px;
-	box-shadow: 0 4px 16px rgba(45,140,255,0.09);
-	max-width: 1100px;
-	margin: 2rem auto 0 auto;
-}
-.notification-admin[data-theme="dark"] {
-	--color-bg: #181c24;
-	--color-text: #f1f5f9;
-	--color-card: #23272f;
-}
-.notification-admin[data-theme="light"] {
-	--color-bg: #f8fafc;
-	--color-text: #222;
-	--color-card: #fff;
-}
-.notification-admin h2 {
-	font-size: 1.4rem;
-	color: var(--color-primary, #2d8cff);
-	margin-bottom: 2rem;
-}
-.add-btn {
-	background: var(--color-primary, #2d8cff);
-	color: #fff;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	margin-bottom: 1.2rem;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	transition: background 0.18s;
-}
-.add-btn:hover {
-	background: var(--color-accent, #ffb347);
-	color: #222;
-}
-.notification-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 1rem;
-}
-.notification-table th, .notification-table td {
-	padding: 0.7rem 0.5rem;
-	text-align: left;
-	border-bottom: 1px solid #e0e0e0;
-}
-.notification-table th {
-	color: var(--color-primary, #2d8cff);
-	font-size: 1.05rem;
-}
-.icon-btn {
-	background: none;
-	border: none;
-	color: #e74c3c;
-	cursor: pointer;
-	padding: 0.2rem 0.5rem;
-	border-radius: 6px;
-	transition: background 0.18s;
-	display: flex;
-	align-items: center;
-}
-.icon-btn.blue {
-	color: #2d8cff;
-}
-.icon-btn:hover {
-	background: #ffeaea;
-}
-.loader, .error {
-	text-align: center;
-	margin-top: 2.5rem;
-	font-size: 1.1rem;
-	color: #888;
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	justify-content: center;
-}
-.error { color: #e74c3c; }
-.modal-backdrop {
-	position: fixed;
-	top: 0; left: 0; right: 0; bottom: 0;
-	background: rgba(0,0,0,0.18);
-	z-index: 1000;
-}
-.modal {
-	position: fixed;
-	top: 50%; left: 50%;
-	transform: translate(-50%, -50%);
-	background: var(--color-card);
-	padding: 2rem 2.2rem;
-	border-radius: 16px;
-	box-shadow: 0 8px 32px rgba(45,140,255,0.13);
-	z-index: 1001;
-	min-width: 320px;
-	max-width: 95vw;
-}
-.modal h3 {
-	margin-bottom: 1.2rem;
-	font-size: 1.15rem;
-	color: var(--color-primary, #2d8cff);
-}
-.modal label {
-	display: block;
-	margin-bottom: 0.7rem;
-	font-size: 1rem;
-}
-.modal input, .modal textarea, .modal select {
-	width: 100%;
-	padding: 0.5rem;
-	border-radius: 7px;
-	border: 1px solid #d0d7e2;
-	margin-top: 0.2rem;
-	margin-bottom: 0.7rem;
-	font-size: 1rem;
-	background: var(--color-bg);
-	color: var(--color-text);
-}
-.modal-actions {
-	display: flex;
-	gap: 1.2rem;
-	justify-content: flex-end;
-	margin-top: 1.2rem;
-}
-.save-btn {
-	background: var(--color-primary, #2d8cff);
-	color: #fff;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	cursor: pointer;
-	transition: background 0.18s;
-}
-.save-btn:hover {
-	background: var(--color-accent, #ffb347);
-	color: #222;
-}
-.cancel-btn {
-	background: #e0e0e0;
-	color: #222;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	cursor: pointer;
-	transition: background 0.18s;
-}
-.cancel-btn:hover {
-	background: #f8d7da;
-	color: #c0392b;
-}
-.spin { animation: spin 1s linear infinite; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
+	.notification-admin {
+		padding: 1rem;
+	}
+
+	.header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+
+	.header h2 {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 1.5rem;
+		color: var(--primary);
+		margin: 0;
+	}
+
+	.add-btn {
+		background: var(--primary);
+		color: white;
+		border: none;
+		border-radius: var(--radius);
+		padding: 0.75rem 1.5rem;
+		font-size: 0.9rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: var(--transition);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.add-btn:hover {
+		background: var(--primary-dark);
+		transform: translateY(-2px);
+	}
+
+	.loader, .error {
+		text-align: center;
+		margin: 2rem 0;
+		font-size: 1rem;
+		color: var(--text-secondary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.error {
+		color: var(--error);
+	}
+
+	.notification-table {
+		overflow-x: auto;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		background: var(--bg-primary);
+		border-radius: var(--radius);
+		overflow: hidden;
+		border: 1px solid var(--border);
+	}
+
+	th {
+		background: var(--bg-secondary);
+		color: var(--text-primary);
+		font-weight: 600;
+		padding: 1rem;
+		text-align: left;
+		border-bottom: 1px solid var(--border);
+	}
+
+	td {
+		padding: 1rem;
+		border-bottom: 1px solid var(--border);
+		color: var(--text-primary);
+	}
+
+	tr:hover {
+		background: var(--bg-hover);
+	}
+
+	.icon-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0.25rem;
+		border-radius: var(--radius);
+		transition: var(--transition);
+		display: inline-flex;
+		align-items: center;
+		margin-right: 0.5rem;
+	}
+
+	.icon-btn.edit {
+		color: var(--primary);
+	}
+
+	.icon-btn.delete {
+		color: var(--error);
+	}
+
+	.icon-btn:hover {
+		background: var(--bg-hover);
+	}
+
+	.modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 1000;
+	}
+
+	.modal {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: var(--bg-primary);
+		padding: 2rem;
+		border-radius: var(--radius);
+		box-shadow: var(--shadow);
+		z-index: 1001;
+		min-width: 600px;
+		max-width: 90vw;
+		max-height: 90vh;
+		overflow-y: auto;
+	}
+
+	.modal h3 {
+		margin-bottom: 1.5rem;
+		font-size: 1.5rem;
+		color: var(--primary);
+	}
+
+	.form-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.form-group {
+		margin-bottom: 1rem;
+	}
+
+	.form-group label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 500;
+		color: var(--text-primary);
+	}
+
+	.form-group input, .form-group select, .form-group textarea {
+		width: 100%;
+		padding: 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--bg-primary);
+		color: var(--text-primary);
+		font-size: 0.9rem;
+		transition: var(--transition);
+	}
+
+	.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+		border-color: var(--primary);
+		box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+	}
+
+	.form-group textarea {
+		resize: vertical;
+		min-height: 100px;
+	}
+
+	.modal-actions {
+		display: flex;
+		gap: 1rem;
+		justify-content: flex-end;
+		margin-top: 1.5rem;
+	}
+
+	.save-btn, .cancel-btn {
+		padding: 0.75rem 1.5rem;
+		border-radius: var(--radius);
+		font-weight: 500;
+		text-decoration: none;
+		transition: var(--transition);
+		border: none;
+		cursor: pointer;
+		font-size: 0.9rem;
+	}
+
+	.save-btn {
+		background: var(--primary);
+		color: white;
+	}
+
+	.save-btn:hover {
+		background: var(--primary-dark);
+	}
+
+	.cancel-btn {
+		background: transparent;
+		color: var(--text-primary);
+		border: 1px solid var(--border);
+	}
+
+	.cancel-btn:hover {
+		background: var(--bg-hover);
+	}
+
+	@media (max-width: 768px) {
+		.header {
+			flex-direction: column;
+			gap: 1rem;
+			align-items: stretch;
+		}
+
+		.form-row {
+			grid-template-columns: 1fr;
+		}
+
+		.modal {
+			min-width: 300px;
+			margin: 1rem;
+		}
+	}
 </style> 

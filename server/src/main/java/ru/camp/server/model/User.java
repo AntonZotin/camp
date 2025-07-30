@@ -32,6 +32,15 @@ public class User {
     @Column(nullable = false)
     private UserType userType;
 
+    @Column(name = "email_notifications", nullable = false)
+    private boolean emailNotifications = true;
+
+    @Column(name = "sms_notifications", nullable = false)
+    private boolean smsNotifications = false;
+
+    @Column(name = "theme", nullable = false)
+    private String theme = "auto";
+
     @OneToMany(mappedBy = "parent")
     private Set<Child> children;
 
