@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.model.Voucher;
 import ru.camp.server.service.VoucherService;
+import ru.camp.server.dto.BookVoucherRequest;
 import java.util.List;
 
 @RestController
@@ -28,8 +29,13 @@ public class VoucherController {
     }
 
     @PostMapping
-    public ResponseEntity<Voucher> create(@RequestBody Voucher voucher) {
-        return ResponseEntity.ok(voucherService.create(voucher));
+    public ResponseEntity<Voucher> create(@RequestBody BookVoucherRequest request) {
+        try {
+            Voucher voucher = voucherService.bookVoucher(request.getChildId(), request.getSessionId());
+            return ResponseEntity.ok(voucher);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")

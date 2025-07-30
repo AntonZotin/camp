@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
-	import { Ticket, CalendarCheck, Loader, AlertCircle, Plus, Eye, Trash2 } from 'lucide-svelte';
+	import { Ticket, CalendarCheck, Loader, AlertCircle, Plus, Eye, Trash2, X, Calendar, User, MapPin, Clock } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
@@ -8,6 +8,8 @@
 	let vouchers: any[] = [];
 	let loading = true;
 	let error = '';
+	let showVoucherDetails = false;
+	let selectedVoucher: any = null;
 
 	async function loadVouchers() {
 		loading = true;
@@ -32,6 +34,16 @@
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
 		await loadVouchers();
+	}
+
+	function showDetails(voucher: any) {
+		selectedVoucher = voucher;
+		showVoucherDetails = true;
+	}
+
+	function closeDetails() {
+		showVoucherDetails = false;
+		selectedVoucher = null;
 	}
 
 	import { onMount } from 'svelte';
@@ -74,7 +86,7 @@
 						<Ticket size={24} />
 						<h3>Путёвка #{voucher.id}</h3>
 						<div class="actions">
-							<button class="icon-btn view" title="Просмотреть детали">
+							<button class="icon-btn view" title="Просмотреть детали" on:click={() => showDetails(voucher)}>
 								<Eye size={16} />
 							</button>
 							<button class="icon-btn delete" title="Удалить" on:click={() => deleteVoucher(voucher.id)}>
@@ -105,6 +117,83 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Модальное окно деталей путёвки -->
+{#if showVoucherDetails && selectedVoucher}
+	<div class="modal-backdrop" on:click={closeDetails} transition:fade>
+		<div class="modal" on:click|stopPropagation transition:fly={{ y: 50, duration: 300 }}>
+			<div class="modal-header">
+				<h3>
+					<Ticket size={20} />
+					<span>Детали путёвки #{selectedVoucher.id}</span>
+				</h3>
+				<button class="close-btn" on:click={closeDetails}>
+					<X size={20} />
+				</button>
+			</div>
+			<div class="modal-content">
+				<div class="detail-section">
+					<h4>
+						<User size={16} />
+						<span>Информация о ребёнке</span>
+					</h4>
+					<div class="detail-grid">
+						<div class="detail-item">
+							<span class="label">Имя:</span>
+							<span class="value">{selectedVoucher.child?.name || 'Не указан'}</span>
+						</div>
+						<div class="detail-item">
+							<span class="label">Дата рождения:</span>
+							<span class="value">{selectedVoucher.child?.birthDate || 'Не указана'}</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="detail-section">
+					<h4>
+						<Calendar size={16} />
+						<span>Информация о смене</span>
+					</h4>
+					<div class="detail-grid">
+						<div class="detail-item">
+							<span class="label">Название смены:</span>
+							<span class="value">{selectedVoucher.session?.name || 'Не указана'}</span>
+						</div>
+						<div class="detail-item">
+							<span class="label">Описание:</span>
+							<span class="value">{selectedVoucher.session?.description || 'Описание отсутствует'}</span>
+						</div>
+						<div class="detail-item">
+							<span class="label">Дата начала:</span>
+							<span class="value">{selectedVoucher.session?.startDate || 'Не указана'}</span>
+						</div>
+						<div class="detail-item">
+							<span class="label">Дата окончания:</span>
+							<span class="value">{selectedVoucher.session?.endDate || 'Не указана'}</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="detail-section">
+					<h4>
+						<Clock size={16} />
+						<span>Статус бронирования</span>
+					</h4>
+					<div class="detail-grid">
+						<div class="detail-item">
+							<span class="label">Статус:</span>
+							<span class="value status-{selectedVoucher.status?.toLowerCase()}">{selectedVoucher.status}</span>
+						</div>
+						<div class="detail-item">
+							<span class="label">Дата бронирования:</span>
+							<span class="value">{selectedVoucher.bookingDate}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.vouchers-cabinet {
@@ -275,6 +364,109 @@
 		color: var(--text-secondary);
 	}
 
+	/* Модальное окно */
+	.modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+	}
+
+	.modal {
+		background: var(--bg-primary);
+		border-radius: var(--radius);
+		box-shadow: var(--shadow);
+		max-width: 600px;
+		width: 90%;
+		max-height: 80vh;
+		overflow-y: auto;
+	}
+
+	.modal-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1.5rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.modal-header h3 {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0;
+		color: var(--primary);
+	}
+
+	.close-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: var(--text-secondary);
+		padding: 0.25rem;
+		border-radius: var(--radius);
+		transition: var(--transition);
+	}
+
+	.close-btn:hover {
+		background: var(--bg-hover);
+		color: var(--text-primary);
+	}
+
+	.modal-content {
+		padding: 1.5rem;
+	}
+
+	.detail-section {
+		margin-bottom: 2rem;
+	}
+
+	.detail-section:last-child {
+		margin-bottom: 0;
+	}
+
+	.detail-section h4 {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin: 0 0 1rem 0;
+		color: var(--primary);
+		font-size: 1.1rem;
+	}
+
+	.detail-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.detail-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		padding: 0.75rem;
+		background: var(--bg-hover);
+		border-radius: var(--radius);
+	}
+
+	.detail-item .label {
+		font-weight: 500;
+		color: var(--text-secondary);
+		min-width: 120px;
+	}
+
+	.detail-item .value {
+		flex: 1;
+		text-align: right;
+		color: var(--text-primary);
+	}
+
 	@media (max-width: 768px) {
 		.header {
 			flex-direction: column;
@@ -284,6 +476,20 @@
 
 		.vouchers-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.modal {
+			width: 95%;
+			margin: 1rem;
+		}
+
+		.detail-item {
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+
+		.detail-item .value {
+			text-align: left;
 		}
 	}
 </style> 

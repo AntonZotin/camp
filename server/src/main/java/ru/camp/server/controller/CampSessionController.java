@@ -28,13 +28,13 @@ public class CampSessionController {
     }
 
     @PostMapping
-    public ResponseEntity<CampSession> create(@RequestBody CampSession session) {
-        return ResponseEntity.ok(campSessionService.create(session));
+    public ResponseEntity<CampSession> create(@RequestBody CampSession campSession) {
+        return ResponseEntity.ok(campSessionService.create(campSession));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CampSession> update(@PathVariable Long id, @RequestBody CampSession session) {
-        return ResponseEntity.ok(campSessionService.update(id, session));
+    public ResponseEntity<CampSession> update(@PathVariable Long id, @RequestBody CampSession campSession) {
+        return ResponseEntity.ok(campSessionService.update(id, campSession));
     }
 
     @DeleteMapping("/{id}")
