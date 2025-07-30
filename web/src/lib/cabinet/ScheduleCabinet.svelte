@@ -188,11 +188,6 @@
 		gap: 0.5rem;
 	}
 
-	.info-item svg {
-		color: var(--text-secondary);
-		flex-shrink: 0;
-	}
-
 	.label {
 		font-size: 0.9rem;
 		color: var(--text-secondary);

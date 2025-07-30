@@ -120,6 +120,7 @@
 
 <!-- Модальное окно деталей путёвки -->
 {#if showVoucherDetails && selectedVoucher}
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 	<div class="modal-backdrop" on:click={closeDetails} transition:fade>
 		<div class="modal" on:click|stopPropagation transition:fly={{ y: 50, duration: 300 }}>
 			<div class="modal-header">
@@ -346,22 +347,6 @@
 	.value {
 		font-weight: 500;
 		color: var(--text-primary);
-	}
-
-	.status-booked {
-		color: var(--primary);
-	}
-
-	.status-confirmed {
-		color: var(--secondary);
-	}
-
-	.status-cancelled {
-		color: var(--error);
-	}
-
-	.status-completed {
-		color: var(--text-secondary);
 	}
 
 	/* Модальное окно */
