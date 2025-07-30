@@ -253,3 +253,17 @@ VALUES (1, 4, 'Login', '2024-05-01 09:00:00', 'User parent1 logged in'),
        (8, 11, 'Login', '2024-05-08 09:00:00', 'User parent8 logged in'),
        (9, 12, 'Login', '2024-05-09 09:00:00', 'User parent9 logged in'),
        (10, 2, 'Login', '2024-05-10 09:00:00', 'User parent logged in');
+
+SELECT setval('activity_logs_id_seq', (SELECT MAX(id) FROM activity_logs));
+SELECT setval('camp_sessions_id_seq', (SELECT MAX(id) FROM camp_sessions));
+SELECT setval('children_id_seq', (SELECT MAX(id) FROM children));
+SELECT setval('duty_logs_id_seq', (SELECT MAX(id) FROM duty_logs));
+SELECT setval('employees_id_seq', (SELECT MAX(id) FROM employees));
+SELECT setval('medical_cards_id_seq', (SELECT MAX(id) FROM medical_cards));
+SELECT setval('medical_visits_id_seq', (SELECT MAX(id) FROM medical_visits));
+SELECT setval('menus_id_seq', (SELECT MAX(id) FROM menus));
+SELECT setval('notifications_id_seq', (SELECT MAX(id) FROM notifications));
+SELECT setval('payments_id_seq', (SELECT MAX(id) FROM payments));
+SELECT setval('schedules_id_seq', (SELECT MAX(id) FROM schedules));
+SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+SELECT setval('vouchers_id_seq', (SELECT MAX(id) FROM vouchers));
