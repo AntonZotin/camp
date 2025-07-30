@@ -1,9 +1,20 @@
 <script>
   import ThemeToggle from './ThemeToggle.svelte';
-  import { Home, Info, Calendar, Phone, LogIn } from 'lucide-svelte';
+  import { Home, Info, Calendar, Phone, LogIn, User, LogOut } from 'lucide-svelte';
+  import { userStore, logoutUser } from '$lib/stores/userStore';
+  import { goto } from '$app/navigation';
+  import { get } from 'svelte/store';
 
   export let currentTheme;
   export let toggleTheme;
+
+  let user = get(userStore);
+  userStore.subscribe((u) => (user = u));
+
+  function handleLogout() {
+    logoutUser();
+    goto('/');
+  }
 
   const navLinks = [
     { name: 'Главная', href: '/', icon: Home },
@@ -33,12 +44,27 @@
 
     <div class="actions">
       <ThemeToggle {currentTheme} {toggleTheme} />
-      <a href="/login" class="button primary">
-        <div class="icon">
-          <LogIn size={18} />
-        </div>
-        <span>Войти</span>
-      </a>
+      {#if user}
+        <a href="/cabinet" class="button primary">
+          <div class="icon">
+            <User size={18} />
+          </div>
+          <span>Кабинет</span>
+        </a>
+        <button class="button secondary logout-btn" on:click={handleLogout}>
+          <div class="icon">
+            <LogOut size={18} />
+          </div>
+          <span>Выйти</span>
+        </button>
+      {:else}
+        <a href="/login" class="button primary">
+          <div class="icon">
+            <LogIn size={18} />
+          </div>
+          <span>Войти</span>
+        </a>
+      {/if}
     </div>
   </div>
 </header>
@@ -125,6 +151,51 @@
     gap: 1rem;
   }
 
+  .button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .button.primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  .button.primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .button.secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .button.secondary:hover {
+    background: var(--bg-hover);
+    transform: translateY(-2px);
+  }
+
+  .logout-btn {
+    color: var(--error);
+    border-color: var(--error);
+  }
+
+  .logout-btn:hover {
+    background: var(--error);
+    color: white;
+  }
+
   .nav-text {
     position: relative;
     transition: var(--transition);
@@ -132,6 +203,19 @@
 
   @media (max-width: 768px) {
     nav {
+      display: none;
+    }
+    
+    .actions {
+      gap: 0.5rem;
+    }
+    
+    .button {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .button span {
       display: none;
     }
   }
