@@ -46,16 +46,19 @@
     {
       title: 'Творческая смена',
       description: 'Театр, живопись, музыка и танцы',
+      link: '/programs#1',
       icon: Palette
     },
     {
       title: 'Спортивная смена',
       description: 'Соревнования, эстафеты и тренировки',
+      link: '/programs#2',
       icon: Activity
     },
     {
       title: 'Научная смена',
       description: 'Эксперименты, квесты и исследования',
+      link: '/programs#3',
       icon: Star
     }
   ];
@@ -143,23 +146,25 @@
 
     <div class="programs-grid">
       {#each programs as program, i (program.title)}
-        <div class="program-card" in:fly={{ y: 50, duration: 500, delay: i * 150 }}>
-          <div class="program-icon">
-            <svelte:component this={program.icon} size={48} />
-          </div>
-          <h3>{program.title}</h3>
-          <p>{program.description}</p>
-          <div class="program-details">
-            <div class="detail-item">
-              <Calendar size={16} />
-              <span>Июнь-Август</span>
+        <a href={program.link}>
+          <div class="program-card" in:fly={{ y: 50, duration: 500, delay: i * 150 }}>
+            <div class="program-icon">
+              <svelte:component this={program.icon} size={48} />
             </div>
-            <div class="detail-item">
-              <Users size={16} />
-              <span>7-15 лет</span>
+            <h3>{program.title}</h3>
+            <p>{program.description}</p>
+            <div class="program-details">
+              <div class="detail-item">
+                <Calendar size={16} />
+                <span>Июнь-Август</span>
+              </div>
+              <div class="detail-item">
+                <Users size={16} />
+                <span>7-15 лет</span>
+              </div>
             </div>
           </div>
-        </div>
+        </a>
       {/each}
     </div>
   </div>
@@ -395,6 +400,14 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
+  }
+
+  .programs-grid a,
+  .programs-grid a:hover,
+  .programs-grid a:active,
+  .programs-grid a:visited {
+    text-decoration: none;
+    color: var(--primary);
   }
 
   .program-card {

@@ -4,6 +4,7 @@
 
   const programs = [
     {
+      id: '1',
       title: 'Творческая смена',
       description: 'Театр, живопись, музыка и танцы',
       icon: Palette,
@@ -39,6 +40,7 @@
       results: 'Итоговый спектакль, выставка работ, музыкальный концерт'
     },
     {
+      id: '2',
       title: 'Спортивная смена',
       description: 'Соревнования, эстафеты и тренировки',
       icon: Activity,
@@ -74,6 +76,7 @@
       results: 'Спортивные соревнования, вручение наград, показательные выступления'
     },
     {
+      id: '3',
       title: 'Научная смена',
       description: 'Эксперименты, квесты и исследования',
       icon: Star,
@@ -154,7 +157,7 @@
 <section class="programs-section">
   <div class="container">
     {#each programs as program, i (program.title)}
-      <div class="program-block" in:fly={{ y: 50, delay: i * 100 }}>
+      <div class="program-block" id={program.id} in:fly={{ y: 50, delay: i * 100 }}>
         <div class="program-header">
           <div class="program-icon">
             <svelte:component this={program.icon} size={48} />
