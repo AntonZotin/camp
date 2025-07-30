@@ -163,161 +163,217 @@
 
 <style>
 .menu-admin {
-	padding: 2rem 1.5rem;
-	background: var(--color-card);
-	border-radius: 18px;
-	box-shadow: 0 4px 16px rgba(45,140,255,0.09);
+	padding: 1rem;
+	background: var(--bg-primary);
+	border-radius: var(--radius);
+	border: 1px solid var(--border);
 	max-width: 1100px;
-	margin: 2rem auto 0 auto;
+	margin: 0 auto;
 }
-.menu-admin[data-theme="dark"] {
-	--color-bg: #181c24;
-	--color-text: #f1f5f9;
-	--color-card: #23272f;
-}
-.menu-admin[data-theme="light"] {
-	--color-bg: #f8fafc;
-	--color-text: #222;
-	--color-card: #fff;
-}
+
 .menu-admin h2 {
-	font-size: 1.4rem;
-	color: var(--color-primary, #2d8cff);
+	font-size: 1.5rem;
+	color: var(--primary);
 	margin-bottom: 2rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
 }
+
 .add-btn {
-	background: var(--color-primary, #2d8cff);
-	color: #fff;
+	background: var(--primary);
+	color: white;
 	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	margin-bottom: 1.2rem;
+	border-radius: var(--radius);
+	padding: 0.75rem 1.5rem;
+	font-size: 0.9rem;
+	font-weight: 500;
+	margin-bottom: 1.5rem;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	transition: background 0.18s;
+	transition: var(--transition);
 }
+
 .add-btn:hover {
-	background: var(--color-accent, #ffb347);
-	color: #222;
+	background: var(--primary-dark);
+	transform: translateY(-2px);
 }
+
+.loader, .error {
+	text-align: center;
+	margin: 2rem 0;
+	font-size: 1rem;
+	color: var(--text-secondary);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+}
+
+.error {
+	color: var(--error);
+}
+
 .menu-table {
 	width: 100%;
 	border-collapse: collapse;
-	margin-top: 1rem;
+	background: var(--bg-primary);
+	border-radius: var(--radius);
+	overflow: hidden;
+	border: 1px solid var(--border);
 }
-.menu-table th, .menu-table td {
-	padding: 0.7rem 0.5rem;
-	text-align: left;
-	border-bottom: 1px solid #e0e0e0;
-}
+
 .menu-table th {
-	color: var(--color-primary, #2d8cff);
-	font-size: 1.05rem;
+	background: var(--bg-secondary);
+	color: var(--text-primary);
+	font-weight: 600;
+	padding: 1rem;
+	text-align: left;
+	border-bottom: 1px solid var(--border);
 }
+
+.menu-table td {
+	padding: 1rem;
+	border-bottom: 1px solid var(--border);
+	color: var(--text-primary);
+}
+
+.menu-table tr:hover {
+	background: var(--bg-hover);
+}
+
 .icon-btn {
 	background: none;
 	border: none;
-	color: #e74c3c;
 	cursor: pointer;
-	padding: 0.2rem 0.5rem;
-	border-radius: 6px;
-	transition: background 0.18s;
-	display: flex;
+	padding: 0.25rem;
+	border-radius: var(--radius);
+	transition: var(--transition);
+	display: inline-flex;
 	align-items: center;
+	margin-right: 0.5rem;
 }
+
 .icon-btn.blue {
-	color: #2d8cff;
+	color: var(--primary);
 }
+
 .icon-btn:hover {
-	background: #ffeaea;
+	background: var(--bg-hover);
 }
-.loader, .error {
-	text-align: center;
-	margin-top: 2.5rem;
-	font-size: 1.1rem;
-	color: #888;
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	justify-content: center;
-}
-.error { color: #e74c3c; }
+
 .modal-backdrop {
 	position: fixed;
-	top: 0; left: 0; right: 0; bottom: 0;
-	background: rgba(0,0,0,0.18);
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
 	z-index: 1000;
 }
+
 .modal {
 	position: fixed;
-	top: 50%; left: 50%;
+	top: 50%;
+	left: 50%;
 	transform: translate(-50%, -50%);
-	background: var(--color-card);
-	padding: 2rem 2.2rem;
-	border-radius: 16px;
-	box-shadow: 0 8px 32px rgba(45,140,255,0.13);
+	background: var(--bg-primary);
+	padding: 2rem;
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
 	z-index: 1001;
-	min-width: 320px;
-	max-width: 95vw;
+	min-width: 500px;
+	max-width: 90vw;
+	max-height: 90vh;
+	overflow-y: auto;
 }
+
 .modal h3 {
-	margin-bottom: 1.2rem;
-	font-size: 1.15rem;
-	color: var(--color-primary, #2d8cff);
+	margin-bottom: 1.5rem;
+	font-size: 1.5rem;
+	color: var(--primary);
 }
+
 .modal label {
 	display: block;
-	margin-bottom: 0.7rem;
-	font-size: 1rem;
+	margin-bottom: 1rem;
+	font-weight: 500;
+	color: var(--text-primary);
 }
-.modal input, .modal textarea, .modal select {
+
+.modal input, .modal select, .modal textarea {
 	width: 100%;
-	padding: 0.5rem;
-	border-radius: 7px;
-	border: 1px solid #d0d7e2;
-	margin-top: 0.2rem;
-	margin-bottom: 0.7rem;
-	font-size: 1rem;
-	background: var(--color-bg);
-	color: var(--color-text);
+	padding: 0.75rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	font-size: 0.9rem;
+	transition: var(--transition);
+	margin-top: 0.5rem;
 }
+
+.modal input:focus, .modal select:focus, .modal textarea:focus {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
 .modal-actions {
 	display: flex;
-	gap: 1.2rem;
+	gap: 1rem;
 	justify-content: flex-end;
-	margin-top: 1.2rem;
+	margin-top: 1.5rem;
 }
+
+.save-btn, .cancel-btn {
+	padding: 0.75rem 1.5rem;
+	border-radius: var(--radius);
+	font-weight: 500;
+	text-decoration: none;
+	transition: var(--transition);
+	border: none;
+	cursor: pointer;
+	font-size: 0.9rem;
+}
+
 .save-btn {
-	background: var(--color-primary, #2d8cff);
-	color: #fff;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	cursor: pointer;
-	transition: background 0.18s;
+	background: var(--primary);
+	color: white;
 }
+
 .save-btn:hover {
-	background: var(--color-accent, #ffb347);
-	color: #222;
+	background: var(--primary-dark);
 }
+
 .cancel-btn {
-	background: #e0e0e0;
-	color: #222;
-	border: none;
-	border-radius: 8px;
-	padding: 0.5rem 1.2rem;
-	font-size: 1rem;
-	cursor: pointer;
-	transition: background 0.18s;
+	background: transparent;
+	color: var(--text-primary);
+	border: 1px solid var(--border);
 }
+
 .cancel-btn:hover {
-	background: #f8d7da;
-	color: #c0392b;
+	background: var(--bg-hover);
 }
-.spin { animation: spin 1s linear infinite; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+	.menu-admin {
+		padding: 1rem;
+		margin: 0;
+	}
+
+	.menu-table {
+		font-size: 0.8rem;
+	}
+
+	.menu-table th, .menu-table td {
+		padding: 0.5rem;
+	}
+
+	.modal {
+		min-width: 300px;
+		margin: 1rem;
+	}
+}
 </style> 
