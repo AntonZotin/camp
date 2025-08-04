@@ -127,7 +127,6 @@ CREATE TABLE users
     password             VARCHAR(255)                            NOT NULL,
     email                VARCHAR(255)                            NOT NULL,
     role                 VARCHAR(255)                            NOT NULL,
-    user_type            VARCHAR(255)                            NOT NULL,
     email_notifications  BOOLEAN                                 NOT NULL DEFAULT TRUE,
     sms_notifications    BOOLEAN                                 NOT NULL DEFAULT FALSE,
     theme                VARCHAR(10)                             NOT NULL DEFAULT 'auto',
