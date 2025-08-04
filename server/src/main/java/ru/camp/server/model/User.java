@@ -28,10 +28,6 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserType userType;
-
     @Column(name = "email_notifications", nullable = false)
     private boolean emailNotifications = true;
 

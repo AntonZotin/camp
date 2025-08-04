@@ -4,18 +4,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.dto.UserRegistrationRequest;
-import ru.camp.server.model.User;
+import ru.camp.server.model.*;
 import ru.camp.server.repository.UserRepository;
 import ru.camp.server.dto.UserLoginRequest;
 import ru.camp.server.dto.AuthResponse;
 import ru.camp.server.config.JwtUtil;
 import ru.camp.server.repository.ChildRepository;
 import ru.camp.server.repository.EmployeeRepository;
-import ru.camp.server.model.Child;
-import ru.camp.server.model.Employee;
 import ru.camp.server.dto.ChildDto;
 import ru.camp.server.dto.ForgotPasswordRequest;
-import ru.camp.server.model.Notification;
 import ru.camp.server.dto.ResetPasswordRequest;
 
 import java.util.Map;
@@ -23,7 +20,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
 
-import ru.camp.server.model.UserType;
 import org.springframework.beans.factory.annotation.Value;
 
 @Service
@@ -55,8 +51,7 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
-        user.setUserType(request.getUserType());
-        if (request.getUserType() == UserType.PARENT && request.getChildren() != null) {
+        if (request.getRole() == Role.PARENT && request.getChildren() != null) {
             HashSet<Child> children = new HashSet<>();
             for (ChildDto childDto : request.getChildren()) {
                 Child child = new Child();
@@ -67,7 +62,7 @@ public class UserService {
             }
             user.setChildren(children);
         }
-        if (request.getUserType() == UserType.EMPLOYEE) {
+        if (request.getRole() == Role.EMPLOYEE) {
             Employee employee = new Employee();
             employee.setFullName(request.getFullName());
             employee.setPosition(request.getPosition());

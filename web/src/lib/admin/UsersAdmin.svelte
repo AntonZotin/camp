@@ -14,15 +14,13 @@
 		username: '', 
 		email: '', 
 		password: '', 
-		role: 'USER', 
-		userType: 'PARENT',
+		role: 'PARENT',
 		fullName: '',
 		position: ''
 	};
 	let showPassword = false;
 
-	const roles = ['ADMIN', 'PARENT', 'EMPLOYEE', 'USER'];
-	const userTypes = ['PARENT', 'EMPLOYEE'];
+	const roles = ['ADMIN', 'PARENT', 'EMPLOYEE'];
 
 	async function loadUsers() {
 		loading = true;
@@ -48,8 +46,7 @@
 				username: userData.username || '',
 				email: userData.email || '',
 				password: '',
-				role: userData.role || 'USER',
-				userType: userData.userType || 'PARENT',
+				role: userData.role || 'PARENT',
 				fullName: userData.employee?.fullName || '',
 				position: userData.employee?.position || ''
 			};
@@ -58,8 +55,7 @@
 				username: '',
 				email: '',
 				password: '',
-				role: 'USER',
-				userType: 'PARENT',
+				role: 'PARENT',
 				fullName: '',
 				position: ''
 			};
@@ -140,7 +136,6 @@
 						<th>Логин</th>
 						<th>Email</th>
 						<th>Роль</th>
-						<th>Тип</th>
 						<th>Доп. информация</th>
 						<th>Действия</th>
 					</tr>
@@ -158,7 +153,6 @@
 									{/each}
 								</select>
 							</td>
-							<td>{u.userType}</td>
 							<td>
 								{#if u.employee}
 									{u.employee.fullName} - {u.employee.position}
@@ -228,15 +222,7 @@
 			</div>
 
 			<div class="form-row">
-				<div class="form-group">
-					<label for="userType">Тип пользователя</label>
-					<select id="userType" bind:value={userForm.userType} required>
-						{#each userTypes as t}
-							<option value={t}>{t}</option>
-						{/each}
-					</select>
-				</div>
-				{#if userForm.userType === 'EMPLOYEE'}
+				{#if userForm.role === 'EMPLOYEE'}
 					<div class="form-group">
 						<label for="fullName">Полное имя</label>
 						<input id="fullName" bind:value={userForm.fullName} />
@@ -244,7 +230,7 @@
 				{/if}
 			</div>
 
-			{#if userForm.userType === 'EMPLOYEE'}
+			{#if userForm.role === 'EMPLOYEE'}
 				<div class="form-group">
 					<label for="position">Должность</label>
 					<input id="position" bind:value={userForm.position} />

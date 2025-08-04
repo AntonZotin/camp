@@ -43,7 +43,6 @@ public class UserController {
             profile.put("username", user.getUsername());
             profile.put("email", user.getEmail());
             profile.put("role", user.getRole());
-            profile.put("userType", user.getUserType());
 
             return ResponseEntity.ok(profile);
         } catch (Exception e) {

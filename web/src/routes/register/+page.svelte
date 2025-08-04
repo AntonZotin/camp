@@ -11,7 +11,6 @@
   let showPassword = false;
   let loading = false;
   let error = '';
-  let userType = 'PARENT';
   let role = 'PARENT';
 
   async function handleRegister(e: Event) {
@@ -26,7 +25,7 @@
       const res = await fetch(`${PUBLIC_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, userType, role })
+        body: JSON.stringify({ username, email, password, role })
       });
       if (!res.ok) {
         const data = await res.json();
@@ -128,21 +127,6 @@
             required
             autocomplete="new-password"
           />
-        </div>
-
-        <div class="form-group">
-          <label for="userType">
-            <User size={18} />
-            <span>Тип аккаунта</span>
-          </label>
-          <select
-            id="userType"
-            bind:value={userType}
-            class="select-input"
-          >
-            <option value="PARENT">Родитель</option>
-            <option value="CHILD">Ребенок</option>
-          </select>
         </div>
 
         {#if error}
