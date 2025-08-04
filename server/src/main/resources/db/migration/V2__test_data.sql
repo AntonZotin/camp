@@ -231,7 +231,7 @@ INSERT INTO duty_logs (id, date, employee_id, session_id, report) VALUES
     (30, '2025-06-30', 10, 1, 'Подведение итогов месяца, подготовка отчётов и планов.');
 
 -- SCHEDULES
-INSERT INTO schedules (id, date, session_id, employee_id, time, eventType, description) VALUES
+INSERT INTO schedules (id, date, session_id, employee_id, time, event_type, description) VALUES
     (1,  '2025-07-01', 1,  1,  '08:00:00', 'Morning Duty',    'Проверка территории лагеря'),
     (2,  '2025-07-01', 1,  2,  '10:00:00', 'Activity Support', 'Помощь в организации спортивных игр'),
     (3,  '2025-07-01', 1,  3,  '14:00:00', 'Medical Check',   'Медицинский осмотр детей'),
@@ -307,7 +307,7 @@ INSERT INTO menus (id, date, session_id, breakfast, lunch, dinner, notes) VALUES
     'Особое внимание детям с аллергией на молочные продукты');
 
 -- MEDICAL_CARDS
-INSERT INTO medical_cards (id, child_id, healthInfo, chronicDiseases, allergies, vaccinations, notes) VALUES
+INSERT INTO medical_cards (id, child_id, health_info, chronic_diseases, allergies, vaccinations, notes) VALUES
     (1,  1,  'Общее состояние хорошее, активен, занимается спортом', 'Нет', 'Нет', 'Прививки по календарю', 'Регулярно посещает врача'),
     (2,  2,  'Легкая астма, носит ингалятор', 'Астма', 'Пыльца растений', 'Прививки по календарю', 'Требуется наблюдение при физической нагрузке'),
     (3,  3,  'Аллергия на орехи, склонен к сенной лихорадке', 'Нет', 'Орехи, пыльца', 'Прививки по календарю', 'При аллергических реакциях использовать антигистаминные'),
