@@ -2,12 +2,12 @@
 INSERT INTO users (id, username, password, email, role, email_notifications, sms_notifications, theme)
 VALUES
 -- Админы (id 1–3)
-(1, 'admin1', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'admin1@camp.ru', 'ADMIN', true, false, 'auto'),
+(1, 'admin', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'admin@camp.ru', 'ADMIN', true, false, 'auto'),
 (2, 'admin2', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'admin2@camp.ru', 'ADMIN', true, false, 'auto'),
 (3, 'admin3', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'admin3@camp.ru', 'ADMIN', true, false, 'auto'),
 
 -- Сотрудники (id 13–32)
-(4, 'employee1', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee1@camp.ru', 'EMPLOYEE', true, false, 'auto'),
+(4, 'employee', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 (5, 'employee2', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee2@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 (6, 'employee3', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee3@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 (7, 'employee4', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee4@camp.ru', 'EMPLOYEE', true, false, 'auto'),
@@ -29,7 +29,7 @@ VALUES
 (23, 'employee20', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee20@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 
 -- Родители (id 200–225)
-(24, 'parent1', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent1@camp.ru', 'PARENT', true, false, 'auto'),
+(24, 'parent', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent@camp.ru', 'PARENT', true, false, 'auto'),
 (25, 'parent2', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent2@camp.ru', 'PARENT', true, false, 'auto'),
 (26, 'parent3', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent3@camp.ru', 'PARENT', true, false, 'auto'),
 (27, 'parent4', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent4@camp.ru', 'PARENT', true, false, 'auto'),
