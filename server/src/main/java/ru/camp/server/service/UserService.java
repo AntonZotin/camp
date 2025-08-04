@@ -55,7 +55,7 @@ public class UserService {
             HashSet<Child> children = new HashSet<>();
             for (ChildDto childDto : request.getChildren()) {
                 Child child = new Child();
-                child.setName(childDto.getName());
+                child.setFullName(childDto.getName());
                 child.setBirthDate(childDto.getBirthDate());
                 child.setParent(user);
                 children.add(child);

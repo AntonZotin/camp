@@ -17,7 +17,7 @@ public class Child {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String fullName;
 
     @Column(nullable = false)
     private LocalDate birthDate;
