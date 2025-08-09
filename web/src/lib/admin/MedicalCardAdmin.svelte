@@ -14,7 +14,6 @@
 	let editCard: MedicalCard | null = null;
 	let cardForm = { childId: 0, healthInfo: '', chronicDiseases: '', allergies: '', vaccinations: '', notes: '' };
 	let children: Child[] = [];
-	let loadingChildren = false;
 
 	async function loadCards() {
 		loading = true;
@@ -33,14 +32,14 @@
 	}
 
 	async function loadChildren() {
-		loadingChildren = true;
+		loading = true;
 		try {
 			const res = await fetch(`${PUBLIC_API_URL}/api/children`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
 			if (res.ok) children = await res.json();
 		} finally {
-			loadingChildren = false;
+			loading = false;
 		}
 	}
 
