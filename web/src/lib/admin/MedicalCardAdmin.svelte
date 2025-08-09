@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import type {Child, MedicalCard} from "$lib/models";
+	import { fly } from 'svelte/transition';
 	import { Loader, Plus, Trash2, Edit, AlertCircle, FileText } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let cards = [];
+	let cards: MedicalCard[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editCard = null;
-	let cardForm = { childId: '', healthInfo: '', chronicDiseases: '', allergies: '', vaccinations: '', notes: '' };
-	let children = [];
+	let editCard: MedicalCard | null = null;
+	let cardForm = { childId: 0, healthInfo: '', chronicDiseases: '', allergies: '', vaccinations: '', notes: '' };
+	let children: Child[] = [];
 	let loadingChildren = false;
 
 	async function loadCards() {
@@ -42,12 +44,12 @@
 		}
 	}
 
-	function openModal(card = null) {
+	function openModal(card: MedicalCard | null = null) {
 		showModal = true;
 		editCard = card;
 		if (card) {
 			cardForm = {
-				childId: card.child?.id || '',
+				childId: card.child?.id || 0,
 				healthInfo: card.healthInfo || '',
 				chronicDiseases: card.chronicDiseases || '',
 				allergies: card.allergies || '',
@@ -55,7 +57,7 @@
 				notes: card.notes || ''
 			};
 		} else {
-			cardForm = { childId: '', healthInfo: '', chronicDiseases: '', allergies: '', vaccinations: '', notes: '' };
+			cardForm = { childId: 0, healthInfo: '', chronicDiseases: '', allergies: '', vaccinations: '', notes: '' };
 		}
 	}
 
@@ -96,8 +98,10 @@
 		await loadCards();
 	}
 
-	import { onMount } from 'svelte';
-	onMount(() => { loadCards(); loadChildren(); });
+	onMount(() => {
+		loadCards();
+		loadChildren();
+	});
 </script>
 
 <div class="medical-card-admin">
@@ -174,7 +178,7 @@
 				<select id="childId" bind:value={cardForm.childId} required>
 					<option value="" disabled>Выберите ребёнка</option>
 					{#each children as ch}
-						<option value={ch.id}>{ch.name}</option>
+						<option value={ch.id}>{ch.fullName}</option>
 					{/each}
 				</select>
 			</div>
