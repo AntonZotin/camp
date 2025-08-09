@@ -1,12 +1,12 @@
 -- USERS
 INSERT INTO users (id, username, password, email, role, email_notifications, sms_notifications, theme)
 VALUES
--- Админы (id 1–3)
+-- Админы
 (1, 'admin', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'admin@camp.ru', 'ADMIN', true, false, 'auto'),
 (2, 'admin2', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'admin2@camp.ru', 'ADMIN', true, false, 'auto'),
 (3, 'admin3', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'admin3@camp.ru', 'ADMIN', true, false, 'auto'),
 
--- Сотрудники (id 13–32)
+-- Сотрудники
 (4, 'employee', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 (5, 'employee2', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee2@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 (6, 'employee3', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee3@camp.ru', 'EMPLOYEE', true, false, 'auto'),
@@ -28,7 +28,7 @@ VALUES
 (22, 'employee19', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee19@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 (23, 'employee20', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'employee20@camp.ru', 'EMPLOYEE', true, false, 'auto'),
 
--- Родители (id 200–225)
+-- Родители
 (24, 'parent', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent@camp.ru', 'PARENT', true, false, 'auto'),
 (25, 'parent2', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent2@camp.ru', 'PARENT', true, false, 'auto'),
 (26, 'parent3', '$2a$10$UUpTR/DE/7D9qOLj7Zmotudf/xzhfhPlNZBWXW3n09vXIN.fHX8ju', 'parent3@camp.ru', 'PARENT', true, false, 'auto'),
