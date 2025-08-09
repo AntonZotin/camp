@@ -5,25 +5,25 @@
     {
       name: 'Анна Петрова',
       role: 'Директор лагеря',
-      photo: '/src/images/team/anna.jpg',
+      photo: '/images/team/anna.jpg',
       experience: '15 лет опыта'
     },
     {
       name: 'Иван Сидоров',
       role: 'Старший вожатый',
-      photo: '/src/images/team/ivan.jpg',
+      photo: '/images/team/ivan.jpg',
       experience: '10 лет опыта'
     },
     {
       name: 'Мария Козлова',
       role: 'Медсестра',
-      photo: '/src/images/team/maria.jpg',
+      photo: '/images/team/maria.jpg',
       experience: '12 лет опыта'
     },
     {
       name: 'Дмитрий Волков',
       role: 'Спортивный инструктор',
-      photo: '/src/images/team/dmitry.jpg',
+      photo: '/images/team/dmitry.jpg',
       experience: '8 лет опыта'
     }
   ];

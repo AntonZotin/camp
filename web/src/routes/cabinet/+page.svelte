@@ -49,7 +49,7 @@
 					<h1>Личный кабинет</h1>
 					<p>Управляйте бронированием, следите за расписанием и получайте персональные предложения</p>
 					<div class="cabinet-image">
-						<img src="/src/images/camp-hero.png" alt="Дети в лагере" />
+						<img src="/images/camp-hero.png" alt="Дети в лагере" />
 					</div>
 				</div>
 
@@ -128,7 +128,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: url("/src/images/star.png");
+		background: url("/images/star.png");
 		z-index: -1;
 		opacity: 0.3;
 	}

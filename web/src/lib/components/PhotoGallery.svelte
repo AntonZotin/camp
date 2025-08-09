@@ -2,12 +2,12 @@
   import { fade } from 'svelte/transition';
 
   const photos = [
-    '/src/images/gallery/1.jpg',
-    '/src/images/gallery/2.jpg',
-    '/src/images/gallery/3.jpg',
-    '/src/images/gallery/4.jpg',
-    '/src/images/gallery/5.jpg',
-    '/src/images/gallery/6.jpg'
+    '/images/gallery/1.jpg',
+    '/images/gallery/2.jpg',
+    '/images/gallery/3.jpg',
+    '/images/gallery/4.jpg',
+    '/images/gallery/5.jpg',
+    '/images/gallery/6.jpg'
   ];
 </script>
 

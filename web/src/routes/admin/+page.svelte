@@ -121,7 +121,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: url("/src/images/star.png");
+		background: url("/images/star.png");
 		z-index: -1;
 		opacity: 0.3;
 	}

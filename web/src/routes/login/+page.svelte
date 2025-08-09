@@ -52,7 +52,7 @@
         <h1>Добро пожаловать!</h1>
         <p>Войдите в личный кабинет, чтобы управлять бронированием и получать персональные предложения</p>
         <div class="auth-image">
-          <img src="/src/images/login-hero.jpg" alt="Дети в лагере" />
+          <img src="/images/login-hero.jpg" alt="Дети в лагере" />
         </div>
       </div>
 
@@ -134,7 +134,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("/src/images/star.png");
+    background: url("/images/star.png");
     z-index: -1;
     opacity: 0.3;
   }

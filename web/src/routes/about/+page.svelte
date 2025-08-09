@@ -51,7 +51,7 @@
       </p>
     </div>
     <div class="hero-image" in:fly={{ x: 50, duration: 800, delay: 200 }}>
-      <img src="/src/images/about-hero.jpg" alt="Дети в лагере" class="hero-img" />
+      <img src="/images/about-hero.jpg" alt="Дети в лагере" class="hero-img" />
     </div>
   </div>
 </section>
@@ -83,7 +83,7 @@
       </div>
 
       <div class="about-image" in:fly={{ x: 50 }}>
-        <img src="/src/images/camp-history.jpg" alt="История лагеря" />
+        <img src="/images/camp-history.jpg" alt="История лагеря" />
         <div class="stats-card">
           <div class="stat-item">
             <Medal size={32} />
@@ -193,7 +193,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("/src/images/star.png");
+    background: url("/images/star.png");
     z-index: -1;
     opacity: 0.3;
   }

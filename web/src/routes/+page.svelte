@@ -98,7 +98,7 @@
       </div>
     </div>
     <div class="hero-image" in:fly={{ x: 50, duration: 800, delay: 200 }}>
-      <img src="/src/images/camp-hero.png" alt="Дети в лагере" class="hero-img" />
+      <img src="/images/camp-hero.png" alt="Дети в лагере" class="hero-img" />
       <div class="floating-elements">
         <div class="floating-icon" style="--delay: 0s">
           <Tent size={32} />
@@ -224,7 +224,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("/src/images/star.png");
+    background: url("/images/star.png");
     z-index: -1;
     opacity: 0.3;
   }

@@ -52,7 +52,7 @@
         <h1>Присоединяйтесь!</h1>
         <p>Создайте аккаунт, чтобы бронировать путевки, получать скидки и следить за успехами ребенка</p>
         <div class="auth-image">
-          <img src="/src/images/register-hero.jpg" alt="Дети в лагере" />
+          <img src="/images/register-hero.jpg" alt="Дети в лагере" />
         </div>
       </div>
 
@@ -163,7 +163,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("/src/images/star.png");
+    background: url("/images/star.png");
     z-index: -1;
     opacity: 0.3;
   }

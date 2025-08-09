@@ -4,6 +4,7 @@
   import Footer from '$lib/components/Footer.svelte';
   import { ArrowUp } from 'lucide-svelte';
   import { onMount } from 'svelte';
+  import '../lib/global.css';
 
   let currentTheme = 'light';
   let showScrollButton = false;
