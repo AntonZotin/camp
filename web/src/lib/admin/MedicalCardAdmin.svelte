@@ -141,7 +141,7 @@
 					{#each cards as c}
 						<tr>
 							<td>{c.id}</td>
-							<td>{c.child?.name}</td>
+							<td>{c.child?.fullName}</td>
 							<td>{c.healthInfo}</td>
 							<td>{c.chronicDiseases}</td>
 							<td>{c.allergies}</td>

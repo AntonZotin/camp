@@ -156,7 +156,7 @@
 						<tr>
 							<td>{v.id}</td>
 							<td>{v.date}</td>
-							<td>{v.child?.name}</td>
+							<td>{v.child?.fullName}</td>
 							<td>{v.doctor?.fullName}</td>
 							<td>{v.description}</td>
 							<td>{v.recommendations}</td>

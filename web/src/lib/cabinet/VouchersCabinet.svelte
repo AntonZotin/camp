@@ -97,7 +97,7 @@
 					<div class="voucher-info">
 						<div class="info-item">
 							<span class="label">Ребёнок:</span>
-							<span class="value">{voucher.child?.name || 'Не указан'}</span>
+							<span class="value">{voucher.child?.fullName || 'Не указан'}</span>
 						</div>
 						<div class="info-item">
 							<span class="label">Смена:</span>
@@ -141,7 +141,7 @@
 					<div class="detail-grid">
 						<div class="detail-item">
 							<span class="label">Имя:</span>
-							<span class="value">{selectedVoucher.child?.name || 'Не указан'}</span>
+							<span class="value">{selectedVoucher.child?.fullName || 'Не указан'}</span>
 						</div>
 						<div class="detail-item">
 							<span class="label">Дата рождения:</span>
