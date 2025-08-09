@@ -27,4 +27,8 @@ public class CampSession {
 
     private String description;
 
+    private Short maxChildren;
+
+    private Float price;
+
 }
