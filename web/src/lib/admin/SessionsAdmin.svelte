@@ -5,7 +5,7 @@
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let sessions: any[] = [];
+	let sessions: any[] = [];  // TODO: типизировать все страницы
 	let loading = true;
 	let error = '';
 	let showModal = false;
