@@ -29,6 +29,6 @@ public class CampSession {
 
     private Short maxChildren;
 
-    private Float price;
+    private Integer price;
 
 }

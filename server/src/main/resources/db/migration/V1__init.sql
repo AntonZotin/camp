@@ -16,7 +16,7 @@ CREATE TABLE camp_sessions
     end_date      date                                    NOT NULL,
     description   VARCHAR(255),
     max_children  SMALLINT,
-    price         REAL,
+    price         INT,
     CONSTRAINT pk_camp_sessions PRIMARY KEY (id)
 );
 
