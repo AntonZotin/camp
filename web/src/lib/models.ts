@@ -13,3 +13,22 @@ export interface MedicalCard {
     vaccinations: string;
     notes: string;
 }
+
+export interface Employee {
+    id: number;
+    fullName: string;
+    position: string;
+}
+
+export interface User {
+    id: number;
+    username: string;
+    password: string;
+    email: string;
+    role: string;
+    emailNotifications: boolean;
+    smsNotifications: boolean;
+    theme: string;
+    children: Child[];
+    employee: Employee;
+}

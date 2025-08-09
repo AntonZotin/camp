@@ -1,15 +1,18 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {User} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Users, Loader, AlertCircle, Plus, Edit, Trash2, UserCog, Eye, EyeOff } from 'lucide-svelte';
+	import { Users, Loader, AlertCircle, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
-	let users: any[] = [];
+	let users: User[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editUser: any = null;
+	let editUser: User | null = null;
 	let userForm = { 
 		username: '', 
 		email: '', 
@@ -38,7 +41,7 @@
 		}
 	}
 
-	function openModal(userData = null) {
+	function openModal(userData: User | null = null) {
 		showModal = true;
 		editUser = userData;
 		if (userData) {
@@ -93,7 +96,9 @@
 		await loadUsers();
 	}
 
-	async function changeRole(id: number, role: string) {
+	async function changeRole(id: number, e: Event) {
+		const target = e.target as HTMLSelectElement;
+		const role = target.value;
 		await fetch(`${PUBLIC_API_URL}/api/admin/users/${id}/role?role=${role}`, {
 			method: 'PUT',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
@@ -101,7 +106,6 @@
 		await loadUsers();
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { loadUsers(); });
 </script>
 
@@ -147,7 +151,7 @@
 							<td>{u.username}</td>
 							<td>{u.email}</td>
 							<td>
-								<select bind:value={u.role} on:change={(e) => changeRole(u.id, e.target.value)}>
+								<select bind:value={u.role} on:change={(e: Event) => changeRole(u.id, e)}>
 									{#each roles as r}
 										<option value={r}>{r}</option>
 									{/each}
