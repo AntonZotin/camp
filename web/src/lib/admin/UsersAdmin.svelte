@@ -100,6 +100,7 @@
 		const url = editUser ? `${PUBLIC_API_URL}/api/admin/users/${editUser.id}` : `${PUBLIC_API_URL}/api/auth/register`;
         const dataToSend = {
             ...userForm,
+			employee: userForm.role === 'EMPLOYEE' ? {fullName: userForm.fullName, position: userForm.position} : undefined,
             children: userForm.role === 'PARENT' ? childrenForms : undefined
         };
 		const body = JSON.stringify(dataToSend);
