@@ -30,6 +30,6 @@ springdoc:
     path: /docs
 jwt:
   secret: "p3n8v6k2s1q4w7z0x5c9b8m2l6j3h1g7f4d2s8a0k9p5o3i7u6y4t2r8e1w6q3z5x7c9v1b3n5m7l9k1j3h5g7f9d1s3a5"
-  expirationMs: 120000
+  expirationMs: 86400000
 frontend:
   url: "http://localhost:5173"
