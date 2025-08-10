@@ -8,6 +8,12 @@
 
 	export let user: UserSession;
 
+    interface ChildForm {
+        id?: number;
+        fullName: string;
+        birthDate: string;
+    }
+
 	let users: User[] = [];
 	let loading = true;
 	let error = '';
@@ -22,6 +28,13 @@
 		position: ''
 	};
 	let showPassword = false;
+    let childrenForms: ChildForm[] = [];
+    let showChildModal = false;
+    let editChildIndex: number | null = null;
+    let childForm = {
+        fullName: '',
+        birthDate: ''
+    };
 
 	const roles = ['ADMIN', 'PARENT', 'EMPLOYEE'];
 
@@ -53,6 +66,16 @@
 				fullName: userData.employee?.fullName || '',
 				position: userData.employee?.position || ''
 			};
+
+            if (userData.role === 'PARENT') {
+                childrenForms = userData.children.map(c => ({
+                    id: c.id,
+                    fullName: c.fullName,
+                    birthDate: c.birthDate
+                }));
+            } else {
+                childrenForms = [];
+            }
 		} else {
 			userForm = {
 				username: '',
@@ -62,6 +85,7 @@
 				fullName: '',
 				position: ''
 			};
+            childrenForms = [];
 		}
 	}
 
@@ -73,8 +97,12 @@
 
 	async function saveUser() {
 		const method = editUser ? 'PUT' : 'POST';
-		const url = editUser ? `${PUBLIC_API_URL}/api/admin/users/${editUser.id}` : `${PUBLIC_API_URL}/api/admin/users`;
-		const body = JSON.stringify(userForm);
+		const url = editUser ? `${PUBLIC_API_URL}/api/admin/users/${editUser.id}` : `${PUBLIC_API_URL}/api/auth/register`;
+        const dataToSend = {
+            ...userForm,
+            children: userForm.role === 'PARENT' ? childrenForms : undefined
+        };
+		const body = JSON.stringify(dataToSend);
 		await fetch(url, {
 			method,
 			headers: {
@@ -105,6 +133,42 @@
 		});
 		await loadUsers();
 	}
+
+    function openChildModal(childData: ChildForm | null = null, index: number | null = null) {
+        showChildModal = true;
+        editChildIndex = index;
+        if (childData) {
+            childForm = {
+                fullName: childData.fullName,
+                birthDate: childData.birthDate
+            };
+        } else {
+            childForm = {
+                fullName: '',
+                birthDate: ''
+            };
+        }
+    }
+
+    function closeChildModal() {
+        showChildModal = false;
+        editChildIndex = null;
+    }
+
+    function saveChild() {
+        if (editChildIndex !== null) {
+            childrenForms[editChildIndex] = { ...childForm };
+        } else {
+            childrenForms.push({ ...childForm });
+        }
+        closeChildModal();
+    }
+
+    function deleteChild(index: number) {
+        if (confirm('Удалить ребенка?')) {
+            childrenForms.splice(index, 1);
+        }
+    }
 
 	onMount(() => { loadUsers(); });
 </script>
@@ -183,11 +247,11 @@
 </div>
 
 {#if showModal}
-	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
-	<div class="modal" in:fly={{ y: 30 }}>
-		<h3>{editUser ? 'Редактировать пользователя' : 'Добавить пользователя'}</h3>
-		<form on:submit|preventDefault={saveUser}>
+    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+    <div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
+    <div class="modal" in:fly={{ y: 30 }}>
+        <h3>{editUser ? 'Редактировать пользователя' : 'Добавить пользователя'}</h3>
+        <form on:submit|preventDefault={saveUser}>
 			<div class="form-row">
 				<div class="form-group">
 					<label for="username">Логин</label>
@@ -198,17 +262,17 @@
 					<input id="email" type="email" bind:value={userForm.email} required />
 				</div>
 			</div>
-			
+
 			<div class="form-row">
 				<div class="form-group">
 					<label for="password">
 						Пароль {#if editUser}(оставьте пустым, чтобы не менять){/if}
 					</label>
 					<div class="password-input">
-						<input 
-							id="password" 
-							type={showPassword ? 'text' : 'password'} 
-							bind:value={userForm.password} 
+						<input
+							id="password"
+							type={showPassword ? 'text' : 'password'}
+							bind:value={userForm.password}
 							required={!editUser}
 						/>
 						<button type="button" class="toggle-password" on:click={() => showPassword = !showPassword}>
@@ -242,12 +306,66 @@
 				</div>
 			{/if}
 
-			<div class="modal-actions">
-				<button type="submit" class="save-btn">Сохранить</button>
-				<button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>
-			</div>
-		</form>
-	</div>
+            {#if userForm.role === 'PARENT'}
+                <div class="children-section">
+                    <h4>Дети</h4>
+                    {#if childrenForms.length > 0}
+                        <div class="children-list">
+                            {#each childrenForms as child, index}
+                                <div class="child-item">
+                                    <div class="child-info">
+                                        <span>{child.fullName}</span>
+                                        <span class="birth-date">{child.birthDate}</span>
+                                    </div>
+                                    <div class="child-actions">
+                                        <button type="button" class="icon-btn edit" on:click={() => openChildModal(child, index)}>
+                                            <Edit size={14} />
+                                        </button>
+                                        <button type="button" class="icon-btn delete" on:click={() => deleteChild(index)}>
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                            {/each}
+                        </div>
+                    {:else}
+                        <p class="no-children">Нет добавленных детей</p>
+                    {/if}
+                    <button type="button" class="add-child-btn" on:click={() => openChildModal()}>
+                        <Plus size={14} />
+                        <span>Добавить ребенка</span>
+                    </button>
+                </div>
+            {/if}
+
+            <div class="modal-actions">
+                <button type="submit" class="save-btn">Сохранить</button>
+                <button type="button" class="cancel-btn" on:click={closeModal}>Отмена</button>
+            </div>
+        </form>
+    </div>
+{/if}
+
+{#if showChildModal}
+    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+    <div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeChildModal}></div>
+    <div class="modal child-modal" in:fly={{ y: 30 }}>
+        <h3>{editChildIndex !== null ? 'Редактировать ребенка' : 'Добавить ребенка'}</h3>
+        <form on:submit|preventDefault={saveChild}>
+            <div class="form-group">
+                <label for="childFullName">Полное имя</label>
+                <input id="childFullName" bind:value={childForm.fullName} required />
+            </div>
+            <div class="form-group">
+                <label for="childBirthDate">Дата рождения</label>
+                <input id="childBirthDate" type="date" bind:value={childForm.birthDate} required />
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="save-btn">Сохранить</button>
+                <button type="button" class="cancel-btn" on:click={closeChildModal}>Отмена</button>
+            </div>
+        </form>
+    </div>
 {/if}
 
 <style>
@@ -515,4 +633,82 @@
 			margin: 1rem;
 		}
 	}
+
+    .children-section {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+    }
+
+    .children-section h4 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .children-list {
+        margin-bottom: 1rem;
+    }
+
+    .child-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .child-item:last-child {
+        border-bottom: none;
+    }
+
+    .child-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .child-info .birth-date {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .child-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .no-children {
+        color: var(--text-secondary);
+        font-style: italic;
+        margin: 1rem 0;
+    }
+
+    .add-child-btn {
+        background: var(--primary-light);
+        color: var(--primary);
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .add-child-btn:hover {
+        background: var(--primary-light-hover);
+    }
+
+    .child-modal {
+        min-width: 400px;
+    }
+
+    @media (max-width: 768px) {
+        .child-modal {
+            min-width: 300px;
+        }
+    }
 </style> 

@@ -143,10 +143,20 @@ public class UserService {
         }
         existingUser.setEmail(user.getEmail());
         existingUser.setRole(user.getRole());
-        existingUser.setChildren(user.getChildren());
-        existingUser.setEmployee(user.getEmployee());
 
-        return userRepository.save(existingUser);
+        if (user.getChildren() != null) {
+            for (Child child : user.getChildren()) {
+                child.setParent(existingUser);
+            }
+            existingUser.setChildren(user.getChildren());
+        }
+
+        if (user.getEmployee() != null) {
+            user.getEmployee().setUser(existingUser);
+            existingUser.setEmployee(user.getEmployee());
+        }
+
+        return saveUser(existingUser);
     }
 
     public User saveUser(User user) {

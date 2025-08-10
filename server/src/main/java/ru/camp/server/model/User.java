@@ -37,9 +37,9 @@ public class User {
     @Column(name = "theme", nullable = false)
     private String theme = "auto";
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Child> children;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Employee employee;
 } 
