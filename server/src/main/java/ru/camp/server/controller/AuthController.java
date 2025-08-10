@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.camp.server.dto.UserRegistrationRequest;
 import ru.camp.server.dto.UserLoginRequest;
 import ru.camp.server.dto.AuthResponse;
+import ru.camp.server.model.User;
 import ru.camp.server.service.UserService;
 import org.springframework.dao.DataIntegrityViolationException;
 import ru.camp.server.dto.ForgotPasswordRequest;
@@ -29,8 +30,8 @@ public class AuthController {
                 request.getEmail() == null || request.getEmail().isBlank()) {
                 return ResponseEntity.badRequest().body("Username, email и password обязательны");
             }
-            userService.registerUser(request);
-            return ResponseEntity.ok().build();
+            User user = userService.registerUser(request);
+            return ResponseEntity.ok(user);
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(409).body("Пользователь с таким username или email уже существует");
         } catch (Exception e) {

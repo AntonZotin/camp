@@ -45,7 +45,7 @@ public class UserService {
         this.notificationService = notificationService;
     }
 
-    public void registerUser(UserRegistrationRequest request) {
+    public User registerUser(UserRegistrationRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -76,6 +76,7 @@ public class UserService {
         if (savedUser.getEmployee() != null) {
             employeeRepository.save(savedUser.getEmployee());
         }
+        return user;
     }
 
     public AuthResponse authenticate(UserLoginRequest request) {
@@ -131,6 +132,21 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User update(Long id, User user) {
+        User existingUser = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        existingUser.setUsername(user.getUsername());
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        existingUser.setEmail(user.getEmail());
+        existingUser.setRole(user.getRole());
+        existingUser.setChildren(user.getChildren());
+        existingUser.setEmployee(user.getEmployee());
+
+        return userRepository.save(existingUser);
     }
 
     public User saveUser(User user) {
