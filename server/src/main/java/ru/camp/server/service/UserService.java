@@ -15,10 +15,8 @@ import ru.camp.server.dto.ChildDto;
 import ru.camp.server.dto.ForgotPasswordRequest;
 import ru.camp.server.dto.ResetPasswordRequest;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -144,16 +142,49 @@ public class UserService {
         existingUser.setEmail(user.getEmail());
         existingUser.setRole(user.getRole());
 
-        if (user.getChildren() != null) {
-            for (Child child : user.getChildren()) {
-                child.setParent(existingUser);
+        if (user.getEmployee() != null) {
+            if (existingUser.getEmployee() == null) {
+                Employee employee = user.getEmployee();
+                employee.setUser(existingUser);
+                existingUser.setEmployee(employee);
+            } else {
+                existingUser.getEmployee().setFullName(user.getEmployee().getFullName());
+                existingUser.getEmployee().setPosition(user.getEmployee().getPosition());
             }
-            existingUser.setChildren(user.getChildren());
+        } else {
+            if (existingUser.getEmployee() != null) {
+                existingUser.setEmployee(null);
+            }
         }
 
-        if (user.getEmployee() != null) {
-            user.getEmployee().setUser(existingUser);
-            existingUser.setEmployee(user.getEmployee());
+        if (user.getChildren() != null) {
+            Set<Child> childrenToRemove = new HashSet<>();
+            for (Child existingChild : existingUser.getChildren()) {
+                boolean found = user.getChildren().stream()
+                    .anyMatch(c -> c.getId() != null && c.getId().equals(existingChild.getId()));
+                if (!found) {
+                    childrenToRemove.add(existingChild);
+                }
+            }
+            existingUser.getChildren().removeAll(childrenToRemove);
+
+            for (Child child : user.getChildren()) {
+                if (child.getId() == null) {
+                    child.setParent(existingUser);
+                    existingUser.getChildren().add(child);
+                } else {
+                    Optional<Child> existingChildOpt = existingUser.getChildren().stream()
+                        .filter(c -> c.getId().equals(child.getId()))
+                        .findFirst();
+                    if (existingChildOpt.isPresent()) {
+                        Child existingChild = existingChildOpt.get();
+                        existingChild.setFullName(child.getFullName());
+                        existingChild.setBirthDate(child.getBirthDate());
+                    }
+                }
+            }
+        } else {
+            existingUser.getChildren().clear();
         }
 
         return saveUser(existingUser);

@@ -14,27 +14,35 @@
         birthDate: string;
     }
 
+    interface EmployeeForm {
+        id?: number;
+        fullName: string;
+        position: string;
+    }
+
+	let userForm = {
+		username: '',
+		email: '',
+		password: '',
+		role: 'PARENT',
+        employee: null as EmployeeForm | null,
+        children: [] as ChildForm[]
+	};
+
+    let childForm: ChildForm = {
+        fullName: '',
+        birthDate: ''
+    };
+
 	let users: User[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
 	let editUser: User | null = null;
-	let userForm = { 
-		username: '', 
-		email: '', 
-		password: '', 
-		role: 'PARENT',
-		fullName: '',
-		position: ''
-	};
 	let showPassword = false;
     let childrenForms: ChildForm[] = [];
     let showChildModal = false;
     let editChildIndex: number | null = null;
-    let childForm = {
-        fullName: '',
-        birthDate: ''
-    };
 
 	const roles = ['ADMIN', 'PARENT', 'EMPLOYEE'];
 
@@ -58,34 +66,31 @@
 		showModal = true;
 		editUser = userData;
 		if (userData) {
-			userForm = {
-				username: userData.username || '',
-				email: userData.email || '',
-				password: '',
-				role: userData.role || 'PARENT',
-				fullName: userData.employee?.fullName || '',
-				position: userData.employee?.position || ''
-			};
-
-            if (userData.role === 'PARENT') {
-                childrenForms = userData.children.map(c => ({
+            userForm = {
+                username: userData.username || '',
+                email: userData.email || '',
+                password: '',
+                role: userData.role || 'PARENT',
+                employee: userData.employee ? {
+                    id: userData.employee.id,
+                    fullName: userData.employee.fullName,
+                    position: userData.employee.position
+                } : null,
+                children: userData.children ? userData.children.map(c => ({
                     id: c.id,
                     fullName: c.fullName,
                     birthDate: c.birthDate
-                }));
-            } else {
-                childrenForms = [];
-            }
+                })) : []
+            };
 		} else {
-			userForm = {
-				username: '',
-				email: '',
-				password: '',
-				role: 'PARENT',
-				fullName: '',
-				position: ''
-			};
-            childrenForms = [];
+            userForm = {
+                username: '',
+                email: '',
+                password: '',
+                role: 'PARENT',
+                employee: null,
+                children: []
+            };
 		}
 	}
 
@@ -100,8 +105,8 @@
 		const url = editUser ? `${PUBLIC_API_URL}/api/admin/users/${editUser.id}` : `${PUBLIC_API_URL}/api/auth/register`;
         const dataToSend = {
             ...userForm,
-			employee: userForm.role === 'EMPLOYEE' ? {fullName: userForm.fullName, position: userForm.position} : undefined,
-            children: userForm.role === 'PARENT' ? childrenForms : undefined
+            employee: userForm.role === 'EMPLOYEE' ? userForm.employee : null,
+            children: userForm.role === 'PARENT' ? userForm.children : []
         };
 		const body = JSON.stringify(dataToSend);
 		await fetch(url, {
@@ -140,6 +145,7 @@
         editChildIndex = index;
         if (childData) {
             childForm = {
+                id: childData.id,
                 fullName: childData.fullName,
                 birthDate: childData.birthDate
             };
@@ -158,9 +164,9 @@
 
     function saveChild() {
         if (editChildIndex !== null) {
-            childrenForms[editChildIndex] = { ...childForm };
+            userForm.children[editChildIndex] = { ...childForm };
         } else {
-            childrenForms.push({ ...childForm });
+            userForm.children.push({ ...childForm });
         }
         closeChildModal();
     }
@@ -291,53 +297,50 @@
 				</div>
 			</div>
 
-			<div class="form-row">
-				{#if userForm.role === 'EMPLOYEE'}
+			{#if userForm.role === 'EMPLOYEE' && userForm.employee !== null}
+				<div class="form-row">
 					<div class="form-group">
 						<label for="fullName">Полное имя</label>
-						<input id="fullName" bind:value={userForm.fullName} />
+						<input id="fullName" bind:value={userForm.employee.fullName} />
 					</div>
-				{/if}
-			</div>
-
-			{#if userForm.role === 'EMPLOYEE'}
-				<div class="form-group">
-					<label for="position">Должность</label>
-					<input id="position" bind:value={userForm.position} />
+					<div class="form-group">
+						<label for="position">Должность</label>
+						<input id="position" bind:value={userForm.employee.position} />
+					</div>
 				</div>
 			{/if}
 
-            {#if userForm.role === 'PARENT'}
-                <div class="children-section">
-                    <h4>Дети</h4>
-                    {#if childrenForms.length > 0}
-                        <div class="children-list">
-                            {#each childrenForms as child, index}
-                                <div class="child-item">
-                                    <div class="child-info">
-                                        <span>{child.fullName}</span>
-                                        <span class="birth-date">{child.birthDate}</span>
-                                    </div>
-                                    <div class="child-actions">
-                                        <button type="button" class="icon-btn edit" on:click={() => openChildModal(child, index)}>
-                                            <Edit size={14} />
-                                        </button>
-                                        <button type="button" class="icon-btn delete" on:click={() => deleteChild(index)}>
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-                            {/each}
-                        </div>
-                    {:else}
-                        <p class="no-children">Нет добавленных детей</p>
-                    {/if}
-                    <button type="button" class="add-child-btn" on:click={() => openChildModal()}>
-                        <Plus size={14} />
-                        <span>Добавить ребенка</span>
-                    </button>
-                </div>
-            {/if}
+			{#if userForm.role === 'PARENT'}
+				<div class="children-section">
+					<h4>Дети</h4>
+					{#if userForm.children.length > 0}
+						<div class="children-list">
+							{#each userForm.children as child, index}
+								<div class="child-item">
+									<div class="child-info">
+										<span>{child.fullName}</span>
+										<span class="birth-date">{child.birthDate}</span>
+									</div>
+									<div class="child-actions">
+										<button type="button" class="icon-btn edit" on:click={() => openChildModal(child, index)}>
+											<Edit size={14} />
+										</button>
+										<button type="button" class="icon-btn delete" on:click={() => deleteChild(index)}>
+											<Trash2 size={14} />
+										</button>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<p class="no-children">Нет добавленных детей</p>
+					{/if}
+					<button type="button" class="add-child-btn" on:click={() => openChildModal()}>
+						<Plus size={14} />
+						<span>Добавить ребенка</span>
+					</button>
+				</div>
+			{/if}
 
             <div class="modal-actions">
                 <button type="submit" class="save-btn">Сохранить</button>
