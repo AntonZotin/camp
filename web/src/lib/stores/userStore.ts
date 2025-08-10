@@ -16,7 +16,9 @@ function getInitialUser(): UserSession | null {
         if (raw) {
             try {
                 return JSON.parse(raw);
-            } catch {}
+            } catch {
+                localStorage.removeItem('user');
+            }
         }
     }
     return null;
@@ -27,17 +29,31 @@ export const userStore = writable<UserSession | null>(getInitialUser());
 function initializeAuthInterceptor() {
     if (typeof window === 'undefined') return;
 
-    const originalFetch = window.fetch;
+    const { fetch: originalFetch } = window;
 
     window.fetch = async function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-        const response = await originalFetch(input, init);
+        const user = getInitialUser();
+        const authInit = init || {};
 
-        if (response.status === 401) {
-            logoutUser('Ваша сессия истекла. Пожалуйста, войдите снова.');
-            throw new Error('Session expired');
+        if (user?.accessToken) {
+            authInit.headers = {
+                ...authInit.headers,
+                'Authorization': `Bearer ${user.accessToken}`
+            };
         }
 
-        return response;
+        try {
+            const response = await originalFetch(input, authInit);
+            if (response.status === 401) {
+                throw new Error('Unauthorized');
+            }
+            return response;
+        } catch (error) {
+            if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                await logoutUser('Ваша сессия истекла. Пожалуйста, войдите снова.');
+            }
+            throw error;
+        }
     };
 }
 
@@ -58,10 +74,10 @@ export function loginUser(user: UserSession) {
     toast.success('Вы успешно вошли в систему');
 }
 
-export function logoutUser(message?: string) {
+export async function logoutUser(message?: string) {
     userStore.set(null);
     if (message) {
         toast.error(message);
     }
-    goto('/login');
+    await goto('/login');
 }

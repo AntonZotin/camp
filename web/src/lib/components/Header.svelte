@@ -11,9 +11,9 @@
   let user = get(userStore);
   userStore.subscribe((u) => (user = u));
 
-  function handleLogout() {
-    logoutUser();
-    goto('/');
+  async function handleLogout() {
+    await logoutUser();
+    await goto('/');
   }
 
   const navLinks = [
@@ -52,9 +52,9 @@
           <span>Кабинет</span>
         </a>
         <button class="button secondary logout-btn" on:click={handleLogout}>
-          <div class="icon">
+          <span class="icon">
             <LogOut size={18} />
-          </div>
+          </span>
           <span>Выйти</span>
         </button>
       {:else}
