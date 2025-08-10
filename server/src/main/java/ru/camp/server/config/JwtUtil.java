@@ -32,8 +32,13 @@ public class JwtUtil {
             .compact();
     }
 
-    public String getUsernameFromJwtToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+    public String getUsernameFromJwtToken(String token) throws JwtException {
+        return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject();
     }
 
     public String getRoleFromJwtToken(String token) {
@@ -44,9 +49,11 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
             return true;
+        } catch (ExpiredJwtException ex) {
+            throw ex;
         } catch (JwtException | IllegalArgumentException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
+            return false;
         }
-        return false;
     }
 } 

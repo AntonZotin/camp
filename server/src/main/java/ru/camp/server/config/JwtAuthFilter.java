@@ -1,5 +1,7 @@
 package ru.camp.server.config;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,10 +30,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
         String token = null;
         String username = null;
+
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7);
-            username = jwtUtil.getUsernameFromJwtToken(token);
+            try {
+                username = jwtUtil.getUsernameFromJwtToken(token);
+            } catch (ExpiredJwtException ex) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expired");
+                return;
+            } catch (JwtException | IllegalArgumentException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
         }
+
         if (username != null && jwtUtil.validateJwtToken(token)) {
             String role = jwtUtil.getRoleFromJwtToken(token);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -40,6 +53,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
+
         filterChain.doFilter(request, response);
     }
 } 

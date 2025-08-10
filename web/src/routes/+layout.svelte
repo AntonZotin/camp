@@ -4,6 +4,7 @@
   import Footer from '$lib/components/Footer.svelte';
   import { ArrowUp } from 'lucide-svelte';
   import { onMount } from 'svelte';
+  import { Toaster } from 'svelte-sonner';
   import '../lib/global.css';
 
   let currentTheme = 'light';
@@ -42,6 +43,7 @@
 </svelte:head>
 
 <div class="layout" class:dark={currentTheme === 'dark'}>
+  <Toaster position="top-right" />
   <Header {currentTheme} {toggleTheme} />
 
   <main class:auth={$page.url.pathname.startsWith('/auth')}>
