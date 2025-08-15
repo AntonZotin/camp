@@ -152,7 +152,7 @@
 							</td>
 							<td>{s.price ? `${s.price} ₽` : 'Не указана'}</td>
 							<td>
-								<div class="description-cell">
+								<div class="description-cell" title={s.description}>
 									{s.description || '-'}
 								</div>
 							</td>
