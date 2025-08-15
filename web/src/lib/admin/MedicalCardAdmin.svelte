@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type {Child, MedicalCard} from "$lib/models";
-	import { fly } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import { Loader, Plus, Trash2, Edit, AlertCircle, FileText } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
@@ -10,6 +10,7 @@
 
 	let cards: MedicalCard[] = [];
 	let loading = true;
+	let loadingChildren = false;
 	let error = '';
 	let showModal = false;
 	let editCard: MedicalCard | null = null;
@@ -23,24 +24,24 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/medical-cards`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки медкарт');
-			cards = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки медкарт';
+			else
+				cards = await res.json();
 		} finally {
 			loading = false;
 		}
 	}
 
 	async function loadChildren() {
-		loading = true;
+		loadingChildren = true;
 		try {
 			const res = await fetch(`${PUBLIC_API_URL}/api/children`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
 			if (res.ok) children = await res.json();
 		} finally {
-			loading = false;
+			loadingChildren = false;
 		}
 	}
 
@@ -116,7 +117,7 @@
 		</button>
 	</div>
 
-	{#if loading}
+	{#if loading || loadingChildren}
 		<div class="loader">
 			<Loader size={24} />
 			<span>Загрузка...</span>
@@ -169,7 +170,7 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editCard ? 'Редактировать медкарту' : 'Добавить медкарту'}</h3>
 		<form on:submit|preventDefault={saveCard}>
