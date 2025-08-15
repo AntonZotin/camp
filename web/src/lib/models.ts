@@ -42,3 +42,13 @@ export interface CampSession {
     maxChildren: number;
     price: number;
 }
+
+export interface Menu {
+  id: number;
+  date: string;
+  session: CampSession;
+  breakfast: string;
+  lunch: string;
+  dinner: string;
+  notes: string;
+}

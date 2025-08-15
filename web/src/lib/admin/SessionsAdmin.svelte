@@ -22,14 +22,17 @@
 	async function loadSessions() {
 		loading = true;
 		error = '';
-		const res = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
-			headers: { Authorization: `Bearer ${user.accessToken}` }
-		});
-		if (!res.ok)
-			error = 'Ошибка загрузки смен';
-		else
-			sessions = await res.json();
-		loading = false;
+		try {
+			const res = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
+				headers: { Authorization: `Bearer ${user.accessToken}` }
+			});
+			if (!res.ok)
+				error = 'Ошибка загрузки смен';
+			else
+				sessions = await res.json();
+		} finally {
+			loading = false;
+		}
 	}
 
 	function openModal(sessionData: CampSession | null = null) {

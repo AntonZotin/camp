@@ -49,14 +49,17 @@
 	async function loadUsers() {
 		loading = true;
 		error = '';
-		const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
-			headers: { Authorization: `Bearer ${user.accessToken}` }
-		});
-		if (!res.ok)
-			error = 'Ошибка загрузки пользователей';
-		else
-			users = await res.json();
-		loading = false;
+		try {
+			const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
+				headers: { Authorization: `Bearer ${user.accessToken}` }
+			});
+			if (!res.ok)
+				error = 'Ошибка загрузки пользователей';
+			else
+				users = await res.json();
+		} finally {
+			loading = false;
+		}
 	}
 
 	function openModal(userData: User | null = null) {

@@ -5,13 +5,21 @@
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let menus = [];
+  	let menus: Menu[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editMenu = null;
-	let menuForm = { date: '', sessionId: '', breakfast: '', lunch: '', dinner: '', notes: '' };
-	let sessions = [];
+  	let editMenu: Menu | null = null;
+	type MenuForm = {
+	  date: string;
+	  sessionId: number | null;
+	  breakfast: string;
+	  lunch: string;
+	  dinner: string;
+	  notes: string;
+	};
+	let menuForm: MenuForm = { date: '', sessionId: null, breakfast: '', lunch: '', dinner: '', notes: '' };
+  	let sessions: CampSession[] = [];
 	let loadingSessions = false;
 
 	async function loadMenus() {
@@ -21,10 +29,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/menus`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки меню');
-			menus = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки меню';
+			else
+				menus = await res.json();
 		} finally {
 			loading = false;
 		}
@@ -42,20 +50,20 @@
 		}
 	}
 
-	function openModal(menu = null) {
+	function openModal(menu: Menu | null = null) {
 		showModal = true;
 		editMenu = menu;
 		if (menu) {
 			menuForm = {
 				date: menu.date,
-				sessionId: menu.session?.id || '',
+				sessionId: menu.session.id || null,
 				breakfast: menu.breakfast || '',
 				lunch: menu.lunch || '',
 				dinner: menu.dinner || '',
 				notes: menu.notes || ''
 			};
 		} else {
-			menuForm = { date: '', sessionId: '', breakfast: '', lunch: '', dinner: '', notes: '' };
+			menuForm = { date: '', sessionId: null, breakfast: '', lunch: '', dinner: '', notes: '' };
 		}
 	}
 
@@ -97,6 +105,7 @@
 	}
 
 	import { onMount } from 'svelte';
+	import type {CampSession, Menu} from "$lib/models";
 	onMount(() => { loadMenus(); loadSessions(); });
 </script>
 
@@ -112,7 +121,7 @@
 		</button>
 	</div>
 
-	{#if loading}
+	{#if loading || loadingSessions}
 		<div class="loader">
 			<Loader size={24} />
 			<span>Загрузка...</span>
@@ -163,7 +172,7 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editMenu ? 'Редактировать меню' : 'Добавить меню'}</h3>
 		<form on:submit|preventDefault={saveMenu}>
