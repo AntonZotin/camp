@@ -44,11 +44,21 @@ export interface CampSession {
 }
 
 export interface Menu {
-  id: number;
-  date: string;
-  session: CampSession;
-  breakfast: string;
-  lunch: string;
-  dinner: string;
-  notes: string;
+    id: number;
+    date: string;
+    session: CampSession;
+    breakfast: string;
+    lunch: string;
+    dinner: string;
+    notes: string;
+}
+
+export interface MedicalVisit {
+    id: number;
+    date: string;
+    child: Child;
+    doctor: Employee;
+    description: string;
+    recommendations: string;
+    medications: string;
 }

@@ -5,14 +5,22 @@
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let visits = [];
+	let visits: MedicalVisit[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editVisit = null;
-	let visitForm = { date: '', childId: '', doctorId: '', description: '', recommendations: '', medications: '' };
-	let children = [];
-	let doctors = [];
+	let editVisit: MedicalVisit | null = null;
+	type VisitForm = {
+	  date: string;
+	  childId: number | null;
+	  doctorId: number | null;
+	  description: string;
+	  recommendations: string;
+	  medications: string;
+	};
+	let visitForm: VisitForm = { date: '', childId: null, doctorId: null, description: '', recommendations: '', medications: '' };
+	let children: Child[] = [];
+	let doctors: Employee[] = [];
 	let loadingChildren = false;
 	let loadingDoctors = false;
 
@@ -23,10 +31,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/medical-visits`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки медосмотров');
-			visits = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки медосмотров';
+			else
+				visits = await res.json();
 		} finally {
 			loading = false;
 		}
@@ -50,26 +58,32 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/employees`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (res.ok) doctors = (await res.json()).filter(e => e.position?.toLowerCase().includes('врач') || e.position?.toLowerCase().includes('doctor'));
+			if (res.ok) {
+				const data: Employee[] = await res.json();
+				doctors = data.filter(e =>
+						e.position?.toLowerCase().includes('медсестра') ||
+						e.position?.toLowerCase().includes('психолог')
+				);
+			}
 		} finally {
 			loadingDoctors = false;
 		}
 	}
 
-	function openModal(visit = null) {
+	function openModal(visit: MedicalVisit | null = null) {
 		showModal = true;
 		editVisit = visit;
 		if (visit) {
 			visitForm = {
 				date: visit.date,
-				childId: visit.child?.id || '',
-				doctorId: visit.doctor?.id || '',
+				childId: visit.child.id || null,
+				doctorId: visit.doctor.id || null,
 				description: visit.description || '',
 				recommendations: visit.recommendations || '',
 				medications: visit.medications || ''
 			};
 		} else {
-			visitForm = { date: '', childId: '', doctorId: '', description: '', recommendations: '', medications: '' };
+			visitForm = { date: '', childId: null, doctorId: null, description: '', recommendations: '', medications: '' };
 		}
 	}
 
@@ -111,6 +125,7 @@
 	}
 
 	import { onMount } from 'svelte';
+	import type {Child, Employee, MedicalVisit} from "$lib/models";
 	onMount(() => { loadVisits(); loadChildren(); loadDoctors(); });
 </script>
 
@@ -126,7 +141,7 @@
 		</button>
 	</div>
 
-	{#if loading}
+	{#if loading || loadingChildren || loadingDoctors}
 		<div class="loader">
 			<Loader size={24} />
 			<span>Загрузка...</span>
@@ -179,7 +194,7 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editVisit ? 'Редактировать осмотр' : 'Добавить осмотр'}</h3>
 		<form on:submit|preventDefault={saveVisit}>
@@ -193,7 +208,7 @@
 					<select id="childId" bind:value={visitForm.childId} required>
 						<option value="" disabled>Выберите ребёнка</option>
 						{#each children as ch}
-							<option value={ch.id}>{ch.name}</option>
+							<option value={ch.id}>{ch.fullName}</option>
 						{/each}
 					</select>
 				</div>
