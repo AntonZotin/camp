@@ -5,11 +5,11 @@
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let sessions: any[] = [];  // TODO: типизировать все страницы
+	let sessions: CampSession[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editSession: any = null;
+	let editSession: CampSession | null = null;
 	let sessionForm = { 
 		name: '', 
 		startDate: '', 
@@ -35,7 +35,7 @@
 		}
 	}
 
-	function openModal(sessionData = null) {
+	function openModal(sessionData: CampSession | null = null) {
 		showModal = true;
 		editSession = sessionData;
 		if (sessionData) {
@@ -90,6 +90,7 @@
 	}
 
 	import { onMount } from 'svelte';
+	import type {CampSession} from "$lib/models";
 	onMount(() => { loadSessions(); });
 </script>
 
