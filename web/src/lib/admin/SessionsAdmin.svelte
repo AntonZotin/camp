@@ -22,17 +22,14 @@
 	async function loadSessions() {
 		loading = true;
 		error = '';
-		try {
-			const res = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
-				headers: { Authorization: `Bearer ${user.accessToken}` }
-			});
-			if (!res.ok) throw new Error('Ошибка загрузки смен');
+		const res = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
+			headers: { Authorization: `Bearer ${user.accessToken}` }
+		});
+		if (!res.ok)
+			error = 'Ошибка загрузки смен';
+		else
 			sessions = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
-		} finally {
-			loading = false;
-		}
+		loading = false;
 	}
 
 	function openModal(sessionData: CampSession | null = null) {
@@ -177,7 +174,7 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editSession ? 'Редактировать смену' : 'Добавить смену'}</h3>
 		<form on:submit|preventDefault={saveSession}>
