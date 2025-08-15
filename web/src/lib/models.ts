@@ -62,3 +62,14 @@ export interface MedicalVisit {
     recommendations: string;
     medications: string;
 }
+
+export interface Notification {
+    id: number;
+    recipient: User;
+    type: string;
+    subject: string;
+    message: string;
+    status: string;
+    createdAt: string;
+    sentAt: string;
+}

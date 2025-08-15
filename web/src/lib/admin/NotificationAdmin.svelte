@@ -5,13 +5,20 @@
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let notifications = [];
+	let notifications: Notification[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editNotification = null;
-	let notificationForm = { recipientId: '', type: 'internal', subject: '', message: '', status: 'pending' };
-	let users = [];
+	let editNotification: Notification | null = null;
+	type NotificationForm = {
+	  recipientId: number | null;
+	  type: string;
+	  subject: string;
+	  message: string;
+	  status: string;
+	};
+	let notificationForm: NotificationForm = { recipientId: null, type: 'internal', subject: '', message: '', status: 'pending' };
+	let users: User[] = [];
 	let loadingUsers = false;
 	const types = ['internal', 'email', 'telegram'];
 	const statuses = ['pending', 'sent', 'failed'];
@@ -23,10 +30,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/notifications`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки уведомлений');
-			notifications = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки уведомлений';
+			else
+				notifications = await res.json();
 		} finally {
 			loading = false;
 		}
@@ -44,19 +51,19 @@
 		}
 	}
 
-	function openModal(notification = null) {
+	function openModal(notification: Notification | null = null) {
 		showModal = true;
 		editNotification = notification;
 		if (notification) {
 			notificationForm = {
-				recipientId: notification.recipient?.id || '',
+				recipientId: notification.recipient.id || null,
 				type: notification.type || 'internal',
 				subject: notification.subject || '',
 				message: notification.message || '',
 				status: notification.status || 'pending'
 			};
 		} else {
-			notificationForm = { recipientId: '', type: 'internal', subject: '', message: '', status: 'pending' };
+			notificationForm = { recipientId: null, type: 'internal', subject: '', message: '', status: 'pending' };
 		}
 	}
 
@@ -97,6 +104,7 @@
 	}
 
 	import { onMount } from 'svelte';
+	import type {Notification, User} from "$lib/models";
 	onMount(() => { loadNotifications(); loadUsers(); });
 </script>
 
@@ -112,7 +120,7 @@
 		</button>
 	</div>
 
-	{#if loading}
+	{#if loading || loadingUsers}
 		<div class="loader">
 			<Loader size={24} />
 			<span>Загрузка...</span>
@@ -167,7 +175,7 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editNotification ? 'Редактировать уведомление' : 'Добавить уведомление'}</h3>
 		<form on:submit|preventDefault={saveNotification}>
