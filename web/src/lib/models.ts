@@ -94,3 +94,11 @@ export interface Payment {
     method: 'credit_card' | 'cash' | 'bank_transfer';
     comment?: string | null;
 }
+
+export interface ActivityLog {
+    id: number;
+    user: User;
+    action: string;
+    timestamp: string;
+    description: string;
+}

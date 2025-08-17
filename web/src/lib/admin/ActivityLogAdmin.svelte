@@ -4,7 +4,7 @@
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let logs = [];
+	let logs: ActivityLog[] = [];
 	let loading = true;
 	let error = '';
 
@@ -15,16 +15,17 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/activity-logs`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки журнала');
-			logs = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки журнала';
+			else
+				logs = await res.json();
 		} finally {
 			loading = false;
 		}
 	}
 
 	import { onMount } from 'svelte';
+	import type {ActivityLog} from "$lib/models";
 	onMount(() => { loadLogs(); });
 </script>
 
