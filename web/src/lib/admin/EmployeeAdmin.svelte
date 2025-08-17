@@ -1,17 +1,24 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {Employee} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Users } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let employees = [];
+	let employees: Employee[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editEmployee = null;
-	let employeeForm = { fullName: '', position: '', userId: '' };
-	let users = [];
+	let editEmployee: Employee | null = null;
+	interface EmployeeForm {
+		fullName: string;
+		position: string;
+		userId: number;
+	}
+	let employeeForm: EmployeeForm = { fullName: '', position: '', userId: 0 };
+	let users: Users[] = [];
 	let loadingUsers = false;
 
 	async function loadEmployees() {
@@ -21,10 +28,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/employees`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки сотрудников');
-			employees = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки сотрудников';
+			else
+				employees = await res.json();
 		} finally {
 			loading = false;
 		}
@@ -42,17 +49,17 @@
 		}
 	}
 
-	function openModal(employee = null) {
+	function openModal(employee: Employee | null = null) {
 		showModal = true;
 		editEmployee = employee;
 		if (employee) {
 			employeeForm = {
-				fullName: employee.fullName || '',
-				position: employee.position || '',
-				userId: employee.user?.id || ''
+				fullName: employee.fullName,
+				position: employee.position,
+				userId: employee.userId
 			};
 		} else {
-			employeeForm = { fullName: '', position: '', userId: '' };
+			employeeForm = { fullName: '', position: '', userId: 0 };
 		}
 	}
 
@@ -90,7 +97,6 @@
 		await loadEmployees();
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { loadEmployees(); loadUsers(); });
 </script>
 
@@ -106,7 +112,7 @@
 		</button>
 	</div>
 
-	{#if loading}
+	{#if loading || loadingUsers}
 		<div class="loader">
 			<Loader size={24} />
 			<span>Загрузка...</span>
@@ -134,7 +140,7 @@
 							<td>{e.id}</td>
 							<td>{e.fullName}</td>
 							<td>{e.position}</td>
-							<td>{e.user?.username}</td>
+							<td>{e.username}</td>
 							<td>
 								<button class="icon-btn edit" title="Редактировать" on:click={() => openModal(e)}>
 									<Edit size={16} />
@@ -153,7 +159,7 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editEmployee ? 'Редактировать сотрудника' : 'Добавить сотрудника'}</h3>
 		<form on:submit|preventDefault={saveEmployee}>

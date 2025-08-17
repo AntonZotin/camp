@@ -1,6 +1,7 @@
 package ru.camp.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,4 +25,14 @@ public class Employee {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
+
+    @JsonProperty("userId")
+    public Long getUserId() {
+        return (user != null) ? user.getId() : null;
+    }
+
+    @JsonProperty("username")
+    public String getUsername() {
+        return (user != null) ? user.getUsername() : null;
+    }
 } 
