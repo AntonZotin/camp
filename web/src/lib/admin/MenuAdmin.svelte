@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {CampSession, Menu} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Utensils } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
   	let menus: Menu[] = [];
@@ -104,8 +107,6 @@
 		await loadMenus();
 	}
 
-	import { onMount } from 'svelte';
-	import type {CampSession, Menu} from "$lib/models";
 	onMount(() => { loadMenus(); loadSessions(); });
 </script>
 

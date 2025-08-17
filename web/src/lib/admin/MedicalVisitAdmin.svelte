@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {Child, Employee, MedicalVisit} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Stethoscope } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
 	let visits: MedicalVisit[] = [];
@@ -121,8 +124,6 @@
 		await loadVisits();
 	}
 
-	import { onMount } from 'svelte';
-	import type {Child, Employee, MedicalVisit} from "$lib/models";
 	onMount(() => { loadVisits(); loadChildren(); loadDoctors(); });
 </script>
 

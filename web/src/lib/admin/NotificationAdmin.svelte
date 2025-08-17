@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {Notification, User} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Bell } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
 	let notifications: Notification[] = [];
@@ -103,8 +106,6 @@
 		await loadNotifications();
 	}
 
-	import { onMount } from 'svelte';
-	import type {Notification, User} from "$lib/models";
 	onMount(() => { loadNotifications(); loadUsers(); });
 </script>
 

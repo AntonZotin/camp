@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {CampSession} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import { Calendar, Loader, AlertCircle, Plus, Edit, Trash2, Clock, Users } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
 	let sessions: CampSession[] = [];
@@ -89,8 +92,6 @@
 		await loadSessions();
 	}
 
-	import { onMount } from 'svelte';
-	import type {CampSession} from "$lib/models";
 	onMount(() => { loadSessions(); });
 </script>
 

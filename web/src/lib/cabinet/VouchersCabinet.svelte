@@ -1,15 +1,17 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {Voucher} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Ticket, CalendarCheck, Loader, AlertCircle, Plus, Eye, Trash2, X, Calendar, User, MapPin, Clock } from 'lucide-svelte';
+	import { Ticket, Loader, AlertCircle, Plus, Eye, Trash2, X, Calendar, User, Clock } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let vouchers: any[] = [];
+	let vouchers: Voucher[] = [];
 	let loading = true;
 	let error = '';
 	let showVoucherDetails = false;
-	let selectedVoucher: any = null;
+	let selectedVoucher: Voucher | null = null;
 
 	async function loadVouchers() {
 		loading = true;
@@ -18,10 +20,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/vouchers/parent/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки путёвок');
-			vouchers = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки путёвок';
+			else
+				vouchers = await res.json();
 		} finally {
 			loading = false;
 		}
@@ -46,7 +48,6 @@
 		selectedVoucher = null;
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { loadVouchers(); });
 </script>
 

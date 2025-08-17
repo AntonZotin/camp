@@ -2,6 +2,7 @@
 	import { Loader, Download, AlertCircle, FileDown } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
 	let loading = false;
