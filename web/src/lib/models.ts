@@ -73,3 +73,22 @@ export interface Notification {
     createdAt: string;
     sentAt: string;
 }
+
+export interface Voucher {
+    id: number;
+    child: Child;
+    session: CampSession;
+    status: 'BOOKED' | 'CONFIRMED' | 'CANCELLED' | 'USED';
+    bookingDate: string;
+}
+
+export interface Payment {
+    id: number;
+    parent: User;
+    voucher: Voucher;
+    amount: number;
+    date: string;
+    status: 'paid' | 'pending' | 'cancelled';
+    method: 'credit_card' | 'cash' | 'bank_transfer';
+    comment?: string | null;
+}

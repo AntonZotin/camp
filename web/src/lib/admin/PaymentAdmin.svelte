@@ -1,22 +1,34 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
-	import { Loader, Plus, Trash2, Edit, AlertCircle, CreditCard } from 'lucide-svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
-	import type { UserSession } from '$lib/stores/userStore';
+	import {fade, fly} from 'svelte/transition';
+	import {AlertCircle, CreditCard, Edit, Loader, Plus, Trash2} from 'lucide-svelte';
+	import {PUBLIC_API_URL} from '$env/static/public';
+	import type {UserSession} from '$lib/stores/userStore';
+	import {onMount} from 'svelte';
+	import type {Payment, User, Voucher} from "$lib/models";
+
 	export let user: UserSession;
 
-	let payments = [];
+	let payments: Payment[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editPayment = null;
-	let paymentForm = { parentId: '', voucherId: '', amount: '', date: '', status: 'pending', method: '', comment: '' };
-	let parents = [];
-	let vouchers = [];
+	let editPayment: Payment | null = null;
+	interface PaymentForm {
+		parentId: number | null;
+		voucherId: number | null;
+		amount: number;
+		date: string;
+		status: 'paid' | 'pending' | 'cancelled';
+		method: 'credit_card' | 'cash' | 'bank_transfer';
+		comment: string;
+	}
+	let paymentForm: PaymentForm = { parentId: null, voucherId: null, amount: 0, date: '', status: 'pending', method: 'credit_card', comment: '' };
+	let parents: User[] = [];
+	let vouchers: Voucher[] = [];
 	let loadingParents = false;
 	let loadingVouchers = false;
-	const statuses = ['paid', 'pending', 'cancelled'];
-	const methods = ['card', 'cash', 'other'];
+	const statuses = ['paid', 'pending', 'failed'];
+	const methods = ['credit_card', 'cash', 'bank_transfer'];
 
 	async function loadPayments() {
 		loading = true;
@@ -25,10 +37,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/payments`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки оплат');
-			payments = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки оплат';
+			else
+				payments = await res.json();
 		} finally {
 			loading = false;
 		}
@@ -40,7 +52,7 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/admin/users`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (res.ok) parents = (await res.json()).filter(u => u.role === 'PARENT');
+			if (res.ok) parents = (await res.json() as User[]).filter(u => u.role === 'PARENT');
 		} finally {
 			loadingParents = false;
 		}
@@ -58,21 +70,21 @@
 		}
 	}
 
-	function openModal(payment = null) {
+	function openModal(payment: Payment | null = null) {
 		showModal = true;
 		editPayment = payment;
 		if (payment) {
 			paymentForm = {
-				parentId: payment.parent?.id || '',
-				voucherId: payment.voucher?.id || '',
-				amount: payment.amount || '',
-				date: payment.date ? payment.date.slice(0, 16) : '',
-				status: payment.status || 'pending',
-				method: payment.method || '',
+				parentId: payment.parent.id || null,
+				voucherId: payment.voucher.id || null,
+				amount: payment.amount,
+				date: payment.date,
+				status: payment.status,
+				method: payment.method,
 				comment: payment.comment || ''
 			};
 		} else {
-			paymentForm = { parentId: '', voucherId: '', amount: '', date: '', status: 'pending', method: '', comment: '' };
+			paymentForm = { parentId: null, voucherId: null, amount: 0, date: '', status: 'pending', method: 'credit_card', comment: '' };
 		}
 	}
 
@@ -87,7 +99,7 @@
 		const body = JSON.stringify({
 			parent: parents.find(p => p.id == paymentForm.parentId),
 			voucher: vouchers.find(v => v.id == paymentForm.voucherId),
-			amount: parseFloat(paymentForm.amount),
+			amount: paymentForm.amount,
 			date: paymentForm.date,
 			status: paymentForm.status,
 			method: paymentForm.method,
@@ -114,7 +126,6 @@
 		await loadPayments();
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { loadPayments(); loadParents(); loadVouchers(); });
 </script>
 
@@ -130,7 +141,7 @@
 		</button>
 	</div>
 
-	{#if loading}
+	{#if loading || loadingParents || loadingVouchers}
 		<div class="loader">
 			<Loader size={24} />
 			<span>Загрузка...</span>
@@ -185,7 +196,7 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editPayment ? 'Редактировать оплату' : 'Добавить оплату'}</h3>
 		<form on:submit|preventDefault={savePayment}>
