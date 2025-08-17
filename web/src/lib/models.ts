@@ -117,7 +117,7 @@ export interface Schedule {
     session: CampSession;
     employee: Employee;
     time: string;
-    eventType: string;
+    title: string;
     description: string;
     location: string;
     team: string;

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type {Schedule} from "$lib/models";
 	import { fly } from 'svelte/transition';
-	import { Calendar, Clock, MapPin, Users, Loader, AlertCircle } from 'lucide-svelte';
+	import {Calendar, Clock, MapPin, Users, Loader, AlertCircle, Activity} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 
@@ -60,10 +60,15 @@
 			{#each schedules as schedule, i (schedule.id)}
 				<div class="schedule-card" in:fly={{ y: 30, delay: i * 100 }}>
 					<div class="schedule-header">
-						<Calendar size={24} />
-						<h3>{schedule.eventType}</h3>
+						<Activity size={24} />
+						<h3>{schedule.title}</h3>
 					</div>
 					<div class="schedule-info">
+						<div class="info-item">
+							<Calendar size={16} />
+							<span class="label">Дата:</span>
+							<span class="value">{schedule.date}</span>
+						</div>
 						<div class="info-item">
 							<Clock size={16} />
 							<span class="label">Время:</span>
@@ -78,10 +83,6 @@
 							<Users size={16} />
 							<span class="label">Группа:</span>
 							<span class="value">{schedule.team}</span>
-						</div>
-						<div class="info-item">
-							<span class="label">Дата:</span>
-							<span class="value">{schedule.date}</span>
 						</div>
 						{#if schedule.description}
 							<div class="description">

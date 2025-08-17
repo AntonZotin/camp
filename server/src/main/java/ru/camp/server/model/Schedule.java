@@ -16,9 +16,6 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private LocalDate date;
-
     @ManyToOne
     @JoinColumn(name = "session_id")
     private CampSession session;
@@ -28,10 +25,13 @@ public class Schedule {
     private Employee employee;
 
     @Column(nullable = false)
+    private LocalDate date;
+
+    @Column(nullable = false)
     private LocalTime time;
 
     @Column(nullable = false, length = 100)
-    private String eventType;
+    private String title;
 
     @Column(length = 1000)
     private String description;
