@@ -14,19 +14,20 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/admin/export/${type}/csv`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка экспорта');
-			const csv = await res.text();
-			const blob = new Blob([csv], { type: 'text/csv' });
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = `${type}.csv`;
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			URL.revokeObjectURL(url);
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok) {
+				error = 'Ошибка экспорта';
+			} else {
+				const csv = await res.text();
+				const blob = new Blob([csv], {type: 'text/csv'});
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `${type}.csv`;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+			}
 		} finally {
 			loading = false;
 		}
