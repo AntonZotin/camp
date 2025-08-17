@@ -14,7 +14,7 @@
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
-	let tab: 'children' | 'vouchers' | 'schedule' | 'duties' | 'settings' = 'children';
+	let tab: 'children' | 'vouchers' | 'schedule' | 'duties' | 'settings';
 
 	onMount(() => {
 		if (!user) goto('/login');
@@ -28,10 +28,16 @@
 
 	function getRoleLabel(role: UserRole): string {
 		switch (role) {
-			case 'ADMIN': return 'Администратор';
-			case 'PARENT': return 'Родитель';
-			case 'EMPLOYEE': return 'Сотрудник';
-			default: return 'Пользователь';
+			case 'ADMIN':
+				return 'Администратор';
+			case 'PARENT':
+				tab = 'children';
+				return 'Родитель';
+			case 'EMPLOYEE':
+				tab = 'schedule';
+				return 'Сотрудник';
+			default:
+				return 'Пользователь';
 		}
 	}
 </script>

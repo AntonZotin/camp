@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {DutyLog} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import { Activity, Clock, MapPin, Users, Loader, AlertCircle, CheckCircle, XCircle } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
-	let duties: any[] = [];
+	let duties: DutyLog[] = [];
 	let loading = true;
 	let error = '';
 
@@ -43,7 +46,6 @@
 		return 'В процессе';
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { loadDuties(); });
 </script>
 

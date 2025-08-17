@@ -1,11 +1,14 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import type {Schedule} from "$lib/models";
+	import { fly } from 'svelte/transition';
 	import { Calendar, Clock, MapPin, Users, Loader, AlertCircle } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
-	let schedules: any[] = [];
+	let schedules: Schedule[] = [];
 	let loading = true;
 	let error = '';
 
@@ -16,16 +19,15 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/schedules/employee/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки расписания');
-			schedules = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки расписания';
+			else
+				schedules = await res.json();
 		} finally {
 			loading = false;
 		}
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { loadSchedules(); });
 </script>
 
@@ -59,23 +61,23 @@
 				<div class="schedule-card" in:fly={{ y: 30, delay: i * 100 }}>
 					<div class="schedule-header">
 						<Calendar size={24} />
-						<h3>{schedule.title || 'Рабочий день'}</h3>
+						<h3>{schedule.eventType}</h3>
 					</div>
 					<div class="schedule-info">
 						<div class="info-item">
 							<Clock size={16} />
 							<span class="label">Время:</span>
-							<span class="value">{schedule.startTime} - {schedule.endTime}</span>
+							<span class="value">{schedule.time}</span>
 						</div>
 						<div class="info-item">
 							<MapPin size={16} />
 							<span class="label">Место:</span>
-							<span class="value">{schedule.location || 'Не указано'}</span>
+							<span class="value">{schedule.location}</span>
 						</div>
 						<div class="info-item">
 							<Users size={16} />
 							<span class="label">Группа:</span>
-							<span class="value">{schedule.group || 'Не указана'}</span>
+							<span class="value">{schedule.team}</span>
 						</div>
 						<div class="info-item">
 							<span class="label">Дата:</span>

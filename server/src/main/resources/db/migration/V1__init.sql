@@ -119,6 +119,8 @@ CREATE TABLE schedules
     time        time WITHOUT TIME ZONE                  NOT NULL,
     event_type  VARCHAR(100)                            NOT NULL,
     description VARCHAR(1000),
+    location  VARCHAR(500)                              NOT NULL,
+    team  VARCHAR(100)                                  NOT NULL,
     CONSTRAINT pk_schedules PRIMARY KEY (id)
 );
 

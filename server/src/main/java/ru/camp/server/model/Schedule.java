@@ -35,4 +35,10 @@ public class Schedule {
 
     @Column(length = 1000)
     private String description;
+
+    @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
+    private String team;
 } 

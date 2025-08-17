@@ -102,3 +102,23 @@ export interface ActivityLog {
     timestamp: string;
     description: string;
 }
+
+export interface DutyLog {
+    id: number;
+    date: string;
+    employee: Employee;
+    session: CampSession;
+    report: string;
+}
+
+export interface Schedule {
+    id: number;
+    date: string;
+    session: CampSession;
+    employee: Employee;
+    time: string;
+    eventType: string;
+    description: string;
+    location: string;
+    team: string;
+}
