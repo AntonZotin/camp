@@ -58,13 +58,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/employees`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (res.ok) {
-				const data: Employee[] = await res.json();
-				doctors = data.filter(e =>
-						e.position?.toLowerCase().includes('медсестра') ||
-						e.position?.toLowerCase().includes('психолог')
-				);
-			}
+			if (res.ok) doctors = (await res.json() as Employee[]).filter(e =>
+					e.position?.toLowerCase().includes('медсестра') ||
+					e.position?.toLowerCase().includes('психолог')
+			);
 		} finally {
 			loadingDoctors = false;
 		}
