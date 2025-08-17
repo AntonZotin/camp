@@ -1,16 +1,18 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import type {Child} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import { Users, Baby, Loader, AlertCircle, Plus, Edit, Trash2 } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	export let user: UserSession;
 
-	let children: any[] = [];
+	let children: Child[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
-	let editChild: any = null;
-	let childForm = { name: '', birthDate: '' };
+	let editChild: Child | null = null;
+	let childForm = { fullName: '', birthDate: '' };
 
 	async function loadChildren() {
 		loading = true;
@@ -19,22 +21,22 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/children/parent/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки детей');
-			children = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки детей';
+			else
+				children = await res.json();
 		} finally {
 			loading = false;
 		}
 	}
 
-	function openModal(child: any = null) {
+	function openModal(child: Child | null = null) {
 		showModal = true;
 		editChild = child;
 		if (child) {
-			childForm = { name: child.name, birthDate: child.birthDate };
+			childForm = { fullName: child.fullName, birthDate: child.birthDate };
 		} else {
-			childForm = { name: '', birthDate: '' };
+			childForm = { fullName: '', birthDate: '' };
 		}
 	}
 
@@ -71,7 +73,6 @@
 		await loadChildren();
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { loadChildren(); });
 </script>
 
@@ -109,7 +110,7 @@
 				<div class="child-card" in:fly={{ y: 30, delay: i * 100 }}>
 					<div class="child-header">
 						<Baby size={24} />
-						<h3>{child.name}</h3>
+						<h3>{child.fullName}</h3>
 						<div class="actions">
 							<button class="icon-btn edit" title="Редактировать" on:click={() => openModal(child)}>
 								<Edit size={16} />
@@ -124,10 +125,6 @@
 							<span class="label">Дата рождения:</span>
 							<span class="value">{child.birthDate}</span>
 						</div>
-						<div class="info-item">
-							<span class="label">ID:</span>
-							<span class="value">{child.id}</span>
-						</div>
 					</div>
 				</div>
 			{/each}
@@ -137,13 +134,13 @@
 
 {#if showModal}
 	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="modal-backdrop" on:click={closeModal}></div>
+	<div class="modal-backdrop" out:fade={{ duration: 250 }} on:click={closeModal}></div>
 	<div class="modal" in:fly={{ y: 30 }}>
 		<h3>{editChild ? 'Редактировать ребенка' : 'Добавить ребенка'}</h3>
 		<form on:submit|preventDefault={saveChild}>
 			<div class="form-group">
 				<label for="name">Имя ребенка</label>
-				<input id="name" bind:value={childForm.name} required />
+				<input id="name" bind:value={childForm.fullName} required />
 			</div>
 			<div class="form-group">
 				<label for="birthDate">Дата рождения</label>
