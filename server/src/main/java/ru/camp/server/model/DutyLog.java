@@ -26,6 +26,24 @@ public class DutyLog {
     @JoinColumn(name = "session_id")
     private CampSession session;
 
-    @Column(nullable = false, length = 2000)
+    @Column(nullable = false)
+    private String startTime;
+
+    @Column(nullable = false)
+    private String endTime;
+
+    @Column(nullable = false, length = 100)
+    private String location;
+
+    @Enumerated(EnumType.STRING)
+    private DutyStatus status;
+
+    @Column(length = 2000)
+    private String description;
+
+    @Column(length = 2000)
+    private String notes;
+
+    @Column(length = 2000)
     private String report;
-} 
+}

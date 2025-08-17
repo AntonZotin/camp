@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { Settings, User, Lock, Mail, Eye, EyeOff, Save, AlertCircle } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+
 	export let user: UserSession;
 
 	let loading = false;
@@ -74,14 +76,10 @@
 				})
 			});
 
-			if (!res.ok) {
-				const data = await res.json();
-				throw new Error(data.message || 'Ошибка обновления профиля');
-			}
-
-			success = 'Профиль успешно обновлен';
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка обновления профиля';
+			if (!res.ok)
+				error = 'Ошибка обновления профиля';
+			else
+				success = 'Профиль успешно обновлен';
 		} finally {
 			loading = false;
 		}
@@ -115,17 +113,14 @@
 				})
 			});
 
-			if (!res.ok) {
-				const data = await res.json();
-				throw new Error(data.message || 'Ошибка смены пароля');
+			if (!res.ok)
+				error = 'Ошибка смены пароля';
+			else {
+				success = 'Пароль успешно изменен';
+				profileForm.currentPassword = '';
+				profileForm.newPassword = '';
+				profileForm.confirmPassword = '';
 			}
-
-			success = 'Пароль успешно изменен';
-			profileForm.currentPassword = '';
-			profileForm.newPassword = '';
-			profileForm.confirmPassword = '';
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка смены пароля';
 		} finally {
 			loading = false;
 		}
@@ -146,20 +141,15 @@
 				body: JSON.stringify(settingsForm)
 			});
 
-			if (!res.ok) {
-				const data = await res.json();
-				throw new Error(data.message || 'Ошибка обновления настроек');
-			}
-
-			success = 'Настройки успешно обновлены';
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка обновления настроек';
+			if (!res.ok)
+				error = 'Ошибка обновления настроек';
+			else
+				success = 'Настройки успешно обновлены';
 		} finally {
 			loading = false;
 		}
 	}
 
-	import { onMount } from 'svelte';
 	onMount(() => { 
 		loadProfile(); 
 		loadSettings();
@@ -189,7 +179,6 @@
 	{/if}
 
 	<div class="settings-grid">
-		<!-- Профиль -->
 		<div class="settings-card" in:fly={{ y: 30, delay: 100 }}>
 			<div class="card-header">
 				<User size={20} />
@@ -215,7 +204,6 @@
 			</form>
 		</div>
 
-		<!-- Смена пароля -->
 		<div class="settings-card" in:fly={{ y: 30, delay: 200 }}>
 			<div class="card-header">
 				<Lock size={20} />
@@ -270,7 +258,6 @@
 			</form>
 		</div>
 
-		<!-- Настройки уведомлений -->
 		<div class="settings-card" in:fly={{ y: 30, delay: 300 }}>
 			<div class="card-header">
 				<Mail size={20} />

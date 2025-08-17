@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type {DutyLog} from "$lib/models";
-	import { fade, fly } from 'svelte/transition';
-	import { Activity, Clock, MapPin, Users, Loader, AlertCircle, CheckCircle, XCircle } from 'lucide-svelte';
+	import { fly } from 'svelte/transition';
+	import {Activity, Clock, MapPin, Users, Loader, AlertCircle, CheckCircle, XCircle, Calendar} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 
@@ -19,10 +19,10 @@
 			const res = await fetch(`${PUBLIC_API_URL}/api/duty-logs/employee/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
-			if (!res.ok) throw new Error('Ошибка загрузки дежурств');
-			duties = await res.json();
-		} catch (e) {
-			error = (e as Error).message || 'Ошибка';
+			if (!res.ok)
+				error = 'Ошибка загрузки дежурств';
+			else
+				duties = await res.json();
 		} finally {
 			loading = false;
 		}
@@ -87,6 +87,11 @@
 					</div>
 					<div class="duty-info">
 						<div class="info-item">
+							<Calendar size={16} />
+							<span class="label">Дата:</span>
+							<span class="value">{duty.date}</span>
+						</div>
+						<div class="info-item">
 							<Clock size={16} />
 							<span class="label">Время:</span>
 							<span class="value">{duty.startTime} - {duty.endTime}</span>
@@ -94,16 +99,12 @@
 						<div class="info-item">
 							<MapPin size={16} />
 							<span class="label">Место:</span>
-							<span class="value">{duty.location || 'Не указано'}</span>
+							<span class="value">{duty.location}</span>
 						</div>
 						<div class="info-item">
 							<Users size={16} />
 							<span class="label">Ответственный:</span>
-							<span class="value">{duty.employee?.fullName || 'Не указан'}</span>
-						</div>
-						<div class="info-item">
-							<span class="label">Дата:</span>
-							<span class="value">{duty.date}</span>
+							<span class="value">{duty.employee?.fullName}</span>
 						</div>
 						{#if duty.description}
 							<div class="description">
@@ -115,6 +116,12 @@
 							<div class="notes">
 								<span class="label">Заметки:</span>
 								<p>{duty.notes}</p>
+							</div>
+						{/if}
+						{#if duty.report}
+							<div class="report">
+								<span class="label">Отчёт:</span>
+								<p>{duty.report}</p>
 							</div>
 						{/if}
 					</div>
@@ -261,6 +268,13 @@
 		padding: 0.75rem;
 		border-radius: var(--radius);
 		border-left: 3px solid var(--primary);
+	}
+
+	.report {
+		background: rgba(79, 70, 229, 0.05);
+		padding: 0.75rem;
+		border-radius: var(--radius);
+		border-left: 3px solid var(--secondary);
 	}
 
 	@media (max-width: 768px) {

@@ -108,6 +108,12 @@ export interface DutyLog {
     date: string;
     employee: Employee;
     session: CampSession;
+    startTime: string;
+    endTime: string;
+    location: string;
+    status: string;
+    description: string;
+    notes: string;
     report: string;
 }
 

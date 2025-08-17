@@ -35,6 +35,12 @@ CREATE TABLE duty_logs
     date        date                                    NOT NULL,
     employee_id BIGINT,
     session_id  BIGINT,
+    start_time  time WITHOUT TIME ZONE                  NOT NULL,
+    end_time    time WITHOUT TIME ZONE                  NOT NULL,
+    location    VARCHAR(500)                            NOT NULL,
+    status      VARCHAR(255)                            NOT NULL,
+    description VARCHAR(2000)                           NOT NULL,
+    notes       VARCHAR(1000)                           NOT NULL,
     report      VARCHAR(2000)                           NOT NULL,
     CONSTRAINT pk_duty_logs PRIMARY KEY (id)
 );
