@@ -6,6 +6,7 @@
     import type {UserSession} from '$lib/stores/userStore';
     import {toast} from 'svelte-sonner';
     import type {Child, User} from "$lib/models";
+    import SearchBox from "$lib/components/SearchBox.svelte";
 
     export let user: UserSession;
 
@@ -195,18 +196,10 @@
         </button>
     </div>
 
-    <div class="controls">
-        <div class="search-box">
-            <span class="icon">
-                <Search size={18}/>
-            </span>
-            <input
-                    type="text"
-                    placeholder="Поиск по ФИО, родителю или дате рождения..."
-                    bind:value={searchQuery}
-            />
-        </div>
-    </div>
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по ФИО, родителю или дате рождения..."
+    />
 
     {#if loading || loadingUsers}
         <div class="loader">
@@ -347,33 +340,6 @@
     .add-btn:hover {
         background: var(--primary-dark);
         transform: translateY(-2px);
-    }
-
-    .controls {
-        margin-bottom: 1.5rem;
-    }
-
-    .search-box {
-        position: relative;
-    }
-
-    .search-box input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.5rem;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        background: var(--bg-primary);
-        color: var(--text-primary);
-        font-size: 0.9rem;
-        box-sizing: border-box;
-    }
-
-    .search-box .icon {
-        position: absolute;
-        left: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-secondary);
     }
 
     .loader, .error, .no-results {
