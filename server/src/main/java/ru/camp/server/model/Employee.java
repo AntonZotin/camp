@@ -31,6 +31,16 @@ public class Employee {
         return (user != null) ? user.getId() : null;
     }
 
+    @JsonProperty("userId")
+    public void setUserId(Long userId) {
+        if (userId != null) {
+            this.user = new User();
+            this.user.setId(userId);
+        } else {
+            this.user = null;
+        }
+    }
+
     @JsonProperty("username")
     public String getUsername() {
         return (user != null) ? user.getUsername() : null;

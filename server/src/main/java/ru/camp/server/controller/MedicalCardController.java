@@ -38,8 +38,12 @@ public class MedicalCardController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MedicalCard> update(@PathVariable Long id, @RequestBody MedicalCard card) {
-        return ResponseEntity.ok(medicalCardService.update(id, card));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody MedicalCard card) {
+        try {
+            return ResponseEntity.ok(medicalCardService.update(id, card));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body("Этот ребёнок уже имеет медицинскую карту");
+        }
     }
 
     @DeleteMapping("/{id}")

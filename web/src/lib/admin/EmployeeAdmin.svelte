@@ -76,7 +76,7 @@
 		const body = JSON.stringify({
 			fullName: employeeForm.fullName,
 			position: employeeForm.position,
-			user: users.find(u => u.id == employeeForm.userId)
+			userId: employeeForm.userId
 		});
 		const response = await fetch(url, {
 			method,

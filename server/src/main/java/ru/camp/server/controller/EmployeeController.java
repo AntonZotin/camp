@@ -1,6 +1,7 @@
 package ru.camp.server.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.model.Employee;
@@ -28,13 +29,21 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<Employee> create(@RequestBody Employee employee) {
-        return ResponseEntity.ok(employeeService.create(employee));
+    public ResponseEntity<?> create(@RequestBody Employee employee) {
+        try {
+            return ResponseEntity.ok(employeeService.create(employee));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body("Пользователь уже связан с сущностью сотрудником");
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> update(@PathVariable Long id, @RequestBody Employee employee) {
-        return ResponseEntity.ok(employeeService.update(id, employee));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Employee employee) {
+        try {
+            return ResponseEntity.ok(employeeService.update(id, employee));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body("Пользователь уже связан с сущностью сотрудником");
+        }
     }
 
     @DeleteMapping("/{id}")
