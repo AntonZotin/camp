@@ -6,6 +6,7 @@
 	import { PUBLIC_API_URL } from '$env/static/public';
 
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -79,7 +80,7 @@
 			vaccinations: cardForm.vaccinations,
 			notes: cardForm.notes
 		});
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -87,17 +88,29 @@
 			},
 			body
 		});
-		await loadCards();
-		closeModal();
+		if (response.ok) {
+			await loadCards();
+			closeModal();
+			toast.success('Карта успешно сохранена');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteCard(id: number) {
 		if (!confirm('Удалить медкарту?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/medical-cards/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/medical-cards/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadCards();
+		if (response.ok) {
+			await loadCards();
+			toast.success('Карта успешно удалена');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => {

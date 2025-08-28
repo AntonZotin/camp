@@ -5,6 +5,7 @@
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Utensils } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -86,7 +87,7 @@
 			dinner: menuForm.dinner,
 			notes: menuForm.notes
 		});
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -94,17 +95,29 @@
 			},
 			body
 		});
-		await loadMenus();
-		closeModal();
+		if (response.ok) {
+			await loadMenus();
+			closeModal();
+			toast.success('Меню успешно сохранено');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteMenu(id: number) {
 		if (!confirm('Удалить меню?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/menus/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/menus/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadMenus();
+		if (response.ok) {
+			await loadMenus();
+			toast.success('Меню успешно удалено');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => { loadMenus(); loadSessions(); });

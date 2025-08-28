@@ -5,6 +5,7 @@
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Stethoscope } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -103,7 +104,7 @@
 			recommendations: visitForm.recommendations,
 			medications: visitForm.medications
 		});
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -111,17 +112,29 @@
 			},
 			body
 		});
-		await loadVisits();
-		closeModal();
+		if (response.ok) {
+			await loadVisits();
+			closeModal();
+			toast.success('Осмотр успешно сохранён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteVisit(id: number) {
 		if (!confirm('Удалить медосмотр?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/medical-visits/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/medical-visits/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadVisits();
+		if (response.ok) {
+			await loadVisits();
+			toast.success('Осмотр успешно удалён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => { loadVisits(); loadChildren(); loadDoctors(); });

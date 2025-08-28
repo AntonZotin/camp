@@ -5,6 +5,7 @@
 	import { Calendar, Loader, AlertCircle, Plus, Edit, Trash2, Clock, Users } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -71,7 +72,7 @@
 		const method = editSession ? 'PUT' : 'POST';
 		const url = editSession ? `${PUBLIC_API_URL}/api/sessions/${editSession.id}` : `${PUBLIC_API_URL}/api/sessions`;
 		const body = JSON.stringify(sessionForm);
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -79,17 +80,29 @@
 			},
 			body
 		});
-		await loadSessions();
-		closeModal();
+		if (response.ok) {
+			await loadSessions();
+			closeModal();
+			toast.success('Смена успешно сохранена');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteSession(id: number) {
 		if (!confirm('Удалить смену?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/sessions/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/sessions/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadSessions();
+		if (response.ok) {
+			await loadSessions();
+			toast.success('Смена успешно удалена');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => { loadSessions(); });

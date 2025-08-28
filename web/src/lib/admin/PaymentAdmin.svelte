@@ -5,6 +5,7 @@
 	import type {UserSession} from '$lib/stores/userStore';
 	import {onMount} from 'svelte';
 	import type {Payment, User, Voucher} from "$lib/models";
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -105,7 +106,7 @@
 			method: paymentForm.method,
 			comment: paymentForm.comment
 		});
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -113,17 +114,29 @@
 			},
 			body
 		});
-		await loadPayments();
-		closeModal();
+		if (response.ok) {
+			await loadPayments();
+			closeModal();
+			toast.success('Платёж успешно сохранён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deletePayment(id: number) {
 		if (!confirm('Удалить оплату?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/payments/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/payments/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadPayments();
+		if (response.ok) {
+			await loadPayments();
+			toast.success('Платёж успешно удалён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => { loadPayments(); loadParents(); loadVouchers(); });

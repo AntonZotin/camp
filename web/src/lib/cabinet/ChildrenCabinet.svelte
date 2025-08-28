@@ -5,6 +5,7 @@
 	import { Users, Baby, Loader, AlertCircle, Plus, Edit, Trash2 } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -53,7 +54,7 @@
 			...childForm,
 			parentId: user.userId
 		});
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -61,17 +62,29 @@
 			},
 			body
 		});
-		await loadChildren();
-		closeModal();
+		if (response.ok) {
+			await loadChildren();
+			closeModal();
+			toast.success('Ребёнок успешно сохранён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteChild(id: number) {
 		if (!confirm('Удалить ребенка?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/children/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/children/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadChildren();
+		if (response.ok) {
+			await loadChildren();
+			toast.success('Ребёнок успешно удалён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => { loadChildren(); });

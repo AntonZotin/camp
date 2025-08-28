@@ -5,6 +5,7 @@
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Users } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -77,7 +78,7 @@
 			position: employeeForm.position,
 			user: users.find(u => u.id == employeeForm.userId)
 		});
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -85,17 +86,29 @@
 			},
 			body
 		});
-		await loadEmployees();
-		closeModal();
+		if (response.ok) {
+			await loadEmployees();
+			closeModal();
+			toast.success('Сотрудник успешно сохранён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteEmployee(id: number) {
 		if (!confirm('Удалить сотрудника?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/employees/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/employees/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadEmployees();
+		if (response.ok) {
+			await loadEmployees();
+			toast.success('Сотрудник успешно удалён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => { loadEmployees(); loadUsers(); });

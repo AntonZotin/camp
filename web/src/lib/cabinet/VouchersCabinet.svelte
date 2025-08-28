@@ -5,6 +5,7 @@
 	import { Ticket, Loader, AlertCircle, Plus, Eye, Trash2, X, Calendar, User, Clock } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 	export let user: UserSession;
 
 	let vouchers: Voucher[] = [];
@@ -31,11 +32,17 @@
 
 	async function deleteVoucher(id: number) {
 		if (!confirm('Удалить путёвку?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/vouchers/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/vouchers/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadVouchers();
+		if (response.ok) {
+			await loadVouchers();
+			toast.success('Бронирование успешно удалено');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	function showDetails(voucher: any) {

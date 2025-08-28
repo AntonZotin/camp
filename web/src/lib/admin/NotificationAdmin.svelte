@@ -5,6 +5,7 @@
 	import { Loader, Plus, Trash2, Edit, AlertCircle, Bell } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -85,7 +86,7 @@
 			message: notificationForm.message,
 			status: notificationForm.status
 		});
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -93,17 +94,29 @@
 			},
 			body
 		});
-		await loadNotifications();
-		closeModal();
+		if (response.ok) {
+			await loadNotifications();
+			closeModal();
+			toast.success('Уведомление успешно сохранено');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteNotification(id: number) {
 		if (!confirm('Удалить уведомление?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/notifications/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/notifications/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
-		await loadNotifications();
+		if (response.ok) {
+			await loadNotifications();
+			toast.success('Уведомление успешно удалено');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	onMount(() => { loadNotifications(); loadUsers(); });
