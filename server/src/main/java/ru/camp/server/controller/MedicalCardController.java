@@ -1,6 +1,7 @@
 package ru.camp.server.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.model.MedicalCard;
@@ -28,8 +29,12 @@ public class MedicalCardController {
     }
 
     @PostMapping
-    public ResponseEntity<MedicalCard> create(@RequestBody MedicalCard card) {
-        return ResponseEntity.ok(medicalCardService.create(card));
+    public ResponseEntity<?> create(@RequestBody MedicalCard card) {
+        try {
+            return ResponseEntity.ok(medicalCardService.create(card));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body("Этот ребёнок уже имеет медицинскую карту");
+        }
     }
 
     @PutMapping("/{id}")
