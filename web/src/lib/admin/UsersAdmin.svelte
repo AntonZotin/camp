@@ -75,7 +75,7 @@
                     id: userData.employee.id,
                     fullName: userData.employee.fullName,
                     position: userData.employee.position
-                } : null,
+                } : { fullName: '', position: '' },
                 children: userData.children ? userData.children.map(c => ({
                     id: c.id,
                     fullName: c.fullName,
@@ -88,7 +88,7 @@
                 email: '',
                 password: '',
                 role: 'PARENT',
-                employee: null,
+                employee: { fullName: '', position: '' },
                 children: []
             };
 		}
@@ -552,6 +552,7 @@
 		color: var(--text-primary);
 		font-size: 0.9rem;
 		transition: var(--transition);
+    	box-sizing: border-box;
 	}
 
 	.form-group input:focus, .form-group select:focus {

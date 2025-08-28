@@ -398,6 +398,7 @@
 		color: var(--text-primary);
 		font-size: 0.9rem;
 		transition: var(--transition);
+    	box-sizing: border-box;
 	}
 
 	.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
