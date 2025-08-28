@@ -53,7 +53,7 @@ public class UserService {
             HashSet<Child> children = new HashSet<>();
             for (ChildDto childDto : request.getChildren()) {
                 Child child = new Child();
-                child.setFullName(childDto.getName());
+                child.setFullName(childDto.getFullName());
                 child.setBirthDate(childDto.getBirthDate());
                 child.setParent(user);
                 children.add(child);
@@ -62,8 +62,8 @@ public class UserService {
         }
         if (request.getRole() == Role.EMPLOYEE) {
             Employee employee = new Employee();
-            employee.setFullName(request.getFullName());
-            employee.setPosition(request.getPosition());
+            employee.setFullName(request.getEmployee().getFullName());
+            employee.setPosition(request.getEmployee().getPosition());
             employee.setUser(user);
             user.setEmployee(employee);
         }

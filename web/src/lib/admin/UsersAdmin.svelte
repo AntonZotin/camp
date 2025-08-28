@@ -5,6 +5,7 @@
 	import { Users, Loader, AlertCircle, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
@@ -109,7 +110,7 @@
             children: userForm.role === 'PARENT' ? userForm.children : []
         };
 		const body = JSON.stringify(dataToSend);
-		await fetch(url, {
+		const response = await fetch(url, {
 			method,
 			headers: {
 				'Content-Type': 'application/json',
@@ -117,26 +118,44 @@
 			},
 			body
 		});
-		await loadUsers();
-		closeModal();
+		if (response.ok) {
+			await loadUsers();
+			closeModal();
+			toast.success('Пользователь успешно сохранён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 	}
 
 	async function deleteUser(id: number) {
 		if (!confirm('Удалить пользователя?')) return;
-		await fetch(`${PUBLIC_API_URL}/api/admin/users/${id}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/admin/users/${id}`, {
 			method: 'DELETE',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
+		if (response.ok) {
+			toast.success('Пользователь успешно удалён');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 		await loadUsers();
 	}
 
 	async function changeRole(id: number, e: Event) {
 		const target = e.target as HTMLSelectElement;
 		const role = target.value;
-		await fetch(`${PUBLIC_API_URL}/api/admin/users/${id}/role?role=${role}`, {
+		const response = await fetch(`${PUBLIC_API_URL}/api/admin/users/${id}/role?role=${role}`, {
 			method: 'PUT',
 			headers: { Authorization: `Bearer ${user.accessToken}` }
 		});
+		if (response.ok) {
+			toast.success('Роль успешно изменена');
+		} else {
+			const error = await response.text();
+			toast.error(`Ошибка: ${error}`);
+		}
 		await loadUsers();
 	}
 
@@ -168,6 +187,7 @@
         } else {
             userForm.children.push({ ...childForm });
         }
+		userForm = {...userForm};
         closeChildModal();
     }
 

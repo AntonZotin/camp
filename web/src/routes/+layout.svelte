@@ -43,7 +43,7 @@
 </svelte:head>
 
 <div class="layout" class:dark={currentTheme === 'dark'}>
-  <Toaster position="top-right" />
+  <Toaster richColors position="top-right" />
   <Header {currentTheme} {toggleTheme} />
 
   <main class:auth={$page.url.pathname.startsWith('/auth')}>

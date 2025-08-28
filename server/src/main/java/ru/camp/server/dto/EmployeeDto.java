@@ -3,11 +3,9 @@ package ru.camp.server.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Setter
 @Getter
-public class ChildDto {
+public class EmployeeDto {
     private String fullName;
-    private LocalDate birthDate;
-} 
+    private String position;
+}

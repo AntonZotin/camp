@@ -13,7 +13,6 @@ public class UserRegistrationRequest {
     private String email;
     private String password;
     private Role role;
-    private String fullName;
-    private String position;
+    private EmployeeDto employee;
     private Set<ChildDto> children;
 } 
