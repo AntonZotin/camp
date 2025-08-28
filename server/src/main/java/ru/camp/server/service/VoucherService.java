@@ -67,6 +67,6 @@ public class VoucherService {
     }
 
     public List<Voucher> getByParentId(Long parentId) {
-        return voucherRepository.findByChildParentId(parentId);
+        return voucherRepository.findByChildParent_Id(parentId);
     }
 } 

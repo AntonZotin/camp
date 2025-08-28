@@ -24,7 +24,7 @@ public class ChildService {
     }
 
     public List<Child> getByParentId(Long parentId) {
-        return childRepository.findByParentId(parentId);
+        return childRepository.findByParent_Id(parentId);
     }
 
     public Child create(Child child) {

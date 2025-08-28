@@ -5,22 +5,9 @@
     import {PUBLIC_API_URL} from '$env/static/public';
     import type {UserSession} from '$lib/stores/userStore';
     import {toast} from 'svelte-sonner';
+    import type {Child, User} from "$lib/models";
 
     export let user: UserSession;
-
-    interface Child {
-        id: number;
-        fullName: string;
-        birthDate: string;
-        parentId?: number;
-        parentName?: string;
-    }
-
-    interface User {
-        id: number;
-        username: string;
-        fullName?: string;
-    }
 
     let children: Child[] = [];
     let filteredChildren: Child[] = [];
@@ -84,14 +71,12 @@
     }
 
     function filterAndSortChildren() {
-        // Фильтрация
         filteredChildren = children.filter(child =>
             child.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (child.parentName?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
+            (child.parentUsername.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
             child.birthDate.includes(searchQuery)
         );
 
-        // Сортировка
         filteredChildren.sort((a, b) => {
             let valueA = a[sortField];
             let valueB = b[sortField];
@@ -121,7 +106,7 @@
         if (child) {
             childForm = {
                 fullName: child.fullName,
-                birthDate: child.birthDate.split('T')[0], // Форматируем дату для input type="date"
+                birthDate: child.birthDate.split('T')[0],
                 parentId: child.parentId || 0
             };
         } else {
@@ -247,7 +232,7 @@
                     <th on:click={() => sortBy('birthDate')} class:active={sortField==='birthDate'}>
                         <span>Дата рождения <ArrowUpDown size={14}/></span>
                     </th>
-                    <th on:click={() => sortBy('parentName')} class:active={sortField==='parentName'}>
+                    <th on:click={() => sortBy('parentUsername')} class:active={sortField==='parentUsername'}>
                         <span>Родитель <ArrowUpDown size={14}/></span>
                     </th>
                     <th>Действия</th>
@@ -259,7 +244,7 @@
                         <td>{child.id}</td>
                         <td>{child.fullName}</td>
                         <td>{new Date(child.birthDate).toLocaleDateString('ru-RU')}</td>
-                        <td>{child.parentName || 'Не указан'}</td>
+                        <td>{child.parentUsername || 'Не указан'}</td>
                         <td>
                             <button class="icon-btn edit" title="Редактировать" on:click={() => openModal(child)}>
                                 <Edit size={16}/>
@@ -310,7 +295,7 @@
                 <select id="parentId" bind:value={childForm.parentId} required>
                     <option value="" disabled>Выберите родителя</option>
                     {#each users as u}
-                        <option value={u.id}>{u.username} {u.fullName ? `(${u.fullName})` : ''}</option>
+                        <option value={u.id}>{u.username}</option>
                     {/each}
                 </select>
             </div>

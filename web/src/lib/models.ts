@@ -2,6 +2,8 @@ export interface Child {
     id: number;
     fullName: string;
     birthDate: string;
+    parentId: number;
+    parentUsername: string;
 }
 
 export interface MedicalCard {

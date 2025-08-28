@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ChildRepository extends JpaRepository<Child, Long> {
-    List<Child> findByParentId(Long parentId);
+    List<Child> findByParent_Id(Long parentId);
 } 
