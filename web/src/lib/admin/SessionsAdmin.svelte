@@ -1,19 +1,24 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type {CampSession} from "$lib/models";
+	import type {CampSession, User} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Calendar, Loader, AlertCircle, Plus, Edit, Trash2, Clock, Users } from 'lucide-svelte';
+	import {Calendar, Loader, AlertCircle, Plus, Edit, Trash2, Clock, Users, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	import {toast} from "svelte-sonner";
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
 	let sessions: CampSession[] = [];
+	let filteredSessions: CampSession[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
 	let editSession: CampSession | null = null;
+    let searchQuery = '';
+    let sortField: keyof CampSession = 'name';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 	let sessionForm = { 
 		name: '', 
 		startDate: '', 
@@ -32,12 +37,43 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки смен';
-			else
+			else {
 				sessions = await res.json();
+				filterAndSortSessions();
+			}
 		} finally {
 			loading = false;
 		}
 	}
+
+    function filterAndSortSessions() {
+        filteredSessions = sessions.filter(session =>
+            session.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            session.description.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        filteredSessions.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof CampSession) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortSessions();
+    }
 
 	function openModal(sessionData: CampSession | null = null) {
 		showModal = true;
@@ -105,6 +141,10 @@
 		}
 	}
 
+    $: if (searchQuery || sortField) {
+        filterAndSortSessions();
+    }
+
 	onMount(() => { loadSessions(); });
 </script>
 
@@ -119,6 +159,11 @@
 			<span>Добавить смену</span>
 		</button>
 	</div>
+
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по названию смены или описанию..."
+    />
 
 	{#if loading}
 		<div class="loader">
@@ -135,17 +180,29 @@
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
-						<th>Название</th>
-						<th>Даты</th>
-						<th>Макс. детей</th>
-						<th>Цена</th>
-						<th>Описание</th>
+						<th on:click={() => sortBy('id')} class:active={sortField==='id'}>
+							<span>ID <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('name')} class:active={sortField==='name'}>
+							<span>Название <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('startDate')} class:active={sortField==='startDate'}>
+							<span>Даты <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('maxChildren')} class:active={sortField==='maxChildren'}>
+							<span>Макс. детей <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('price')} class:active={sortField==='price'}>
+							<span>Цена <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('description')} class:active={sortField==='description'}>
+							<span>Описание <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Действия</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each sessions as s}
+					{#each filteredSessions as s}
 						<tr>
 							<td>{s.id}</td>
 							<td>{s.name}</td>
@@ -295,33 +352,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	.dates {
 		display: flex;
