@@ -518,51 +518,6 @@
         line-height: 1.3;
     }
 
-    .team-junior {
-        background: var(--info-light);
-        color: var(--info-dark);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius);
-        font-size: 0.8rem;
-        display: inline-block;
-    }
-
-    .team-middle {
-        background: var(--warning-light);
-        color: var(--warning-dark);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius);
-        font-size: 0.8rem;
-        display: inline-block;
-    }
-
-    .team-senior {
-        background: var(--success-light);
-        color: var(--success-dark);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius);
-        font-size: 0.8rem;
-        display: inline-block;
-    }
-
-    .team-staff {
-        background: var(--primary);
-        color: var(--primary-dark);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius);
-        font-size: 0.8rem;
-        display: inline-block;
-    }
-
-    .team-all {
-        background: var(--secondary-light);
-        color: var(--secondary-dark);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius);
-        font-size: 0.8rem;
-        display: inline-block;
-    }
-
     .text-muted {
         color: var(--text-secondary);
         font-style: italic;
