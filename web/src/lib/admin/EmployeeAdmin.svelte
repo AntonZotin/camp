@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type {Employee} from "$lib/models";
+	import type {Employee, MedicalVisit} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Loader, Plus, Trash2, Edit, AlertCircle, Users } from 'lucide-svelte';
+	import {Loader, Plus, Trash2, Edit, AlertCircle, Users, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	import {toast} from "svelte-sonner";
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
 	let employees: Employee[] = [];
+	let filteredEmployees: Employee[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
@@ -22,6 +24,9 @@
 	let employeeForm: EmployeeForm = { fullName: '', position: '', userId: 0 };
 	let users: Users[] = [];
 	let loadingUsers = false;
+    let searchQuery = '';
+    let sortField: keyof Employee = 'fullName';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 
 	async function loadEmployees() {
 		loading = true;
@@ -32,8 +37,10 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки сотрудников';
-			else
+			else {
 				employees = await res.json();
+				filterAndSortEmployees();
+			}
 		} finally {
 			loading = false;
 		}
@@ -50,6 +57,36 @@
 			loadingUsers = false;
 		}
 	}
+
+    function filterAndSortEmployees() {
+        filteredEmployees = employees.filter(employee =>
+            employee.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            employee.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            employee.username.toLowerCase().includes(searchQuery)
+        );
+
+        filteredEmployees.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof Employee) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortEmployees();
+    }
 
 	function openModal(employee: Employee | null = null) {
 		showModal = true;
@@ -111,6 +148,10 @@
 		}
 	}
 
+    $: if (searchQuery || sortField) {
+        filterAndSortEmployees();
+    }
+
 	onMount(() => { loadEmployees(); loadUsers(); });
 </script>
 
@@ -125,6 +166,11 @@
 			<span>Добавить сотрудника</span>
 		</button>
 	</div>
+
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по всем полям..."
+    />
 
 	{#if loading || loadingUsers}
 		<div class="loader">
@@ -141,15 +187,23 @@
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
-						<th>ФИО</th>
-						<th>Должность</th>
-						<th>Пользователь</th>
+						<th on:click={() => sortBy('id')} class:active={sortField==='id'}>
+							<span>ID <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('fullName')} class:active={sortField==='fullName'}>
+							<span>ФИО <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('position')} class:active={sortField==='position'}>
+							<span>Должность <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('username')} class:active={sortField==='username'}>
+							<span>Пользователь <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Действия</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each employees as e}
+					{#each filteredEmployees as e}
 						<tr>
 							<td>{e.id}</td>
 							<td>{e.fullName}</td>
@@ -266,33 +320,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	.icon-btn {
 		background: none;

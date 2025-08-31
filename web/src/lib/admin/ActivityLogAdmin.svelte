@@ -1,15 +1,20 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type {ActivityLog} from "$lib/models";
-	import { Loader, AlertCircle, Activity } from 'lucide-svelte';
+	import type {ActivityLog, MedicalVisit} from "$lib/models";
+	import {Loader, AlertCircle, Activity, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
 	let logs: ActivityLog[] = [];
+	let filteredLogs: ActivityLog[] = [];
 	let loading = true;
 	let error = '';
+    let searchQuery = '';
+    let sortField: keyof ActivityLog = 'action';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 
 	async function loadLogs() {
 		loading = true;
@@ -20,12 +25,49 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки журнала';
-			else
+			else {
 				logs = await res.json();
+				filterAndSortLogs();
+			}
 		} finally {
 			loading = false;
 		}
 	}
+
+    function filterAndSortLogs() {
+        filteredLogs = logs.filter(log =>
+            log.user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            log.timestamp.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            log.description.toLowerCase().includes(searchQuery) ||
+            log.action.toLowerCase().includes(searchQuery)
+        );
+
+        filteredLogs.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof ActivityLog) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortLogs();
+    }
+
+    $: if (searchQuery || sortField) {
+        filterAndSortLogs();
+    }
 
 	onMount(() => { loadLogs(); });
 </script>
@@ -37,6 +79,11 @@
 			<span>Журнал активности</span>
 		</h2>
 	</div>
+
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по всем полям..."
+    />
 
 	{#if loading}
 		<div class="loader">
@@ -53,15 +100,23 @@
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
+						<th on:click={() => sortBy('id')} class:active={sortField==='id'}>
+							<span>ID <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Пользователь</th>
-						<th>Действие</th>
-						<th>Время</th>
-						<th>Описание</th>
+						<th on:click={() => sortBy('action')} class:active={sortField==='action'}>
+							<span>Действие <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('timestamp')} class:active={sortField==='timestamp'}>
+							<span>Время <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('description')} class:active={sortField==='description'}>
+							<span>Описание <ArrowUpDown size={14}/></span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each logs as l}
+					{#each filteredLogs as l}
 						<tr>
 							<td>{l.id}</td>
 							<td>{l.user?.username}</td>
@@ -116,33 +171,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	@media (max-width: 768px) {
 		.header {

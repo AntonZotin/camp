@@ -2,14 +2,16 @@
 	import { onMount } from 'svelte';
 	import type {Child, Employee, MedicalVisit} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Loader, Plus, Trash2, Edit, AlertCircle, Stethoscope } from 'lucide-svelte';
+	import {Loader, Plus, Trash2, Edit, AlertCircle, Stethoscope, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	import {toast} from "svelte-sonner";
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
 	let visits: MedicalVisit[] = [];
+	let filteredVisits: MedicalVisit[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
@@ -27,6 +29,9 @@
 	let doctors: Employee[] = [];
 	let loadingChildren = false;
 	let loadingDoctors = false;
+    let searchQuery = '';
+    let sortField: keyof MedicalVisit = 'date';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 
 	async function loadVisits() {
 		loading = true;
@@ -37,8 +42,10 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки медосмотров';
-			else
+			else {
 				visits = await res.json();
+				filterAndSortVisits();
+			}
 		} finally {
 			loading = false;
 		}
@@ -70,6 +77,39 @@
 			loadingDoctors = false;
 		}
 	}
+
+    function filterAndSortVisits() {
+        filteredVisits = visits.filter(visit =>
+            visit.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            visit.child.fullName.toLowerCase().includes(searchQuery) ||
+            visit.doctor.fullName.toLowerCase().includes(searchQuery) ||
+            visit.description.toLowerCase().includes(searchQuery) ||
+            visit.recommendations.toLowerCase().includes(searchQuery) ||
+            visit.medications.toLowerCase().includes(searchQuery)
+        );
+
+        filteredVisits.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof MedicalVisit) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortVisits();
+    }
 
 	function openModal(visit: MedicalVisit | null = null) {
 		showModal = true;
@@ -137,6 +177,10 @@
 		}
 	}
 
+    $: if (searchQuery || sortField) {
+        filterAndSortVisits();
+    }
+
 	onMount(() => { loadVisits(); loadChildren(); loadDoctors(); });
 </script>
 
@@ -151,6 +195,11 @@
 			<span>Добавить осмотр</span>
 		</button>
 	</div>
+
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по всем полям..."
+    />
 
 	{#if loading || loadingChildren || loadingDoctors}
 		<div class="loader">
@@ -167,18 +216,28 @@
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
-						<th>Дата</th>
+						<th on:click={() => sortBy('id')} class:active={sortField==='id'}>
+							<span>ID <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('date')} class:active={sortField==='date'}>
+							<span>Дата <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Ребёнок</th>
 						<th>Врач</th>
-						<th>Описание</th>
-						<th>Рекомендации</th>
-						<th>Лекарства</th>
+						<th on:click={() => sortBy('description')} class:active={sortField==='description'}>
+							<span>Описание <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('recommendations')} class:active={sortField==='recommendations'}>
+							<span>Рекомендации <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('medications')} class:active={sortField==='medications'}>
+							<span>Лекарства <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Действия</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each visits as v}
+					{#each filteredVisits as v}
 						<tr>
 							<td>{v.id}</td>
 							<td>{v.date}</td>
@@ -318,33 +377,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	.icon-btn {
 		background: none;

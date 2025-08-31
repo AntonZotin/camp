@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type {Notification, User} from "$lib/models";
+	import type {MedicalVisit, Notification, User} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Loader, Plus, Trash2, Edit, AlertCircle, Bell } from 'lucide-svelte';
+	import {Loader, Plus, Trash2, Edit, AlertCircle, Bell, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	import {toast} from "svelte-sonner";
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
 	let notifications: Notification[] = [];
+	let filteredNotifications: Notification[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
@@ -24,6 +26,9 @@
 	let notificationForm: NotificationForm = { recipientId: null, type: 'internal', subject: '', message: '', status: 'pending' };
 	let users: User[] = [];
 	let loadingUsers = false;
+    let searchQuery = '';
+    let sortField: keyof Notification = 'type';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 	const types = ['internal', 'email', 'telegram'];
 	const statuses = ['pending', 'sent', 'failed'];
 
@@ -36,8 +41,10 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки уведомлений';
-			else
+			else {
 				notifications = await res.json();
+				filterAndSortNotifications();
+			}
 		} finally {
 			loading = false;
 		}
@@ -54,6 +61,38 @@
 			loadingUsers = false;
 		}
 	}
+
+    function filterAndSortNotifications() {
+        filteredNotifications = notifications.filter(notification =>
+            notification.recipient.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            notification.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            notification.subject.toLowerCase().includes(searchQuery) ||
+            notification.message.toLowerCase().includes(searchQuery) ||
+            notification.status.toLowerCase().includes(searchQuery)
+        );
+
+        filteredNotifications.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof Notification) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortNotifications();
+    }
 
 	function openModal(notification: Notification | null = null) {
 		showModal = true;
@@ -119,6 +158,10 @@
 		}
 	}
 
+    $: if (searchQuery || sortField) {
+        filterAndSortNotifications();
+    }
+
 	onMount(() => { loadNotifications(); loadUsers(); });
 </script>
 
@@ -133,6 +176,11 @@
 			<span>Добавить уведомление</span>
 		</button>
 	</div>
+
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по всем полям..."
+    />
 
 	{#if loading || loadingUsers}
 		<div class="loader">
@@ -149,19 +197,33 @@
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
+						<th on:click={() => sortBy('id')} class:active={sortField==='id'}>
+							<span>ID <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Получатель</th>
-						<th>Тип</th>
-						<th>Тема</th>
-						<th>Сообщение</th>
-						<th>Статус</th>
-						<th>Создано</th>
-						<th>Отправлено</th>
+						<th on:click={() => sortBy('type')} class:active={sortField==='type'}>
+							<span>Тип <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('subject')} class:active={sortField==='subject'}>
+							<span>Тема <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('message')} class:active={sortField==='message'}>
+							<span>Сообщение <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('status')} class:active={sortField==='status'}>
+							<span>Статус <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('createdAt')} class:active={sortField==='createdAt'}>
+							<span>Создано <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('sentAt')} class:active={sortField==='sentAt'}>
+							<span>Отправлено <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Действия</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each notifications as n}
+					{#each filteredNotifications as n}
 						<tr>
 							<td>{n.id}</td>
 							<td>{n.recipient?.username}</td>
@@ -300,33 +362,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	.icon-btn {
 		background: none;

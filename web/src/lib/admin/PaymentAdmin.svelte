@@ -1,15 +1,17 @@
 <script lang="ts">
 	import {fade, fly} from 'svelte/transition';
-	import {AlertCircle, CreditCard, Edit, Loader, Plus, Trash2} from 'lucide-svelte';
+	import {AlertCircle, ArrowUpDown, CreditCard, Edit, Loader, Plus, Trash2} from 'lucide-svelte';
 	import {PUBLIC_API_URL} from '$env/static/public';
 	import type {UserSession} from '$lib/stores/userStore';
 	import {onMount} from 'svelte';
-	import type {Payment, User, Voucher} from "$lib/models";
+	import type {MedicalVisit, Payment, User, Voucher} from "$lib/models";
 	import {toast} from "svelte-sonner";
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
 	let payments: Payment[] = [];
+	let filteredPayments: Payment[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
@@ -28,6 +30,9 @@
 	let vouchers: Voucher[] = [];
 	let loadingParents = false;
 	let loadingVouchers = false;
+    let searchQuery = '';
+    let sortField: keyof Payment = 'date';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 	const statuses = ['paid', 'pending', 'failed'];
 	const methods = ['credit_card', 'cash', 'bank_transfer'];
 
@@ -40,8 +45,10 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки оплат';
-			else
+			else {
 				payments = await res.json();
+				filterAndSortPayments();
+			}
 		} finally {
 			loading = false;
 		}
@@ -70,6 +77,38 @@
 			loadingVouchers = false;
 		}
 	}
+
+    function filterAndSortPayments() {
+        filteredPayments = payments.filter(payment =>
+            payment.parent.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            payment.voucher.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            payment.date.toLowerCase().includes(searchQuery) ||
+            payment.status.toLowerCase().includes(searchQuery) ||
+            payment.method.toLowerCase().includes(searchQuery)
+        );
+
+        filteredPayments.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof Payment) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortPayments();
+    }
 
 	function openModal(payment: Payment | null = null) {
 		showModal = true;
@@ -139,6 +178,10 @@
 		}
 	}
 
+    $: if (searchQuery || sortField) {
+        filterAndSortPayments();
+    }
+
 	onMount(() => { loadPayments(); loadParents(); loadVouchers(); });
 </script>
 
@@ -153,6 +196,11 @@
 			<span>Добавить оплату</span>
 		</button>
 	</div>
+
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по всем полям..."
+    />
 
 	{#if loading || loadingParents || loadingVouchers}
 		<div class="loader">
@@ -169,19 +217,31 @@
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
+						<th on:click={() => sortBy('id')} class:active={sortField==='id'}>
+							<span>ID <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Родитель</th>
 						<th>Путёвка</th>
-						<th>Сумма</th>
-						<th>Дата</th>
-						<th>Статус</th>
-						<th>Способ</th>
-						<th>Комментарий</th>
+						<th on:click={() => sortBy('amount')} class:active={sortField==='amount'}>
+							<span>Сумма <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('date')} class:active={sortField==='date'}>
+							<span>Дата <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('status')} class:active={sortField==='status'}>
+							<span>Статус <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('method')} class:active={sortField==='method'}>
+							<span>Способ <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('comment')} class:active={sortField==='comment'}>
+							<span>Комментарий <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Действия</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each payments as p}
+					{#each filteredPayments as p}
 						<tr>
 							<td>{p.id}</td>
 							<td>{p.parent?.username}</td>
@@ -337,33 +397,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	.icon-btn {
 		background: none;
