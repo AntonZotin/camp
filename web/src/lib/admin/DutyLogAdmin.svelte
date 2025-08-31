@@ -529,32 +529,32 @@
     }
 
     .status-planned {
-        background: rgb(255, 193, 7);
-        color: rgb(204, 85, 0);
+        background: var(--warning-light);
+        color: var(--warning-dark);
         padding: 0.25rem 0.5rem;
         border-radius: var(--radius);
         display: inline-block;
     }
 
     .status-completed {
-        background: rgb(144, 238, 144);
-        color: rgb(0, 100, 0);
+        background: var(--success-light);
+        color: var(--success-dark);
         padding: 0.25rem 0.5rem;
         border-radius: var(--radius);
         display: inline-block;
     }
 
     .status-cancelled {
-        background: rgb(255, 193, 193);
-        color: rgb(178, 34, 34);
+        background: var(--error-light);
+        color: var(--error-dark);
         padding: 0.25rem 0.5rem;
         border-radius: var(--radius);
         display: inline-block;
     }
 
     .status-in-progress {
-        background: rgb(173, 216, 230);
-        color: rgb(30, 144, 255);
+        background: var(--info-light);
+        color: var(--info-dark);
         padding: 0.25rem 0.5rem;
         border-radius: var(--radius);
         display: inline-block;

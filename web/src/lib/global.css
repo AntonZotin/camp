@@ -15,6 +15,14 @@
     --text-primary: #1f2937;
     --text-secondary: #4b5563;
     --border: #e5e7eb;
+    --warning-light: rgb(255, 193, 7);
+    --warning-dark: rgb(204, 85, 0);
+    --success-light: rgb(144, 238, 144);
+    --success-dark: rgb(0, 100, 0);
+    --error-light: rgb(255, 193, 193);
+    --error-dark: rgb(178, 34, 34);
+    --info-light: rgb(173, 216, 230);
+    --info-dark: rgb(30, 144, 255);
 }
 
 [data-theme='dark'] {
