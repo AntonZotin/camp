@@ -27,7 +27,7 @@
     import ActivityLogAdmin from '$lib/admin/ActivityLogAdmin.svelte';
     import AdminExport from '$lib/admin/AdminExport.svelte';
     import UsersAdmin from '$lib/admin/UsersAdmin.svelte';
-    import SessionsAdmin from '$lib/admin/SessionsAdmin.svelte';
+    import SessionsAdmin from '$lib/admin/CampSessionsAdmin.svelte';
     import ChildAdmin from "$lib/admin/ChildAdmin.svelte";
     import DutyLogAdmin from "$lib/admin/DutyLogAdmin.svelte";
     import ScheduleAdmin from "$lib/admin/ScheduleAdmin.svelte";
