@@ -16,7 +16,7 @@
         CreditCard,
         FileText,
         UserCheck,
-        Download
+        Download, ClipboardCheck
     } from 'lucide-svelte';
     import MenuAdmin from '$lib/admin/MenuAdmin.svelte';
     import EmployeeAdmin from '$lib/admin/EmployeeAdmin.svelte';
@@ -30,13 +30,14 @@
     import SessionsAdmin from '$lib/admin/SessionsAdmin.svelte';
     import ChildAdmin from "$lib/admin/ChildAdmin.svelte";
     import DutyLogAdmin from "$lib/admin/DutyLogAdmin.svelte";
+    import ScheduleAdmin from "$lib/admin/ScheduleAdmin.svelte";
 
     let user = get(userStore);
     const unsubUser = userStore.subscribe((u) => (user = u));
 
     let tab: 'users' | 'sessions' | 'menu' | 'medical-cards' | 'medical-visits'
         | 'notifications' | 'payments' | 'employees' | 'children' | 'activity-logs' | 'duty-logs'
-        | 'export' = 'users';
+        | 'schedules'| 'export' = 'users';
 
     onMount(() => {
         if (!user || user.role !== 'ADMIN') goto('/login');
@@ -107,6 +108,10 @@
 						<Calendar size={18} />
 						<span>Журнал дежурств</span>
 					</button>
+					<button class:active={tab==='schedules'} on:click={() => tab='schedules'}>
+						<ClipboardCheck size={18} />
+						<span>Расписание</span>
+					</button>
                     <button class:active={tab==='export'} on:click={() => tab='export'}>
                         <Download size={18}/>
                         <span>Экспорт</span>
@@ -136,6 +141,8 @@
                         <ActivityLogAdmin {user}/>
 					{:else if tab === 'duty-logs'}
 						<DutyLogAdmin {user} />
+					{:else if tab === 'schedules'}
+						<ScheduleAdmin {user} />
                     {:else if tab === 'export'}
                         <AdminExport {user}/>
                     {/if}

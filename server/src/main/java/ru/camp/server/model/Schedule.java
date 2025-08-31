@@ -1,5 +1,6 @@
 package ru.camp.server.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,4 +42,24 @@ public class Schedule {
 
     @Column(nullable = false)
     private String team;
+
+    @JsonProperty("sessionId")
+    public void setSessionId(Long sessionId) {
+        if (sessionId != null) {
+            this.session = new CampSession();
+            this.session.setId(sessionId);
+        } else {
+            this.session = null;
+        }
+    }
+
+    @JsonProperty("employeeId")
+    public void setEmployeeId(Long employeeId) {
+        if (employeeId != null) {
+            this.employee = new Employee();
+            this.employee.setId(employeeId);
+        } else {
+            this.employee = null;
+        }
+    }
 } 

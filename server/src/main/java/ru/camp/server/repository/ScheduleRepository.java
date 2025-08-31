@@ -6,5 +6,5 @@ import ru.camp.server.model.Schedule;
 import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    List<Schedule> findByEmployeeId(Long employeeId);
+    List<Schedule> findByEmployee_Id(Long employeeId);
 } 
