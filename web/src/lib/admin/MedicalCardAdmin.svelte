@@ -2,15 +2,17 @@
 	import { onMount } from 'svelte';
 	import type {Child, MedicalCard} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Loader, Plus, Trash2, Edit, AlertCircle, FileText } from 'lucide-svelte';
+	import {Loader, Plus, Trash2, Edit, AlertCircle, FileText, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 
 	import type { UserSession } from '$lib/stores/userStore';
 	import {toast} from "svelte-sonner";
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
 	let cards: MedicalCard[] = [];
+	let filteredCards: MedicalCard[] = [];
 	let loading = true;
 	let loadingChildren = false;
 	let error = '';
@@ -18,6 +20,9 @@
 	let editCard: MedicalCard | null = null;
 	let cardForm = { childId: 0, healthInfo: '', chronicDiseases: '', allergies: '', vaccinations: '', notes: '' };
 	let children: Child[] = [];
+    let searchQuery = '';
+    let sortField: keyof MedicalCard = 'healthInfo';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 
 	async function loadCards() {
 		loading = true;
@@ -28,8 +33,10 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки медкарт';
-			else
+			else {
 				cards = await res.json();
+				filterAndSortCards();
+			}
 		} finally {
 			loading = false;
 		}
@@ -46,6 +53,38 @@
 			loadingChildren = false;
 		}
 	}
+
+    function filterAndSortCards() {
+        filteredCards = cards.filter(card =>
+            card.child?.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            card.healthInfo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            card.chronicDiseases.toLowerCase().includes(searchQuery) ||
+            card.allergies.toLowerCase().includes(searchQuery) ||
+            card.vaccinations.toLowerCase().includes(searchQuery)
+        );
+
+        filteredCards.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof MedicalCard) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortCards();
+    }
 
 	function openModal(card: MedicalCard | null = null) {
 		showModal = true;
@@ -113,6 +152,10 @@
 		}
 	}
 
+    $: if (searchQuery || sortField) {
+        filterAndSortCards();
+    }
+
 	onMount(() => {
 		loadCards();
 		loadChildren();
@@ -131,6 +174,11 @@
 		</button>
 	</div>
 
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по всем полям карты..."
+    />
+
 	{#if loading || loadingChildren}
 		<div class="loader">
 			<Loader size={24} />
@@ -146,18 +194,28 @@
 			<table>
 				<thead>
 					<tr>
-						<th>ID</th>
+						<th on:click={() => sortBy('id')} class:active={sortField==='id'}>
+							<span>ID <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Ребёнок</th>
-						<th>Здоровье</th>
-						<th>Хронические</th>
-						<th>Аллергии</th>
-						<th>Прививки</th>
+						<th on:click={() => sortBy('healthInfo')} class:active={sortField==='healthInfo'}>
+							<span>Здоровье <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('chronicDiseases')} class:active={sortField==='chronicDiseases'}>
+							<span>Хронические <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('allergies')} class:active={sortField==='allergies'}>
+							<span>Аллергии <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('vaccinations')} class:active={sortField==='vaccinations'}>
+							<span>Прививки <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Примечания</th>
 						<th>Действия</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each cards as c}
+					{#each filteredCards as c}
 						<tr>
 							<td>{c.id}</td>
 							<td>{c.child?.fullName}</td>
@@ -291,33 +349,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	.icon-btn {
 		background: none;
