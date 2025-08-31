@@ -37,6 +37,6 @@ public class DutyLogService {
     }
 
     public List<DutyLog> getByEmployeeId(Long employeeId) {
-        return dutyLogRepository.findByEmployeeId(employeeId);
+        return dutyLogRepository.findByEmployee_Id(employeeId);
     }
 } 

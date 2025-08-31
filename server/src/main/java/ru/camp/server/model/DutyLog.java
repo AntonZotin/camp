@@ -1,10 +1,12 @@
 package ru.camp.server.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Setter
 @Getter
@@ -27,10 +29,10 @@ public class DutyLog {
     private CampSession session;
 
     @Column(nullable = false)
-    private String startTime;
+    private LocalTime startTime;
 
     @Column(nullable = false)
-    private String endTime;
+    private LocalTime endTime;
 
     @Column(nullable = false, length = 100)
     private String location;
@@ -46,4 +48,24 @@ public class DutyLog {
 
     @Column(length = 2000)
     private String report;
+
+    @JsonProperty("employeeId")
+    public void setEmployeeId(Long employeeId) {
+        if (employeeId != null) {
+            this.employee = new Employee();
+            this.employee.setId(employeeId);
+        } else {
+            this.employee = null;
+        }
+    }
+
+    @JsonProperty("sessionId")
+    public void setSessionId(Long sessionId) {
+        if (sessionId != null) {
+            this.session = new CampSession();
+            this.session.setId(sessionId);
+        } else {
+            this.session = null;
+        }
+    }
 }
