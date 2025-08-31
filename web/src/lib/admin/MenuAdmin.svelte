@@ -2,14 +2,16 @@
 	import { onMount } from 'svelte';
 	import type {CampSession, Menu} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Loader, Plus, Trash2, Edit, AlertCircle, Utensils } from 'lucide-svelte';
+	import {Loader, Plus, Trash2, Edit, AlertCircle, Utensils, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	import {toast} from "svelte-sonner";
+	import SearchBox from "$lib/components/SearchBox.svelte";
 
 	export let user: UserSession;
 
   	let menus: Menu[] = [];
+  	let filteredMenus: Menu[] = [];
 	let loading = true;
 	let error = '';
 	let showModal = false;
@@ -25,6 +27,9 @@
 	let menuForm: MenuForm = { date: '', sessionId: null, breakfast: '', lunch: '', dinner: '', notes: '' };
   	let sessions: CampSession[] = [];
 	let loadingSessions = false;
+    let searchQuery = '';
+    let sortField: keyof Menu = 'date';
+    let sortDirection: 'asc' | 'desc' = 'asc';
 
 	async function loadMenus() {
 		loading = true;
@@ -35,8 +40,10 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки меню';
-			else
+			else {
 				menus = await res.json();
+				filterAndSortMenus();
+			}
 		} finally {
 			loading = false;
 		}
@@ -53,6 +60,38 @@
 			loadingSessions = false;
 		}
 	}
+
+    function filterAndSortMenus() {
+        filteredMenus = menus.filter(menu =>
+            menu.session.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            menu.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            menu.breakfast.toLowerCase().includes(searchQuery) ||
+            menu.lunch.toLowerCase().includes(searchQuery) ||
+            menu.dinner.toLowerCase().includes(searchQuery)
+        );
+
+        filteredMenus.sort((a, b) => {
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+            if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+
+            if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+            if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
+    function sortBy(field: keyof Menu) {
+        if (sortField === field) {
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortField = field;
+            sortDirection = 'asc';
+        }
+        filterAndSortMenus();
+    }
 
 	function openModal(menu: Menu | null = null) {
 		showModal = true;
@@ -120,6 +159,10 @@
 		}
 	}
 
+    $: if (searchQuery || sortField) {
+        filterAndSortMenus();
+    }
+
 	onMount(() => { loadMenus(); loadSessions(); });
 </script>
 
@@ -134,6 +177,11 @@
 			<span>Добавить меню</span>
 		</button>
 	</div>
+
+    <SearchBox
+        bind:value={searchQuery}
+        placeholder="Поиск по описанию смены, дате или блюду..."
+    />
 
 	{#if loading || loadingSessions}
 		<div class="loader">
@@ -150,17 +198,25 @@
 			<table>
 				<thead>
 					<tr>
-						<th>Дата</th>
+						<th on:click={() => sortBy('date')} class:active={sortField==='date'}>
+							<span>Дата <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Смена</th>
-						<th>Завтрак</th>
-						<th>Обед</th>
-						<th>Ужин</th>
+						<th on:click={() => sortBy('breakfast')} class:active={sortField==='breakfast'}>
+							<span>Завтрак <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('lunch')} class:active={sortField==='lunch'}>
+							<span>Обед <ArrowUpDown size={14}/></span>
+						</th>
+						<th on:click={() => sortBy('dinner')} class:active={sortField==='dinner'}>
+							<span>Ужин <ArrowUpDown size={14}/></span>
+						</th>
 						<th>Примечания</th>
 						<th>Действия</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each menus as m}
+					{#each filteredMenus as m}
 						<tr>
 							<td>{m.date}</td>
 							<td>{m.session?.name}</td>
@@ -294,33 +350,51 @@
 		overflow-x: auto;
 	}
 
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		background: var(--bg-primary);
-		border-radius: var(--radius);
-		overflow: hidden;
-		border: 1px solid var(--border);
-	}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-primary);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
 
-	th {
-		background: var(--bg-secondary);
-		color: var(--text-primary);
-		font-weight: 600;
-		padding: 1rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
+    th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
 
-	td {
-		padding: 1rem;
-		border-bottom: 1px solid var(--border);
-		color: var(--text-primary);
-	}
+    th:hover {
+        background: var(--bg-hover);
+    }
 
-	tr:hover {
-		background: var(--bg-hover);
-	}
+    th.active {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    th span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    tr:hover {
+        background: var(--bg-hover);
+    }
 
 	.icon-btn {
 		background: none;
