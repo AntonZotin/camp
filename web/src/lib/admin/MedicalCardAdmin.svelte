@@ -176,7 +176,7 @@
 
     <SearchBox
         bind:value={searchQuery}
-        placeholder="Поиск по всем полям карты..."
+        placeholder="Поиск по всем полям..."
     />
 
 	{#if loading || loadingChildren}
