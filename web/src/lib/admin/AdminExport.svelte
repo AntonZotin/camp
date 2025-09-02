@@ -44,21 +44,13 @@
 
   <div class="export-content">
     <div class="export-actions">
-      <button class="export-btn" on:click={() => exportXlsx('activity-logs')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('users')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
           <Download size={18} />
         {/if}
-        <span>Экспорт логов активности</span>
-      </button>
-      <button class="export-btn" on:click={() => exportXlsx('camp-sessions')} disabled={loading}>
-        {#if loading}
-          <Loader size={18} />
-        {:else}
-          <Download size={18} />
-        {/if}
-        <span>Экспорт сессий</span>
+        <span>Экспорт пользователей</span>
       </button>
       <button class="export-btn" on:click={() => exportXlsx('children')} disabled={loading}>
         {#if loading}
@@ -68,14 +60,6 @@
         {/if}
         <span>Экспорт детей</span>
       </button>
-      <button class="export-btn" on:click={() => exportXlsx('duty-logs')} disabled={loading}>
-        {#if loading}
-          <Loader size={18} />
-        {:else}
-          <Download size={18} />
-        {/if}
-        <span>Экспорт дежурств</span>
-      </button>
       <button class="export-btn" on:click={() => exportXlsx('employees')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
@@ -83,6 +67,22 @@
           <Download size={18} />
         {/if}
         <span>Экспорт сотрудников</span>
+      </button>
+      <button class="export-btn" on:click={() => exportXlsx('camp-sessions')} disabled={loading}>
+        {#if loading}
+          <Loader size={18} />
+        {:else}
+          <Download size={18} />
+        {/if}
+        <span>Экспорт смен</span>
+      </button>
+      <button class="export-btn" on:click={() => exportXlsx('menus')} disabled={loading}>
+        {#if loading}
+          <Loader size={18} />
+        {:else}
+          <Download size={18} />
+        {/if}
+        <span>Экспорт меню</span>
       </button>
       <button class="export-btn" on:click={() => exportXlsx('medical-cards')} disabled={loading}>
         {#if loading}
@@ -100,14 +100,6 @@
         {/if}
         <span>Экспорт медицинских визитов</span>
       </button>
-      <button class="export-btn" on:click={() => exportXlsx('menus')} disabled={loading}>
-        {#if loading}
-          <Loader size={18} />
-        {:else}
-          <Download size={18} />
-        {/if}
-        <span>Экспорт меню</span>
-      </button>
       <button class="export-btn" on:click={() => exportXlsx('notifications')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
@@ -124,6 +116,22 @@
         {/if}
         <span>Экспорт платежей</span>
       </button>
+      <button class="export-btn" on:click={() => exportXlsx('vouchers')} disabled={loading}>
+        {#if loading}
+          <Loader size={18} />
+        {:else}
+          <Download size={18} />
+        {/if}
+        <span>Экспорт путёвок</span>
+      </button>
+      <button class="export-btn" on:click={() => exportXlsx('duty-logs')} disabled={loading}>
+        {#if loading}
+          <Loader size={18} />
+        {:else}
+          <Download size={18} />
+        {/if}
+        <span>Экспорт дежурств</span>
+      </button>
       <button class="export-btn" on:click={() => exportXlsx('schedules')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
@@ -132,21 +140,13 @@
         {/if}
         <span>Экспорт расписаний</span>
       </button>
-      <button class="export-btn" on:click={() => exportXlsx('users')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('activity-logs')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
           <Download size={18} />
         {/if}
-        <span>Экспорт пользователей</span>
-      </button>
-      <button class="export-btn" on:click={() => exportXlsx('vouchers')} disabled={loading}>
-        {#if loading}
-          <Loader size={18} />
-        {:else}
-          <Download size={18} />
-        {/if}
-        <span>Экспорт путёвок</span>
+        <span>Экспорт логов активности</span>
       </button>
     </div>
 
