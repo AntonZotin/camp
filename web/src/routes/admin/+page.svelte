@@ -36,9 +36,10 @@
     let user = get(userStore);
     const unsubUser = userStore.subscribe((u) => (user = u));
 
-    let tab: 'users' | 'sessions' | 'menu' | 'medical-cards' | 'medical-visits'
-        | 'notifications' | 'payments' | 'employees' | 'children' | 'activity-logs' | 'duty-logs'
-        | 'schedules' | 'vouchers' | 'export' = 'users';
+    let tab:
+        'users' | 'children' | 'employees' | 'sessions' | 'menu' | 'medical-cards' | 'medical-visits'
+        | 'notifications' | 'payments' | 'vouchers' | 'duty-logs'
+        | 'schedules' | 'activity-logs' | 'export' = 'users';
 
     onMount(() => {
         if (!user || user.role !== 'ADMIN') goto('/login');
@@ -73,6 +74,10 @@
 						<Baby size={18} />
 						<span>Дети</span>
 					</button>
+                    <button class:active={tab==='employees'} on:click={() => tab='employees'}>
+                        <Users size={18}/>
+                        <span>Сотрудники</span>
+                    </button>
                     <button class:active={tab==='sessions'} on:click={() => tab='sessions'}>
                         <Calendar size={18}/>
                         <span>Смены</span>
@@ -97,14 +102,10 @@
                         <CreditCard size={18}/>
                         <span>Оплаты</span>
                     </button>
-                    <button class:active={tab==='employees'} on:click={() => tab='employees'}>
-                        <Users size={18}/>
-                        <span>Сотрудники</span>
-                    </button>
-                    <button class:active={tab==='activity-logs'} on:click={() => tab='activity-logs'}>
-                        <Activity size={18}/>
-                        <span>Журнал активности</span>
-                    </button>
+					<button class:active={tab==='vouchers'} on:click={() => tab='vouchers'}>
+						<TicketCheck size={18} />
+						<span>Путевки</span>
+					</button>
 					<button class:active={tab==='duty-logs'} on:click={() => tab='duty-logs'}>
 						<Calendar size={18} />
 						<span>Журнал дежурств</span>
@@ -113,10 +114,10 @@
 						<ClipboardCheck size={18} />
 						<span>Расписание</span>
 					</button>
-					<button class:active={tab==='vouchers'} on:click={() => tab='vouchers'}>
-						<TicketCheck size={18} />
-						<span>Путевки</span>
-					</button>
+                    <button class:active={tab==='activity-logs'} on:click={() => tab='activity-logs'}>
+                        <Activity size={18}/>
+                        <span>Журнал активности</span>
+                    </button>
                     <button class:active={tab==='export'} on:click={() => tab='export'}>
                         <Download size={18}/>
                         <span>Экспорт</span>
@@ -128,12 +129,12 @@
                         <UsersAdmin {user}/>
 					{:else if tab === 'children'}
 						<ChildAdmin {user} />
+                    {:else if tab === 'employees'}
+                        <EmployeeAdmin {user}/>
                     {:else if tab === 'sessions'}
                         <SessionsAdmin {user}/>
                     {:else if tab === 'menu'}
                         <MenuAdmin {user}/>
-                    {:else if tab === 'employees'}
-                        <EmployeeAdmin {user}/>
                     {:else if tab === 'medical-cards'}
                         <MedicalCardAdmin {user}/>
                     {:else if tab === 'medical-visits'}
@@ -142,14 +143,14 @@
                         <NotificationAdmin {user}/>
                     {:else if tab === 'payments'}
                         <PaymentAdmin {user}/>
-                    {:else if tab === 'activity-logs'}
-                        <ActivityLogAdmin {user}/>
+					{:else if tab === 'vouchers'}
+						<VoucherAdmin {user} />
 					{:else if tab === 'duty-logs'}
 						<DutyLogAdmin {user} />
 					{:else if tab === 'schedules'}
 						<ScheduleAdmin {user} />
-					{:else if tab === 'vouchers'}
-						<VoucherAdmin {user} />
+                    {:else if tab === 'activity-logs'}
+                        <ActivityLogAdmin {user}/>
                     {:else if tab === 'export'}
                         <AdminExport {user}/>
                     {/if}
