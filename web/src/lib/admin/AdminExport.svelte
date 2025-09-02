@@ -8,22 +8,21 @@
   let loading = false;
   let error = '';
 
-  async function exportCsv(type: string) {
+  async function exportXlsx(type: string) {
     loading = true;
     error = '';
     try {
-      const res = await fetch(`${PUBLIC_API_URL}/api/admin/export/${type}/csv`, {
+      const res = await fetch(`${PUBLIC_API_URL}/api/admin/export/${type}/xlsx`, {
         headers: { Authorization: `Bearer ${user.accessToken}` }
       });
       if (!res.ok) {
         error = 'Ошибка экспорта';
       } else {
-        const csv = await res.text();
-        const blob = new Blob([csv], {type: 'text/csv'});
+        const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${type}.csv`;
+        a.download = `${type}.xlsx`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -45,7 +44,7 @@
 
   <div class="export-content">
     <div class="export-actions">
-      <button class="export-btn" on:click={() => exportCsv('activity-logs')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('activity-logs')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -53,7 +52,7 @@
         {/if}
         <span>Экспорт логов активности</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('camp-sessions')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('camp-sessions')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -61,7 +60,7 @@
         {/if}
         <span>Экспорт сессий</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('children')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('children')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -69,7 +68,7 @@
         {/if}
         <span>Экспорт детей</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('duty-logs')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('duty-logs')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -77,7 +76,7 @@
         {/if}
         <span>Экспорт дежурств</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('employees')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('employees')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -85,7 +84,7 @@
         {/if}
         <span>Экспорт сотрудников</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('medical-cards')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('medical-cards')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -93,7 +92,7 @@
         {/if}
         <span>Экспорт медицинских карт</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('medical-visits')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('medical-visits')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -101,7 +100,7 @@
         {/if}
         <span>Экспорт медицинских визитов</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('menus')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('menus')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -109,7 +108,7 @@
         {/if}
         <span>Экспорт меню</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('notifications')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('notifications')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -117,7 +116,7 @@
         {/if}
         <span>Экспорт уведомлений</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('payments')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('payments')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -125,7 +124,7 @@
         {/if}
         <span>Экспорт платежей</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('schedules')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('schedules')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -133,7 +132,7 @@
         {/if}
         <span>Экспорт расписаний</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('users')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('users')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}
@@ -141,7 +140,7 @@
         {/if}
         <span>Экспорт пользователей</span>
       </button>
-      <button class="export-btn" on:click={() => exportCsv('vouchers')} disabled={loading}>
+      <button class="export-btn" on:click={() => exportXlsx('vouchers')} disabled={loading}>
         {#if loading}
           <Loader size={18} />
         {:else}

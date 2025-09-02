@@ -1,5 +1,7 @@
 package ru.camp.server.controller;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -10,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.camp.server.model.*;
 import ru.camp.server.repository.*;
 
-import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/export")
@@ -62,183 +64,229 @@ public class AdminExportController {
         this.scheduleRepository = scheduleRepository;
     }
 
-    private <T> ResponseEntity<String> exportToCsv(String filename, String header, List<T> items, Function<T, String> mapFunction) {
-        String csv = header + "\n" +
-            items.stream()
-                .map(mapFunction)
-                .collect(Collectors.joining("\n"));
-        return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + "; charset=" + StandardCharsets.UTF_8.name())
-            .body(csv);
+    private <T> ResponseEntity<byte[]> exportToXlsx(String entityName, String[] headers, List<T> items, Function<T, String[]> mapFunction) {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet(entityName);
+
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+
+            int rowNum = 1;
+            for (T item : items) {
+                String[] rowValues = mapFunction.apply(item);
+                Row row = sheet.createRow(rowNum++);
+                for (int i = 0; i < rowValues.length; i++) {
+                    Cell cell = row.createCell(i);
+                    cell.setCellValue(rowValues[i]);
+                }
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + entityName + ".xlsx")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .body(outputStream.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @GetMapping("/activity-logs/csv")
-    public ResponseEntity<String> exportActivityLogsToCsv() {
+    @GetMapping("/activity-logs/xlsx")
+    public ResponseEntity<byte[]> exportActivityLogsToXlsx() {
         List<ActivityLog> activityLogs = activityLogRepository.findAll();
-        return exportToCsv("activity-logs.csv", "id,user_id,action,timestamp,description",
-            activityLogs, a -> a.getId() + "," +
-                (a.getUser() != null ? a.getUser().getId() : "") + "," +
-                a.getAction() + "," +
-                a.getTimestamp() + "," +
-                a.getDescription());
+        return exportToXlsx("activity-logs", new String[] {"id,user_id,action,timestamp,description"},
+            activityLogs, a -> new String[] {
+                a.getId() + "," +
+                    (a.getUser() != null ? a.getUser().getId() : "") + "," +
+                    a.getAction() + "," +
+                    a.getTimestamp() + "," +
+                    a.getDescription()
+            });
     }
 
-    @GetMapping("/camp-sessions/csv")
-    public ResponseEntity<String> exportCampSessionsToCsv() {
+    @GetMapping("/camp-sessions/xlsx")
+    public ResponseEntity<byte[]> exportCampSessionsToXlsx() {
         List<CampSession> campSessions = campSessionRepository.findAll();
-        return exportToCsv("camp-sessions.csv", "id,name,start_date,end_date,description,max_children,price",
-            campSessions, c -> c.getId() + "," +
-                c.getName() + "," +
-                c.getStartDate() + "," +
-                c.getEndDate() + "," +
-                c.getDescription() + "," +
-                c.getMaxChildren() + "," +
-                c.getPrice());
+        return exportToXlsx("camp-sessions", new String[] {"id,name,start_date,end_date,description,max_children,price"},
+            campSessions, c -> new String[] {
+                c.getId() + "," +
+                    c.getName() + "," +
+                    c.getStartDate() + "," +
+                    c.getEndDate() + "," +
+                    c.getDescription() + "," +
+                    c.getMaxChildren() + "," +
+                    c.getPrice()
+            });
     }
 
-    @GetMapping("/children/csv")
-    public ResponseEntity<String> exportChildrenToCsv() {
+    @GetMapping("/children/xlsx")
+    public ResponseEntity<byte[]> exportChildrenToXlsx() {
         List<Child> children = childRepository.findAll();
-        return exportToCsv("children.csv", "id,full_name,birth_date,parent_id,parent_username",
-            children, c -> c.getId() + "," +
-                c.getFullName() + "," +
-                c.getBirthDate() + "," +
-                (c.getParent() != null ? c.getParent().getId() : "") + "," +
-                (c.getParent() != null ? c.getParent().getUsername() : ""));
+        return exportToXlsx("children", new String[] {"id,full_name,birth_date,parent_id,parent_username"},
+            children, c -> new String[] {
+                c.getId() + "," +
+                    c.getFullName() + "," +
+                    c.getBirthDate() + "," +
+                    (c.getParent() != null ? c.getParent().getId() : "") + "," +
+                    (c.getParent() != null ? c.getParent().getUsername() : "")
+            });
     }
 
-    @GetMapping("/duty-logs/csv")
-    public ResponseEntity<String> exportDutyLogsToCsv() {
+    @GetMapping("/duty-logs/xlsx")
+    public ResponseEntity<byte[]> exportDutyLogsToXlsx() {
         List<DutyLog> dutyLogs = dutyLogRepository.findAll();
-        return exportToCsv("duty-logs.csv", "id,date,employee_id,session_id,start_time,end_time,location,status,description,notes,report",
-            dutyLogs, d -> d.getId() + "," +
-                d.getDate() + "," +
-                (d.getEmployee() != null ? d.getEmployee().getId() : "") + "," +
-                (d.getSession() != null ? d.getSession().getId() : "") + "," +
-                d.getStartTime() + "," +
-                d.getEndTime() + "," +
-                d.getLocation() + "," +
-                d.getStatus() + "," +
-                d.getDescription() + "," +
-                d.getNotes() + "," +
-                d.getReport());
+        return exportToXlsx("duty-logs", new String[] {"id,date,employee_id,session_id,start_time,end_time,location,status,description,notes,report"},
+            dutyLogs, d -> new String[] {
+                d.getId() + "," +
+                    d.getDate() + "," +
+                    (d.getEmployee() != null ? d.getEmployee().getId() : "") + "," +
+                    (d.getSession() != null ? d.getSession().getId() : "") + "," +
+                    d.getStartTime() + "," +
+                    d.getEndTime() + "," +
+                    d.getLocation() + "," +
+                    d.getStatus() + "," +
+                    d.getDescription() + "," +
+                    d.getNotes() + "," +
+                    d.getReport()
+            });
     }
 
-    @GetMapping("/employees/csv")
-    public ResponseEntity<String> exportEmployeesToCsv() {
+    @GetMapping("/employees/xlsx")
+    public ResponseEntity<byte[]> exportEmployeesToXlsx() {
         List<Employee> employees = employeeRepository.findAll();
-        return exportToCsv("employees.csv", "id,full_name,position,user_id,username",
-            employees, e -> e.getId() + "," +
-                e.getFullName() + "," +
-                e.getPosition() + "," +
-                (e.getUser() != null ? e.getUser().getId() : "") + "," +
-                (e.getUser() != null ? e.getUser().getUsername() : ""));
+        return exportToXlsx("employees", new String[] {"id,full_name,position,user_id,username"},
+            employees, e -> new String[] {
+                e.getId() + "," +
+                    e.getFullName() + "," +
+                    e.getPosition() + "," +
+                    (e.getUser() != null ? e.getUser().getId() : "") + "," +
+                    (e.getUser() != null ? e.getUser().getUsername() : "")
+            });
     }
 
-    @GetMapping("/medical-cards/csv")
-    public ResponseEntity<String> exportMedicalCardsToCsv() {
+    @GetMapping("/medical-cards/xlsx")
+    public ResponseEntity<byte[]> exportMedicalCardsToXlsx() {
         List<MedicalCard> medicalCards = medicalCardRepository.findAll();
-        return exportToCsv("medical-cards.csv", "id,child_id,health_info,chronic_diseases,allergies,vaccinations,notes",
-            medicalCards, m -> m.getId() + "," +
-                (m.getChild() != null ? m.getChild().getId() : "") + "," +
-                m.getHealthInfo() + "," +
-                m.getChronicDiseases() + "," +
-                m.getAllergies() + "," +
-                m.getVaccinations() + "," +
-                m.getNotes());
+        return exportToXlsx("medical-cards", new String[] {"id,child_id,health_info,chronic_diseases,allergies,vaccinations,notes"},
+            medicalCards, m -> new String[] {
+                m.getId() + "," +
+                    (m.getChild() != null ? m.getChild().getId() : "") + "," +
+                    m.getHealthInfo() + "," +
+                    m.getChronicDiseases() + "," +
+                    m.getAllergies() + "," +
+                    m.getVaccinations() + "," +
+                    m.getNotes()
+            });
     }
 
-    @GetMapping("/medical-visits/csv")
-    public ResponseEntity<String> exportMedicalVisitsToCsv() {
+    @GetMapping("/medical-visits/xlsx")
+    public ResponseEntity<byte[]> exportMedicalVisitsToXlsx() {
         List<MedicalVisit> medicalVisits = medicalVisitRepository.findAll();
-        return exportToCsv("medical-visits.csv", "id,date,child_id,doctor_id,description,recommendations,medications",
-            medicalVisits, v -> v.getId() + "," +
-                v.getDate() + "," +
-                (v.getChild() != null ? v.getChild().getId() : "") + "," +
-                (v.getDoctor() != null ? v.getDoctor().getId() : "") + "," +
-                v.getDescription() + "," +
-                v.getRecommendations() + "," +
-                v.getMedications());
+        return exportToXlsx("medical-visits", new String[] {"id,date,child_id,doctor_id,description,recommendations,medications"},
+            medicalVisits, v -> new String[] {
+                v.getId() + "," +
+                    v.getDate() + "," +
+                    (v.getChild() != null ? v.getChild().getId() : "") + "," +
+                    (v.getDoctor() != null ? v.getDoctor().getId() : "") + "," +
+                    v.getDescription() + "," +
+                    v.getRecommendations() + "," +
+                    v.getMedications()
+            });
     }
 
-    @GetMapping("/menus/csv")
-    public ResponseEntity<String> exportMenusToCsv() {
+    @GetMapping("/menus/xlsx")
+    public ResponseEntity<byte[]> exportMenusToXlsx() {
         List<Menu> menus = menuRepository.findAll();
-        return exportToCsv("menus.csv", "id,date,session_id,breakfast,lunch,dinner,notes",
-            menus, m -> m.getId() + "," +
-                m.getDate() + "," +
-                (m.getSession() != null ? m.getSession().getId() : "") + "," +
-                m.getBreakfast() + "," +
-                m.getLunch() + "," +
-                m.getDinner() + "," +
-                m.getNotes());
+        return exportToXlsx("menus", new String[] {"id,date,session_id,breakfast,lunch,dinner,notes"},
+            menus, m -> new String[] {
+                m.getId() + "," +
+                    m.getDate() + "," +
+                    (m.getSession() != null ? m.getSession().getId() : "") + "," +
+                    m.getBreakfast() + "," +
+                    m.getLunch() + "," +
+                    m.getDinner() + "," +
+                    m.getNotes()
+            });
     }
 
-    @GetMapping("/notifications/csv")
-    public ResponseEntity<String> exportNotificationsToCsv() {
+    @GetMapping("/notifications/xlsx")
+    public ResponseEntity<byte[]> exportNotificationsToXlsx() {
         List<Notification> notifications = notificationRepository.findAll();
-        return exportToCsv("notifications.csv", "id,recipient_id,type,subject,message,status,created_at,sent_at",
-            notifications, n -> n.getId() + "," +
-                (n.getRecipient() != null ? n.getRecipient().getId() : "") + "," +
-                n.getType() + "," +
-                n.getSubject() + "," +
-                n.getMessage() + "," +
-                n.getStatus() + "," +
-                n.getCreatedAt() + "," +
-                n.getSentAt());
+        return exportToXlsx("notifications", new String[] {"id,recipient_id,type,subject,message,status,created_at,sent_at"},
+            notifications, n -> new String[] {
+                n.getId() + "," +
+                    (n.getRecipient() != null ? n.getRecipient().getId() : "") + "," +
+                    n.getType() + "," +
+                    n.getSubject() + "," +
+                    n.getMessage() + "," +
+                    n.getStatus() + "," +
+                    n.getCreatedAt() + "," +
+                    n.getSentAt()
+            });
     }
 
-    @GetMapping("/payments/csv")
-    public ResponseEntity<String> exportPaymentsToCsv() {
+    @GetMapping("/payments/xlsx")
+    public ResponseEntity<byte[]> exportPaymentsToXlsx() {
         List<Payment> payments = paymentRepository.findAll();
-        return exportToCsv("payments.csv", "id,parent_id,voucher_id,amount,date,status,method,comment",
-            payments, p -> p.getId() + "," +
-                (p.getParent() != null ? p.getParent().getId() : "") + "," +
-                (p.getVoucher() != null ? p.getVoucher().getId() : "") + "," +
-                p.getAmount() + "," +
-                p.getDate() + "," +
-                p.getStatus() + "," +
-                p.getMethod() + "," +
-                p.getComment());
+        return exportToXlsx("payments", new String[] {"id,parent_id,voucher_id,amount,date,status,method,comment"},
+            payments, p -> new String[] {
+                p.getId() + "," +
+                    (p.getParent() != null ? p.getParent().getId() : "") + "," +
+                    (p.getVoucher() != null ? p.getVoucher().getId() : "") + "," +
+                    p.getAmount() + "," +
+                    p.getDate() + "," +
+                    p.getStatus() + "," +
+                    p.getMethod() + "," +
+                    p.getComment()
+            });
     }
 
-    @GetMapping("/schedules/csv")
-    public ResponseEntity<String> exportSchedulesToCsv() {
+    @GetMapping("/schedules/xlsx")
+    public ResponseEntity<byte[]> exportSchedulesToXlsx() {
         List<Schedule> schedules = scheduleRepository.findAll();
-        return exportToCsv("schedules.csv", "id,session_id,employee_id,date,time,title,description,location,team",
-            schedules, s -> s.getId() + "," +
-                (s.getSession() != null ? s.getSession().getId() : "") + "," +
-                (s.getEmployee() != null ? s.getEmployee().getId() : "") + "," +
-                s.getDate() + "," +
-                s.getTime() + "," +
-                s.getTitle() + "," +
-                s.getDescription() + "," +
-                s.getLocation() + "," +
-                s.getTeam());
+        return exportToXlsx("schedules", new String[] {"id,session_id,employee_id,date,time,title,description,location,team"},
+            schedules, s -> new String[] {
+                s.getId() + "," +
+                    (s.getSession() != null ? s.getSession().getId() : "") + "," +
+                    (s.getEmployee() != null ? s.getEmployee().getId() : "") + "," +
+                    s.getDate() + "," +
+                    s.getTime() + "," +
+                    s.getTitle() + "," +
+                    s.getDescription() + "," +
+                    s.getLocation() + "," +
+                    s.getTeam()
+            });
     }
 
-    @GetMapping("/users/csv")
-    public ResponseEntity<String> exportUsersToCsv() {
+    @GetMapping("/users/xlsx")
+    public ResponseEntity<byte[]> exportUsersToXlsx() {
         List<User> users = userRepository.findAll();
-        return exportToCsv("users.csv", "id,username,email,role,email_notifications,sms_notifications,theme",
-            users, u -> u.getId() + "," +
-                u.getUsername() + "," +
-                u.getEmail() + "," +
-                u.getRole() + "," +
-                u.isEmailNotifications() + "," +
-                u.isSmsNotifications() + "," +
-                u.getTheme());
+        return exportToXlsx("users", new String[] {"id,username,email,role,email_notifications,sms_notifications,theme"},
+            users, u -> new String[] {
+                u.getId() + "," +
+                    u.getUsername() + "," +
+                    u.getEmail() + "," +
+                    u.getRole() + "," +
+                    u.isEmailNotifications() + "," +
+                    u.isSmsNotifications() + "," +
+                    u.getTheme()
+            });
     }
 
-    @GetMapping("/vouchers/csv")
-    public ResponseEntity<String> exportVouchersToCsv() {
+    @GetMapping("/vouchers/xlsx")
+    public ResponseEntity<byte[]> exportVouchersToXlsx() {
         List<Voucher> vouchers = voucherRepository.findAll();
-        return exportToCsv("vouchers.csv", "id,child_id,session_id,status,booking_date",
-            vouchers, v -> v.getId() + "," +
-                (v.getChild() != null ? v.getChild().getId() : "") + "," +
-                (v.getSession() != null ? v.getSession().getId() : "") + "," +
-                v.getStatus() + "," +
-                v.getBookingDate());
+        return exportToXlsx("vouchers", new String[] {"id,child_id,session_id,status,booking_date"},
+            vouchers, v -> new String[] {
+                v.getId() + "," +
+                    (v.getChild() != null ? v.getChild().getId() : "") + "," +
+                    (v.getSession() != null ? v.getSession().getId() : "") + "," +
+                    v.getStatus() + "," +
+                    v.getBookingDate()
+            });
     }
 }
