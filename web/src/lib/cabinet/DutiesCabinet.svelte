@@ -27,8 +27,10 @@
 			});
 			if (!res.ok)
 				error = 'Ошибка загрузки дежурств';
-			else
+			else {
 				duties = await res.json();
+            	duties.sort((a, b) => a.id - b.id);
+			}
 		} finally {
 			loading = false;
 		}
@@ -212,12 +214,10 @@
 								</div>
 							{/if}
 
-							{#if duty.status === 'PENDING' || duty.status === 'IN_PROGRESS'}
-								<button class="btn-edit" on:click={() => startEdit(duty)}>
-									<Edit size={16} />
-									<span>Редактировать</span>
-								</button>
-							{/if}
+							<button class="btn-edit" on:click={() => startEdit(duty)}>
+								<Edit size={16} />
+								<span>Редактировать</span>
+							</button>
 						{/if}
 					</div>
 				</div>
