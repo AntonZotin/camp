@@ -5,12 +5,18 @@
 	import {Activity, Clock, MapPin, Users, Loader, AlertCircle, CheckCircle, XCircle, Calendar} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+    import { Edit, Save, X } from 'lucide-svelte';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
 	let duties: DutyLog[] = [];
 	let loading = true;
 	let error = '';
+    let editingDuty: number | null = null;
+    let editedNotes = '';
+    let editedReport = '';
+    let editedStatus = '';
 
 	async function loadDuties() {
 		loading = true;
@@ -31,20 +37,64 @@
 	function getStatusIcon(status: string) {
 		if (status === 'COMPLETED') return CheckCircle;
 		if (status === 'CANCELLED') return XCircle;
+		if (status === 'PLANNED') return Calendar;
 		return Clock;
 	}
 
 	function getStatusColor(status: string) {
 		if (status === 'COMPLETED') return 'var(--secondary)';
 		if (status === 'CANCELLED') return 'var(--error)';
+		if (status === 'PLANNED') return 'var(--primary-dark)';
 		return 'var(--primary)';
 	}
 
 	function getStatusText(status: string) {
 		if (status === 'COMPLETED') return 'Завершено';
 		if (status === 'CANCELLED') return 'Отменено';
+		if (status === 'PLANNED') return 'Планируется';
 		return 'В процессе';
 	}
+
+    function startEdit(duty: DutyLog) {
+        editingDuty = duty.id;
+        editedNotes = duty.notes || '';
+        editedReport = duty.report || '';
+        editedStatus = duty.status;
+    }
+
+    function cancelEdit() {
+        editingDuty = null;
+        editedNotes = '';
+        editedReport = '';
+        editedStatus = '';
+    }
+
+    async function saveDuty(dutyId: number) {
+        try {
+            const res = await fetch(`${PUBLIC_API_URL}/api/duty-logs/${dutyId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${user.accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    notes: editedNotes,
+                    report: editedReport,
+                    status: editedStatus
+                })
+            });
+
+            if (res.ok) {
+                await loadDuties();
+                editingDuty = null;
+    			toast.success('Дежурство успешно изменено');
+            } else {
+    			toast.error('Ошибка при сохранении');
+            }
+        } catch (err) {
+            error = 'Ошибка при сохранении';
+        }
+    }
 
 	onMount(() => { loadDuties(); });
 </script>
@@ -82,7 +132,16 @@
 						<h3>Дежурство #{duty.id}</h3>
 						<div class="status" style="color: {getStatusColor(duty.status)}">
 							<svelte:component this={getStatusIcon(duty.status)} size={20} />
-							<span>{getStatusText(duty.status)}</span>
+							{#if editingDuty === duty.id}
+								<select bind:value={editedStatus}>
+									<option value="PLANNED">Планируется</option>
+									<option value="IN_PROGRESS">В процессе</option>
+									<option value="COMPLETED">Завершено</option>
+									<option value="CANCELLED">Отменено</option>
+								</select>
+							{:else}
+								<span>{getStatusText(duty.status)}</span>
+							{/if}
 						</div>
 					</div>
 					<div class="duty-info">
@@ -99,30 +158,66 @@
 						<div class="info-item">
 							<MapPin size={16} />
 							<span class="label">Место:</span>
-							<span class="value">{duty.location}</span>
+							<span class="value">{duty.schedule.location}</span>
 						</div>
 						<div class="info-item">
 							<Users size={16} />
 							<span class="label">Ответственный:</span>
-							<span class="value">{duty.employee?.fullName}</span>
+							<span class="value">{duty.schedule.employee.fullName}</span>
 						</div>
-						{#if duty.description}
+						{#if duty.schedule.description}
 							<div class="description">
 								<span class="label">Описание:</span>
-								<p>{duty.description}</p>
+								<p>{duty.schedule.description}</p>
 							</div>
 						{/if}
-						{#if duty.notes}
-							<div class="notes">
-								<span class="label">Заметки:</span>
-								<p>{duty.notes}</p>
+						{#if editingDuty === duty.id}
+							<div class="edit-section">
+								<label for="editedNotes">Заметки:</label>
+								<textarea id="editedNotes"
+									bind:value={editedNotes}
+									placeholder="Добавьте заметки о дежурстве"
+									rows={3}
+								></textarea>
+
+								<label for="editedReport">Отчёт:</label>
+								<textarea id="editedReport"
+									bind:value={editedReport}
+									placeholder="Добавьте отчёт о выполненной работе"
+									rows={4}
+								></textarea>
+
+								<div class="edit-actions">
+									<button class="btn-save" on:click={() => saveDuty(duty.id)}>
+										<Save size={16} />
+										<span>Сохранить</span>
+									</button>
+									<button class="btn-cancel" on:click={cancelEdit}>
+										<X size={16} />
+										<span>Отмена</span>
+									</button>
+								</div>
 							</div>
-						{/if}
-						{#if duty.report}
-							<div class="report">
-								<span class="label">Отчёт:</span>
-								<p>{duty.report}</p>
-							</div>
+						{:else}
+							{#if duty.notes}
+								<div class="notes">
+									<span class="label">Заметки:</span>
+									<p>{duty.notes}</p>
+								</div>
+							{/if}
+							{#if duty.report}
+								<div class="report">
+									<span class="label">Отчёт:</span>
+									<p>{duty.report}</p>
+								</div>
+							{/if}
+
+							{#if duty.status === 'PENDING' || duty.status === 'IN_PROGRESS'}
+								<button class="btn-edit" on:click={() => startEdit(duty)}>
+									<Edit size={16} />
+									<span>Редактировать</span>
+								</button>
+							{/if}
 						{/if}
 					</div>
 				</div>
@@ -288,4 +383,75 @@
 			grid-template-columns: 1fr;
 		}
 	}
+
+    .edit-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--border);
+    }
+
+    .edit-section label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .edit-section textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 1rem;
+        font-family: inherit;
+        resize: vertical;
+    }
+
+    .edit-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    .btn-edit, .btn-save, .btn-cancel {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-edit {
+        background: rgba(79, 70, 229, 0.1);
+        color: var(--primary);
+        border: 1px solid rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-edit:hover {
+        background: rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-save {
+        background: var(--secondary);
+        color: white;
+    }
+
+    .btn-save:hover {
+        background: var(--secondary-dark);
+    }
+
+    .btn-cancel {
+        background: var(--error-light);
+        color: var(--error);
+    }
+
+    .btn-cancel:hover {
+        background: var(--error);
+        color: white;
+    }
 </style> 

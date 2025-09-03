@@ -2,15 +2,18 @@
 	import { onMount } from 'svelte';
 	import type {Schedule} from "$lib/models";
 	import { fly } from 'svelte/transition';
-	import {Calendar, Clock, MapPin, Users, Loader, AlertCircle, Activity} from 'lucide-svelte';
+	import {Calendar, Clock, MapPin, Users, Loader, AlertCircle, Activity, CheckCircle} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
+    import { Play } from 'lucide-svelte';
+	import {toast} from "svelte-sonner";
 
 	export let user: UserSession;
 
 	let schedules: Schedule[] = [];
 	let loading = true;
 	let error = '';
+    let startingSchedule: number | null = null;
 
 	async function loadSchedules() {
 		loading = true;
@@ -27,6 +30,30 @@
 			loading = false;
 		}
 	}
+
+    async function startSchedule(scheduleId: number) {
+        startingSchedule = scheduleId;
+        try {
+            const res = await fetch(`${PUBLIC_API_URL}/api/duty-logs/start-from-schedule/${scheduleId}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${user.accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (res.ok) {
+                await loadSchedules();
+    			toast.success('Дежурство успешно создано');
+            } else {
+    			toast.error('Ошибка при начале события');
+            }
+        } catch (err) {
+            error = 'Ошибка при начале события';
+        } finally {
+            startingSchedule = null;
+        }
+    }
 
 	onMount(() => { loadSchedules(); });
 </script>
@@ -62,6 +89,18 @@
 					<div class="schedule-header">
 						<Activity size={24} />
 						<h3>{schedule.title}</h3>
+						<button
+							class="btn-start"
+							on:click={() => startSchedule(schedule.id)}
+							disabled={startingSchedule === schedule.id}
+						>
+							{#if startingSchedule === schedule.id}
+								<Loader size={16} />
+							{:else}
+								<Play size={16} />
+							{/if}
+							<span>Начать</span>
+						</button>
 					</div>
 					<div class="schedule-info">
 						<div class="info-item">
@@ -232,4 +271,28 @@
 			grid-template-columns: 1fr;
 		}
 	}
+
+    .btn-start {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-start:hover:not(:disabled) {
+        background: var(--primary-dark);
+    }
+
+    .btn-start:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
 </style> 

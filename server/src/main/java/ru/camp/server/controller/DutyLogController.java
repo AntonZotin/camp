@@ -32,6 +32,16 @@ public class DutyLogController {
         return ResponseEntity.ok(dutyLogService.getByEmployeeId(employeeId));
     }
 
+    @GetMapping("/schedule/{scheduleId}")
+    public ResponseEntity<List<DutyLog>> getByScheduleId(@PathVariable Long scheduleId) {
+        return ResponseEntity.ok(dutyLogService.getByScheduleId(scheduleId));
+    }
+
+    @PostMapping("/start-from-schedule/{scheduleId}")
+    public ResponseEntity<DutyLog> startFromSchedule(@PathVariable Long scheduleId) {
+        return ResponseEntity.ok(dutyLogService.startFromSchedule(scheduleId));
+    }
+
     @PostMapping
     public ResponseEntity<DutyLog> create(@RequestBody DutyLog log) {
         return ResponseEntity.ok(dutyLogService.create(log));
@@ -47,4 +57,4 @@ public class DutyLogController {
         dutyLogService.delete(id);
         return ResponseEntity.noContent().build();
     }
-} 
+}
