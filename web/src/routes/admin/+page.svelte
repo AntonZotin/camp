@@ -10,12 +10,9 @@
         Baby,
         Calendar,
         Activity,
-        Settings,
         Menu,
         Bell,
         CreditCard,
-        FileText,
-        UserCheck,
         Download, ClipboardCheck, TicketCheck
     } from 'lucide-svelte';
     import MenuAdmin from '$lib/admin/MenuAdmin.svelte';

@@ -1,18 +1,17 @@
 <script>
-  import { page } from '$app/stores';
+  import {page} from '$app/stores';
   import Header from '$lib/components/Header.svelte';
   import Footer from '$lib/components/Footer.svelte';
-  import { ArrowUp } from 'lucide-svelte';
-  import { onMount } from 'svelte';
-  import { Toaster } from 'svelte-sonner';
+  import {ArrowUp} from 'lucide-svelte';
+  import {onMount} from 'svelte';
+  import {Toaster} from 'svelte-sonner';
   import '../lib/global.css';
 
   let currentTheme = 'light';
   let showScrollButton = false;
 
   onMount(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    currentTheme = savedTheme;
+    currentTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', currentTheme);
 
     window.addEventListener('scroll', handleScroll);
