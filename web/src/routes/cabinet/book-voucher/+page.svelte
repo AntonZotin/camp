@@ -191,16 +191,16 @@
 					<h3>Подтверждение бронирования</h3>
 					<div class="summary-item">
 						<span class="label">Ребёнок:</span>
-						<span class="value">{children.find(c => c.id.toString() === selectedChild)?.fullName}</span>
+						<span class="value">{children.find(c => c.id === parseInt(selectedChild))?.fullName}</span>
 					</div>
 					<div class="summary-item">
 						<span class="label">Смена:</span>
-						<span class="value">{sessions.find(s => s.id.toString() === selectedSession)?.name}</span>
+						<span class="value">{sessions.find(s => s.id === parseInt(selectedSession))?.name}</span>
 					</div>
 					<div class="summary-item">
 						<span class="label">Период:</span>
 						<span class="value">
-							{sessions.find(s => s.id.toString() === selectedSession)?.startDate} - {sessions.find(s => s.id.toString() === selectedSession)?.endDate}
+							{sessions.find(s => s.id === parseInt(selectedSession))?.startDate} - {sessions.find(s => s.id === parseInt(selectedSession))?.endDate}
 						</span>
 					</div>
 				</div>
