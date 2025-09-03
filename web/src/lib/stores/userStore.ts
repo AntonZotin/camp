@@ -45,7 +45,7 @@ function initializeAuthInterceptor() {
         try {
             const response = await originalFetch(input, authInit);
             if (response.status === 401) {
-                throw new Error('Unauthorized');
+                throw new Error('Логин или пароль введены не верно');
             }
             return response;
         } catch (error) {
