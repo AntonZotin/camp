@@ -7,8 +7,10 @@
 	import { userStore } from '$lib/stores/userStore';
 	import { get } from 'svelte/store';
 	import { onMount } from 'svelte';
+	import type { CampSession, Child } from "$lib/models";
+	import {toast} from "svelte-sonner";
 
-	let user = get(userStore);
+	let user: UserSession | null = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
 	let loading = true;
@@ -16,8 +18,8 @@
 	let error = '';
 	let success = '';
 
-	let children: any[] = [];
-	let sessions: any[] = [];
+	let children: Child[] = [];
+	let sessions: CampSession[] = [];
 	let selectedChild: string = '';
 	let selectedSession: string = '';
 
@@ -31,15 +33,15 @@
 		loading = true;
 		error = '';
 		try {
-			const childrenRes = await fetch(`${PUBLIC_API_URL}/api/children/parent/${user.userId}`, {
-				headers: { Authorization: `Bearer ${user.accessToken}` }
+			const childrenRes = await fetch(`${PUBLIC_API_URL}/api/children/parent/${user?.userId}`, {
+				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (childrenRes.ok) {
 				children = await childrenRes.json();
 			}
 
 			const sessionsRes = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
-				headers: { Authorization: `Bearer ${user.accessToken}` }
+				headers: { Authorization: `Bearer ${user?.accessToken}` }
 			});
 			if (sessionsRes.ok) {
 				sessions = await sessionsRes.json();
@@ -53,7 +55,7 @@
 
 	async function bookVoucher() {
 		if (!selectedChild || !selectedSession) {
-			error = 'Пожалуйста, выберите ребёнка и смену';
+			toast.error('Пожалуйста, выберите ребёнка и смену');
 			return;
 		}
 
@@ -66,7 +68,7 @@
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${user.accessToken}`
+					Authorization: `Bearer ${user?.accessToken}`
 				},
 				body: JSON.stringify({
 					childId: parseInt(selectedChild),
@@ -76,14 +78,17 @@
 
 			if (!res.ok) {
 				const data = await res.json();
+				toast.error('Ошибка бронирования путёвки');
 				throw new Error(data.message || 'Ошибка бронирования путёвки');
 			}
 
 			success = 'Путёвка успешно забронирована!';
+			toast.success(success);
 			setTimeout(() => {
 				goto('/cabinet');
 			}, 2000);
 		} catch (e) {
+			toast.error('Ошибка бронирования путёвки');
 			error = (e as Error).message || 'Ошибка бронирования путёвки';
 		} finally {
 			submitting = false;
@@ -139,7 +144,7 @@
 								<div class="child-card">
 									<User size={24} />
 									<div class="child-info">
-										<h4>{child.name}</h4>
+										<h4>{child.fullName}</h4>
 										<p>Дата рождения: {child.birthDate}</p>
 									</div>
 								</div>
@@ -186,23 +191,23 @@
 					<h3>Подтверждение бронирования</h3>
 					<div class="summary-item">
 						<span class="label">Ребёнок:</span>
-						<span class="value">{children.find(c => c.id == selectedChild)?.name}</span>
+						<span class="value">{children.find(c => c.id.toString() === selectedChild)?.fullName}</span>
 					</div>
 					<div class="summary-item">
 						<span class="label">Смена:</span>
-						<span class="value">{sessions.find(s => s.id == selectedSession)?.name}</span>
+						<span class="value">{sessions.find(s => s.id.toString() === selectedSession)?.name}</span>
 					</div>
 					<div class="summary-item">
 						<span class="label">Период:</span>
 						<span class="value">
-							{sessions.find(s => s.id == selectedSession)?.startDate} - {sessions.find(s => s.id == selectedSession)?.endDate}
+							{sessions.find(s => s.id.toString() === selectedSession)?.startDate} - {sessions.find(s => s.id.toString() === selectedSession)?.endDate}
 						</span>
 					</div>
 				</div>
 			{/if}
 
-			<button 
-				class="book-btn" 
+			<button
+				class="book-btn"
 				disabled={!selectedChild || !selectedSession || submitting}
 				on:click={bookVoucher}
 			>
@@ -461,4 +466,4 @@
 			text-align: center;
 		}
 	}
-</style> 
+</style>
