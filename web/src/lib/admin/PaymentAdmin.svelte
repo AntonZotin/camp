@@ -4,7 +4,7 @@
 	import {PUBLIC_API_URL} from '$env/static/public';
 	import type {UserSession} from '$lib/stores/userStore';
 	import {onMount} from 'svelte';
-	import type {MedicalVisit, Payment, User, Voucher} from "$lib/models";
+	import type {Payment, User, Voucher} from "$lib/models";
 	import {toast} from "svelte-sonner";
 	import SearchBox from "$lib/components/SearchBox.svelte";
 

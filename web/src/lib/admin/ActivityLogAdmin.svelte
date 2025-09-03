@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type {ActivityLog, MedicalVisit} from "$lib/models";
+	import type {ActivityLog} from "$lib/models";
 	import {Loader, AlertCircle, Activity, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';

@@ -112,8 +112,8 @@ public class AdminExportController {
     @GetMapping("/activity-logs/xlsx")
     public ResponseEntity<byte[]> exportActivityLogsToXlsx() {
         List<ActivityLog> activityLogs = activityLogRepository.findAll();
-        return exportToXlsx("activity-logs", new String[] {"id", "user_id", "action", "timestamp", "description"},
-            activityLogs, a -> new String[] {
+        return exportToXlsx("activity-logs", new String[]{"id", "user_id", "action", "timestamp", "description"},
+            activityLogs, a -> new String[]{
                 a.getId().toString(),
                 (a.getUser() != null ? a.getUser().getId().toString() : ""),
                 a.getAction(),
@@ -125,8 +125,8 @@ public class AdminExportController {
     @GetMapping("/camp-sessions/xlsx")
     public ResponseEntity<byte[]> exportCampSessionsToXlsx() {
         List<CampSession> campSessions = campSessionRepository.findAll();
-        return exportToXlsx("camp-sessions", new String[] {"id", "name", "start_date", "end_date", "description", "max_children", "price"},
-            campSessions, c -> new String[] {
+        return exportToXlsx("camp-sessions", new String[]{"id", "name", "start_date", "end_date", "description", "max_children", "price"},
+            campSessions, c -> new String[]{
                 c.getId().toString(),
                 c.getName(),
                 c.getStartDate().toString(),
@@ -140,8 +140,8 @@ public class AdminExportController {
     @GetMapping("/children/xlsx")
     public ResponseEntity<byte[]> exportChildrenToXlsx() {
         List<Child> children = childRepository.findAll();
-        return exportToXlsx("children", new String[] {"id", "full_name", "birth_date", "parent_id", "parent_username"},
-            children, c -> new String[] {
+        return exportToXlsx("children", new String[]{"id", "full_name", "birth_date", "parent_id", "parent_username"},
+            children, c -> new String[]{
                 c.getId().toString(),
                 c.getFullName(),
                 c.getBirthDate().toString(),
@@ -153,8 +153,8 @@ public class AdminExportController {
     @GetMapping("/duty-logs/xlsx")
     public ResponseEntity<byte[]> exportDutyLogsToXlsx() {
         List<DutyLog> dutyLogs = dutyLogRepository.findAll();
-        return exportToXlsx("duty-logs", new String[] {"id", "schedule_id", "date", "start_time", "end_time", "status", "notes", "report"},
-            dutyLogs, d -> new String[] {
+        return exportToXlsx("duty-logs", new String[]{"id", "schedule_id", "date", "start_time", "end_time", "status", "notes", "report"},
+            dutyLogs, d -> new String[]{
                 d.getId().toString(),
                 (d.getSchedule() != null ? d.getSchedule().getId().toString() : ""),
                 d.getDate().toString(),
@@ -169,8 +169,8 @@ public class AdminExportController {
     @GetMapping("/employees/xlsx")
     public ResponseEntity<byte[]> exportEmployeesToXlsx() {
         List<Employee> employees = employeeRepository.findAll();
-        return exportToXlsx("employees", new String[] {"id", "full_name", "position", "user_id", "username"},
-            employees, e -> new String[] {
+        return exportToXlsx("employees", new String[]{"id", "full_name", "position", "user_id", "username"},
+            employees, e -> new String[]{
                 e.getId().toString(),
                 e.getFullName(),
                 e.getPosition(),
@@ -182,8 +182,8 @@ public class AdminExportController {
     @GetMapping("/medical-cards/xlsx")
     public ResponseEntity<byte[]> exportMedicalCardsToXlsx() {
         List<MedicalCard> medicalCards = medicalCardRepository.findAll();
-        return exportToXlsx("medical-cards", new String[] {"id", "child_id", "health_info", "chronic_diseases", "allergies", "vaccinations", "notes"},
-            medicalCards, m -> new String[] {
+        return exportToXlsx("medical-cards", new String[]{"id", "child_id", "health_info", "chronic_diseases", "allergies", "vaccinations", "notes"},
+            medicalCards, m -> new String[]{
                 m.getId().toString(),
                 (m.getChild() != null ? m.getChild().getId().toString() : ""),
                 m.getHealthInfo(),
@@ -197,8 +197,8 @@ public class AdminExportController {
     @GetMapping("/medical-visits/xlsx")
     public ResponseEntity<byte[]> exportMedicalVisitsToXlsx() {
         List<MedicalVisit> medicalVisits = medicalVisitRepository.findAll();
-        return exportToXlsx("medical-visits", new String[] {"id", "date", "child_id", "doctor_id", "description", "recommendations", "medications"},
-            medicalVisits, v -> new String[] {
+        return exportToXlsx("medical-visits", new String[]{"id", "date", "child_id", "doctor_id", "description", "recommendations", "medications"},
+            medicalVisits, v -> new String[]{
                 v.getId().toString(),
                 v.getDate().toString(),
                 (v.getChild() != null ? v.getChild().getId().toString() : ""),
@@ -212,8 +212,8 @@ public class AdminExportController {
     @GetMapping("/menus/xlsx")
     public ResponseEntity<byte[]> exportMenusToXlsx() {
         List<Menu> menus = menuRepository.findAll();
-        return exportToXlsx("menus", new String[] {"id", "date", "session_id", "breakfast", "lunch", "dinner", "notes"},
-            menus, m -> new String[] {
+        return exportToXlsx("menus", new String[]{"id", "date", "session_id", "breakfast", "lunch", "dinner", "notes"},
+            menus, m -> new String[]{
                 m.getId().toString(),
                 m.getDate().toString(),
                 (m.getSession() != null ? m.getSession().getId().toString() : ""),
@@ -227,8 +227,8 @@ public class AdminExportController {
     @GetMapping("/notifications/xlsx")
     public ResponseEntity<byte[]> exportNotificationsToXlsx() {
         List<Notification> notifications = notificationRepository.findAll();
-        return exportToXlsx("notifications", new String[] {"id", "recipient_id", "type", "subject", "message", "status", "created_at", "sent_at"},
-            notifications, n -> new String[] {
+        return exportToXlsx("notifications", new String[]{"id", "recipient_id", "type", "subject", "message", "status", "created_at", "sent_at"},
+            notifications, n -> new String[]{
                 n.getId().toString(),
                 (n.getRecipient() != null ? n.getRecipient().getId().toString() : ""),
                 n.getType(),
@@ -243,8 +243,8 @@ public class AdminExportController {
     @GetMapping("/payments/xlsx")
     public ResponseEntity<byte[]> exportPaymentsToXlsx() {
         List<Payment> payments = paymentRepository.findAll();
-        return exportToXlsx("payments", new String[] {"id", "parent_id", "voucher_id", "amount", "date", "status", "method", "comment"},
-            payments, p -> new String[] {
+        return exportToXlsx("payments", new String[]{"id", "parent_id", "voucher_id", "amount", "date", "status", "method", "comment"},
+            payments, p -> new String[]{
                 p.getId().toString(),
                 (p.getParent() != null ? p.getParent().getId().toString() : ""),
                 (p.getVoucher() != null ? p.getVoucher().getId().toString() : ""),
@@ -259,8 +259,8 @@ public class AdminExportController {
     @GetMapping("/schedules/xlsx")
     public ResponseEntity<byte[]> exportSchedulesToXlsx() {
         List<Schedule> schedules = scheduleRepository.findAll();
-        return exportToXlsx("schedules", new String[] {"id", "session_id", "employee_id", "date", "time", "title", "description", "location", "team"},
-            schedules, s -> new String[] {
+        return exportToXlsx("schedules", new String[]{"id", "session_id", "employee_id", "date", "time", "title", "description", "location", "team"},
+            schedules, s -> new String[]{
                 s.getId().toString(),
                 (s.getSession() != null ? s.getSession().getId().toString() : ""),
                 (s.getEmployee() != null ? s.getEmployee().getId().toString() : ""),
@@ -276,8 +276,8 @@ public class AdminExportController {
     @GetMapping("/users/xlsx")
     public ResponseEntity<byte[]> exportUsersToXlsx() {
         List<User> users = userRepository.findAll();
-        return exportToXlsx("users", new String[] {"id", "username", "email", "role", "email_notifications", "sms_notifications", "theme"},
-            users, u -> new String[] {
+        return exportToXlsx("users", new String[]{"id", "username", "email", "role", "email_notifications", "sms_notifications", "theme"},
+            users, u -> new String[]{
                 u.getId().toString(),
                 u.getUsername(),
                 u.getEmail(),
@@ -291,8 +291,8 @@ public class AdminExportController {
     @GetMapping("/vouchers/xlsx")
     public ResponseEntity<byte[]> exportVouchersToXlsx() {
         List<Voucher> vouchers = voucherRepository.findAll();
-        return exportToXlsx("vouchers", new String[] {"id", "child_id", "session_id", "status", "booking_date"},
-            vouchers, v -> new String[] {
+        return exportToXlsx("vouchers", new String[]{"id", "child_id", "session_id", "status", "booking_date"},
+            vouchers, v -> new String[]{
                 v.getId().toString(),
                 (v.getChild() != null ? v.getChild().getId().toString() : ""),
                 (v.getSession() != null ? v.getSession().getId().toString() : ""),

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type {Employee, MedicalVisit} from "$lib/models";
+	import type {Employee} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
 	import {Loader, Plus, Trash2, Edit, AlertCircle, Users, ArrowUpDown} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';

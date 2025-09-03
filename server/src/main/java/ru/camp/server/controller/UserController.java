@@ -33,7 +33,7 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userService.findByUsername(username);
-            
+
             if (user == null) {
                 return ResponseEntity.status(404).body("Пользователь не найден");
             }
@@ -56,7 +56,7 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userService.findByUsername(username);
-            
+
             if (user == null) {
                 return ResponseEntity.status(404).body("Пользователь не найден");
             }
@@ -93,7 +93,7 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userService.findByUsername(username);
-            
+
             if (user == null) {
                 return ResponseEntity.status(404).body("Пользователь не найден");
             }
@@ -123,7 +123,7 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userService.findByUsername(username);
-            
+
             if (user == null) {
                 return ResponseEntity.status(404).body("Пользователь не найден");
             }
@@ -145,7 +145,7 @@ public class UserController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             User user = userService.findByUsername(username);
-            
+
             if (user == null) {
                 return ResponseEntity.status(404).body("Пользователь не найден");
             }

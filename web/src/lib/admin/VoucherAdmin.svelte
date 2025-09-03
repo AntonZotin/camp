@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { fade, fly } from 'svelte/transition';
-    import { Loader, Plus, Trash2, Edit, AlertCircle, Search, ArrowUpDown, Calendar, Ticket, User, BookOpen } from 'lucide-svelte';
+    import { Loader, Plus, Trash2, Edit, AlertCircle, ArrowUpDown, Ticket } from 'lucide-svelte';
     import { PUBLIC_API_URL } from '$env/static/public';
     import type { UserSession } from '$lib/stores/userStore';
     import { toast } from 'svelte-sonner';

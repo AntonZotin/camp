@@ -13,16 +13,16 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(false);
+                    .allowedOrigins("*")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .allowCredentials(false);
                 registry.addMapping("/docs/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET");
+                    .allowedOrigins("*")
+                    .allowedMethods("GET");
                 registry.addMapping("/v3/api-docs/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("GET");
+                    .allowedOrigins("*")
+                    .allowedMethods("GET");
             }
         };
     }
