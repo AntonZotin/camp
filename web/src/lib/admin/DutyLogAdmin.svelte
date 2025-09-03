@@ -5,7 +5,7 @@
     import { PUBLIC_API_URL } from '$env/static/public';
     import type { UserSession } from '$lib/stores/userStore';
     import { toast } from 'svelte-sonner';
-    import type { DutyLog, Employee, CampSession } from "$lib/models";
+    import type { DutyLog, Schedule } from "$lib/models";
     import SearchBox from "$lib/components/SearchBox.svelte";
 
     export let user: UserSession;
@@ -21,33 +21,26 @@
     let sortDirection: 'asc' | 'desc' = 'desc';
 
     interface DutyLogForm {
+        scheduleId: number;
         date: string;
-        employeeId: number;
-        sessionId: number;
         startTime: string;
         endTime: string;
-        location: string;
         status: string;
-        description: string;
         notes: string;
         report: string;
     }
 
     let dutyLogForm: DutyLogForm = {
+        scheduleId: 0,
         date: '',
-        employeeId: 0,
-        sessionId: 0,
         startTime: '08:00',
         endTime: '17:00',
-        location: '',
         status: 'PLANNED',
-        description: '',
         notes: '',
         report: ''
     };
 
-    let employees: Employee[] = [];
-    let sessions: CampSession[] = [];
+    let schedules: Schedule[] = [];
     let loadingData = false;
 
     const statusOptions = [
@@ -77,37 +70,24 @@
         }
     }
 
-    async function loadEmployees() {
+    async function loadSchedules() {
         try {
-            const res = await fetch(`${PUBLIC_API_URL}/api/employees`, {
+            const res = await fetch(`${PUBLIC_API_URL}/api/schedules`, {
                 headers: { Authorization: `Bearer ${user.accessToken}` }
             });
             if (res.ok) {
-                employees = await res.json();
+                schedules = await res.json();
             }
         } catch (e) {
-            console.error('Error loading employees:', e);
-        }
-    }
-
-    async function loadSessions() {
-        try {
-            const res = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
-                headers: { Authorization: `Bearer ${user.accessToken}` }
-            });
-            if (res.ok) {
-                sessions = await res.json();
-            }
-        } catch (e) {
-            console.error('Error loading sessions:', e);
+            console.error('Error loading schedules:', e);
         }
     }
 
     function filterAndSortDutyLogs() {
         filteredDutyLogs = dutyLogs.filter(log =>
-            log.employee.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            log.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            log.session.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (log.schedule?.employee?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
+            (log.schedule?.location?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
+            (log.schedule?.session?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
             getStatusLabel(log.status).toLowerCase().includes(searchQuery.toLowerCase()) ||
             log.date.includes(searchQuery)
         );
@@ -140,27 +120,21 @@
         editDutyLog = log;
         if (log) {
             dutyLogForm = {
+                scheduleId: log.schedule?.id || 0,
                 date: log.date.split('T')[0],
-                employeeId: log.employee.id,
-                sessionId: log.session.id,
                 startTime: log.startTime,
                 endTime: log.endTime,
-                location: log.location,
                 status: log.status,
-                description: log.description || '',
                 notes: log.notes || '',
                 report: log.report || ''
             };
         } else {
             dutyLogForm = {
+                scheduleId: 0,
                 date: new Date().toISOString().split('T')[0],
-                employeeId: 0,
-                sessionId: 0,
                 startTime: '08:00',
                 endTime: '17:00',
-                location: '',
                 status: 'PLANNED',
-                description: '',
                 notes: '',
                 report: ''
             };
@@ -185,6 +159,26 @@
             case 'IN_PROGRESS': return 'status-in-progress';
             default: return '';
         }
+    }
+
+    function getScheduleInfo(schedule: Schedule | null) {
+        if (!schedule) return '-';
+        return `${schedule.title} (${schedule.date} ${schedule.time})`;
+    }
+
+    function getEmployeeInfo(schedule: Schedule | null) {
+        if (!schedule || !schedule.employee) return '-';
+        return schedule.employee.fullName;
+    }
+
+    function getLocationInfo(schedule: Schedule | null) {
+        if (!schedule) return '-';
+        return schedule.location;
+    }
+
+    function getSessionInfo(schedule: Schedule | null) {
+        if (!schedule || !schedule.session) return '-';
+        return schedule.session.name;
     }
 
     async function saveDutyLog() {
@@ -243,7 +237,7 @@
 
     onMount(async () => {
         loadingData = true;
-        await Promise.all([loadDutyLogs(), loadEmployees(), loadSessions()]);
+        await Promise.all([loadDutyLogs(), loadSchedules()]);
         loadingData = false;
     });
 </script>
@@ -283,6 +277,7 @@
                         <th on:click={() => sortBy('date')} class:active={sortField==='date'}>
                             <span>Дата <ArrowUpDown size={14}/></span>
                         </th>
+                        <th>Расписание</th>
                         <th>Сотрудник</th>
                         <th>Смена</th>
                         <th on:click={() => sortBy('startTime')} class:active={sortField==='startTime'}>
@@ -291,9 +286,7 @@
                         <th on:click={() => sortBy('endTime')} class:active={sortField==='endTime'}>
                             <span>Время окончания <ArrowUpDown size={14}/></span>
                         </th>
-                        <th on:click={() => sortBy('location')} class:active={sortField==='location'}>
-                            <span>Локация <ArrowUpDown size={14}/></span>
-                        </th>
+                        <th>Локация</th>
                         <th on:click={() => sortBy('status')} class:active={sortField==='status'}>
                             <span>Статус <ArrowUpDown size={14}/></span>
                         </th>
@@ -304,16 +297,17 @@
                     {#each filteredDutyLogs as log}
                         <tr>
                             <td>{new Date(log.date).toLocaleDateString('ru-RU')}</td>
+                            <td>{getScheduleInfo(log.schedule)}</td>
                             <td>
-                                <div>{log.employee.fullName}</div>
-                                {#if log.employee.position}
-                                    <small>{log.employee.position}</small>
+                                <div>{getEmployeeInfo(log.schedule)}</div>
+                                {#if log.schedule?.employee?.position}
+                                    <small>{log.schedule.employee.position}</small>
                                 {/if}
                             </td>
-                            <td>{log.session.name || '-'}</td>
+                            <td>{getSessionInfo(log.schedule)}</td>
                             <td>{log.startTime}</td>
                             <td>{log.endTime}</td>
-                            <td>{log.location}</td>
+                            <td>{getLocationInfo(log.schedule)}</td>
                             <td>
                                 <span class={getStatusClass(log.status)}>
                                     {getStatusLabel(log.status)}
@@ -343,39 +337,21 @@
         <form on:submit|preventDefault={saveDutyLog}>
             <div class="form-row">
                 <div class="form-group">
+                    <label for="scheduleId">Расписание</label>
+                    <select id="scheduleId" bind:value={dutyLogForm.scheduleId} required>
+                        <option value="" disabled>Выберите расписание</option>
+                        {#each schedules as schedule}
+                            <option value={schedule.id}>
+                                {schedule.title} - {schedule.date} {schedule.time}
+                                ({schedule.employee?.fullName || 'Не назначено'})
+                            </option>
+                        {/each}
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="date">Дата</label>
                     <input id="date" type="date" bind:value={dutyLogForm.date} required />
-                </div>
-
-                <div class="form-group">
-                    <label for="employeeId">Сотрудник</label>
-                    <select id="employeeId" bind:value={dutyLogForm.employeeId} required>
-                        <option value="" disabled>Выберите сотрудника</option>
-                        {#each employees as emp}
-                            <option value={emp.id}>{emp.fullName} - {emp.position}</option>
-                        {/each}
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="sessionId">Смена</label>
-                    <select id="sessionId" bind:value={dutyLogForm.sessionId} required>
-                        <option value="" disabled>Выберите смену</option>
-                        {#each sessions as session}
-                            <option value={session.id}>{session.name}</option>
-                        {/each}
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="status">Статус</label>
-                    <select id="status" bind:value={dutyLogForm.status} required>
-                        {#each statusOptions as option}
-                            <option value={option.value}>{option.label}</option>
-                        {/each}
-                    </select>
                 </div>
             </div>
 
@@ -391,14 +367,15 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="location">Локация</label>
-                <input id="location" bind:value={dutyLogForm.location} required />
-            </div>
-
-            <div class="form-group">
-                <label for="description">Описание дежурства</label>
-                <textarea id="description" bind:value={dutyLogForm.description} rows={3} placeholder="Обязанности и задачи дежурства..."></textarea>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="status">Статус</label>
+                    <select id="status" bind:value={dutyLogForm.status} required>
+                        {#each statusOptions as option}
+                            <option value={option.value}>{option.label}</option>
+                        {/each}
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">

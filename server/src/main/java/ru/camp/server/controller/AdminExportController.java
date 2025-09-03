@@ -153,17 +153,14 @@ public class AdminExportController {
     @GetMapping("/duty-logs/xlsx")
     public ResponseEntity<byte[]> exportDutyLogsToXlsx() {
         List<DutyLog> dutyLogs = dutyLogRepository.findAll();
-        return exportToXlsx("duty-logs", new String[] {"id", "date", "employee_id", "session_id", "start_time", "end_time", "location", "status", "description", "notes", "report"},
+        return exportToXlsx("duty-logs", new String[] {"id", "schedule_id", "date", "start_time", "end_time", "status", "notes", "report"},
             dutyLogs, d -> new String[] {
                 d.getId().toString(),
+                (d.getSchedule() != null ? d.getSchedule().getId().toString() : ""),
                 d.getDate().toString(),
-                (d.getEmployee() != null ? d.getEmployee().getId().toString() : ""),
-                (d.getSession() != null ? d.getSession().getId().toString() : ""),
                 d.getStartTime().toString(),
                 d.getEndTime().toString(),
-                d.getLocation(),
                 d.getStatus().toString(),
-                d.getDescription(),
                 d.getNotes(),
                 d.getReport()
             });
