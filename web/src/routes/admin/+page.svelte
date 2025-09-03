@@ -38,8 +38,8 @@
 
     let tab:
         'users' | 'children' | 'employees' | 'sessions' | 'menu' | 'medical-cards' | 'medical-visits'
-        | 'notifications' | 'payments' | 'vouchers' | 'duty-logs'
-        | 'schedules' | 'activity-logs' | 'export' = 'users';
+        | 'notifications' | 'payments' | 'vouchers'
+        | 'schedules' | 'duty-logs' | 'activity-logs' | 'export' = 'users';
 
     onMount(() => {
         if (!user || user.role !== 'ADMIN') goto('/login');
@@ -106,13 +106,13 @@
 						<TicketCheck size={18} />
 						<span>Путевки</span>
 					</button>
-					<button class:active={tab==='duty-logs'} on:click={() => tab='duty-logs'}>
-						<Calendar size={18} />
-						<span>Журнал дежурств</span>
-					</button>
 					<button class:active={tab==='schedules'} on:click={() => tab='schedules'}>
 						<ClipboardCheck size={18} />
 						<span>Расписание</span>
+					</button>
+					<button class:active={tab==='duty-logs'} on:click={() => tab='duty-logs'}>
+						<Calendar size={18} />
+						<span>Журнал дежурств</span>
 					</button>
                     <button class:active={tab==='activity-logs'} on:click={() => tab='activity-logs'}>
                         <Activity size={18}/>
@@ -145,10 +145,10 @@
                         <PaymentAdmin {user}/>
 					{:else if tab === 'vouchers'}
 						<VoucherAdmin {user} />
-					{:else if tab === 'duty-logs'}
-						<DutyLogAdmin {user} />
 					{:else if tab === 'schedules'}
 						<ScheduleAdmin {user} />
+					{:else if tab === 'duty-logs'}
+						<DutyLogAdmin {user} />
                     {:else if tab === 'activity-logs'}
                         <ActivityLogAdmin {user}/>
                     {:else if tab === 'export'}
