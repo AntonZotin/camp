@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type {Schedule} from "$lib/models";
 	import { fly } from 'svelte/transition';
-	import {Calendar, Clock, MapPin, Users, Loader, AlertCircle, Activity, CheckCircle} from 'lucide-svelte';
+	import {Calendar, Clock, MapPin, Users, Loader, AlertCircle, Activity} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
     import { Play } from 'lucide-svelte';
