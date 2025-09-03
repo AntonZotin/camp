@@ -29,7 +29,7 @@
 				error = 'Ошибка загрузки дежурств';
 			else {
 				duties = await res.json();
-            	duties.sort((a, b) => a.id - b.id);
+            	duties.sort((a, b) => b.id - a.id);
 			}
 		} finally {
 			loading = false;
@@ -405,6 +405,24 @@
         margin-bottom: 1rem;
         font-family: inherit;
         resize: vertical;
+    }
+
+    .status select {
+        width: 100%;
+        padding: 0.3rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        transition: var(--transition);
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .status select {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
     .edit-actions {
