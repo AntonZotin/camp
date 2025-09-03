@@ -31,7 +31,6 @@
 		loading = true;
 		error = '';
 		try {
-			// Загружаем детей пользователя
 			const childrenRes = await fetch(`${PUBLIC_API_URL}/api/children/parent/${user.userId}`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});
@@ -39,7 +38,6 @@
 				children = await childrenRes.json();
 			}
 
-			// Загружаем доступные смены
 			const sessionsRes = await fetch(`${PUBLIC_API_URL}/api/sessions`, {
 				headers: { Authorization: `Bearer ${user.accessToken}` }
 			});

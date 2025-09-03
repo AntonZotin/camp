@@ -59,7 +59,6 @@
 
     if (Object.keys(formErrors).length === 0) {
       isSubmitting = true;
-      // Здесь будет реальная отправка формы
       await new Promise(resolve => setTimeout(resolve, 1000));
       isSubmitting = false;
       isSuccess = true;

@@ -1,5 +1,5 @@
 <script>
-  import {Search, X} from "lucide-svelte"; // иконка
+  import {Search, X} from "lucide-svelte";
     export let value = "";
     export let placeholder = "Поиск...";
 </script>
