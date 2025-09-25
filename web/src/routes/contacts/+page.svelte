@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { fade, fly } from 'svelte/transition';
   import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-svelte';
 
@@ -40,12 +40,29 @@
     message: ''
   };
 
-  let formErrors = {};
+  interface FormErrors {
+      name: string | null;
+      email: string | null;
+      phone: string | null;
+      message: string | null;
+  }
+
+  let formErrors: FormErrors = {
+    name: null,
+    email: null,
+    phone: null,
+    message: null
+  };
   let isSubmitting = false;
   let isSuccess = false;
 
   const validateForm = () => {
-    const errors = {};
+    const errors: FormErrors = {
+      name: null,
+      email: null,
+      phone: null,
+      message: null
+    };
     if (!formData.name) errors.name = 'Введите имя';
     if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) errors.email = 'Введите корректный email';
     if (!formData.phone || !/^[\d\s+\-()]{10,}$/.test(formData.phone)) errors.phone = 'Введите корректный телефон';
