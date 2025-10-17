@@ -15,6 +15,7 @@ import ru.camp.server.service.UserService;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Aspect
 @Component
@@ -42,7 +43,7 @@ public class ActivityLogAspect {
         ActivityLog activityLog = new ActivityLog();
         activityLog.setUser(user);
         activityLog.setAction(logAnnotation.action());
-        activityLog.setTimestamp(LocalDateTime.now());
+        activityLog.setTimestamp(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         String description = logAnnotation.description();
         if (description.isEmpty()) {
