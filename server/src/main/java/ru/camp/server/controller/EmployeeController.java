@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.camp.server.aspect.LogActivity;
 import ru.camp.server.model.Employee;
 import ru.camp.server.service.EmployeeService;
 
@@ -20,16 +21,19 @@ public class EmployeeController {
     }
 
     @GetMapping
+    @LogActivity(action = "VIEW_EMPLOYEES", description = "Просмотр списка сотрудников")
     public ResponseEntity<List<Employee>> getAll() {
         return ResponseEntity.ok(employeeService.getAll());
     }
 
     @GetMapping("/{id}")
+    @LogActivity(action = "VIEW_EMPLOYEE", description = "Просмотр карточки сотрудника")
     public ResponseEntity<Employee> getById(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.getById(id));
     }
 
     @PostMapping
+    @LogActivity(action = "CREATE_EMPLOYEE", description = "Создание сотрудника")
     public ResponseEntity<?> create(@RequestBody Employee employee) {
         try {
             return ResponseEntity.ok(employeeService.create(employee));
@@ -39,6 +43,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
+    @LogActivity(action = "UPDATE_EMPLOYEE", description = "Обновление данных сотрудника")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Employee employee) {
         try {
             return ResponseEntity.ok(employeeService.update(id, employee));
@@ -48,6 +53,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
+    @LogActivity(action = "DELETE_EMPLOYEE", description = "Удаление сотрудника")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         employeeService.delete(id);
         return ResponseEntity.noContent().build();

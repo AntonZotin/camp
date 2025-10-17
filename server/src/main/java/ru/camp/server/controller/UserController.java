@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import ru.camp.server.aspect.LogActivity;
 import ru.camp.server.dto.ChangePasswordRequest;
 import ru.camp.server.dto.UpdateProfileRequest;
 import ru.camp.server.dto.UserSettingsRequest;
@@ -28,6 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
+    @LogActivity(action = "VIEW_PROFILE", description = "Просмотр профиля")
     public ResponseEntity<?> getProfile() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -51,6 +53,7 @@ public class UserController {
     }
 
     @PutMapping("/profile")
+    @LogActivity(action = "UPDATE_PROFILE", description = "Обновление профиля")
     public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -61,7 +64,6 @@ public class UserController {
                 return ResponseEntity.status(404).body("Пользователь не найден");
             }
 
-            // Проверяем, что новый username не занят другим пользователем
             if (!username.equals(request.getUsername())) {
                 User existingUser = userService.findByUsername(request.getUsername());
                 if (existingUser != null) {
@@ -69,7 +71,6 @@ public class UserController {
                 }
             }
 
-            // Проверяем, что новый email не занят другим пользователем
             if (!user.getEmail().equals(request.getEmail())) {
                 User existingUser = userService.findByEmail(request.getEmail());
                 if (existingUser != null) {
@@ -88,6 +89,7 @@ public class UserController {
     }
 
     @PutMapping("/change-password")
+    @LogActivity(action = "CHANGE_PASSWORD", description = "Смена пароля")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -98,12 +100,10 @@ public class UserController {
                 return ResponseEntity.status(404).body("Пользователь не найден");
             }
 
-            // Проверяем текущий пароль
             if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
                 return ResponseEntity.status(400).body("Неверный текущий пароль");
             }
 
-            // Проверяем новый пароль
             if (request.getNewPassword().length() < 6) {
                 return ResponseEntity.status(400).body("Новый пароль должен быть не менее 6 символов");
             }
@@ -118,6 +118,7 @@ public class UserController {
     }
 
     @GetMapping("/settings")
+    @LogActivity(action = "VIEW_SETTINGS", description = "Просмотр настроек")
     public ResponseEntity<?> getSettings() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -140,6 +141,7 @@ public class UserController {
     }
 
     @PutMapping("/settings")
+    @LogActivity(action = "UPDATE_SETTINGS", description = "Обновление настроек")
     public ResponseEntity<?> updateSettings(@RequestBody UserSettingsRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

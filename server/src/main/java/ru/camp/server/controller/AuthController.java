@@ -3,6 +3,7 @@ package ru.camp.server.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.camp.server.aspect.LogActivity;
 import ru.camp.server.dto.UserRegistrationRequest;
 import ru.camp.server.dto.UserLoginRequest;
 import ru.camp.server.dto.AuthResponse;
@@ -23,6 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @LogActivity(action = "REGISTER", description = "Регистрация нового пользователя")
     public ResponseEntity<?> register(@RequestBody UserRegistrationRequest request) {
         try {
             if (request.getUsername() == null || request.getUsername().isBlank() ||
@@ -40,6 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @LogActivity(action = "LOGIN", description = "Вход в систему")
     public ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
         try {
             if (request.getUsernameOrEmail() == null || request.getUsernameOrEmail().isBlank() ||
@@ -56,6 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
+    @LogActivity(action = "FORGOT_PASSWORD", description = "Запрос восстановления пароля")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         try {
             userService.processForgotPassword(request);
@@ -68,6 +72,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
+    @LogActivity(action = "RESET_PASSWORD", description = "Сброс пароля")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         try {
             userService.resetPassword(request);
