@@ -36,7 +36,7 @@
 
     function filterAndSortLogs() {
         filteredLogs = logs.filter(log =>
-            log.user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			(log.user?.username?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
             log.timestamp.toLowerCase().includes(searchQuery.toLowerCase()) ||
             log.description.toLowerCase().includes(searchQuery) ||
             log.action.toLowerCase().includes(searchQuery)
@@ -119,7 +119,11 @@
 					{#each filteredLogs as l}
 						<tr>
 							<td>{l.id}</td>
-							<td>{l.user?.username}</td>
+							{#if l.user}
+								<td>{l.user?.username}</td>
+							{:else}
+								<td>unknown</td>
+							{/if}
 							<td>{l.action}</td>
 							<td>{l.timestamp}</td>
 							<td>{l.description}</td>
