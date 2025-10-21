@@ -21,11 +21,13 @@ import java.time.temporal.ChronoUnit;
 @Component
 public class ActivityLogAspect {
 
-    @Autowired
-    private ActivityLogService activityLogService;
+    private final ActivityLogService activityLogService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public ActivityLogAspect(ActivityLogService activityLogService, UserService userService) {
+        this.activityLogService = activityLogService;
+        this.userService = userService;
+    }
 
     @Around("@annotation(ru.camp.server.aspect.LogActivity)")
     public Object logActivity(ProceedingJoinPoint joinPoint) throws Throwable {
