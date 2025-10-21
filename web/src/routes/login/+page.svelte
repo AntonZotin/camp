@@ -31,7 +31,7 @@
         userId: data.userId,
         role: data.role
       });
-      goto('/cabinet');
+      await goto('/cabinet');
     } catch (e) {
       error = (e as Error).message || 'Ошибка входа';
     } finally {

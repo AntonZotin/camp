@@ -58,6 +58,16 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/logout")
+    @LogActivity(action = "LOGOUT", description = "Выход из системы")
+    public ResponseEntity<?> logout() {
+        try {
+            return ResponseEntity.ok().body("Успешный выход из системы");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Ошибка выхода: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/forgot-password")
     @LogActivity(action = "FORGOT_PASSWORD", description = "Запрос восстановления пароля")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {

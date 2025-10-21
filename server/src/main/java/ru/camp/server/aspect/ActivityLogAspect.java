@@ -4,7 +4,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -35,12 +34,7 @@ public class ActivityLogAspect {
         Method method = signature.getMethod();
         LogActivity logAnnotation = method.getAnnotation(LogActivity.class);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = null;
-        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
-            String username = authentication.getName();
-            user = userService.findByUsername(username);
-        }
+        User user = getUserFromRequest(joinPoint, method);
 
         ActivityLog activityLog = new ActivityLog();
         activityLog.setUser(user);
@@ -52,16 +46,36 @@ public class ActivityLogAspect {
             description = generateDescription(joinPoint, method);
         }
         activityLog.setDescription(description);
+        activityLogService.create(activityLog);
 
         try {
-            Object result = joinPoint.proceed();
-            activityLogService.create(activityLog);
-            return result;
+            return joinPoint.proceed();
         } catch (Exception e) {
             activityLog.setDescription(activityLog.getDescription() + " (Ошибка: " + e.getMessage() + ")");
-            activityLogService.create(activityLog);
             throw e;
         }
+    }
+
+    private User getUserFromRequest(ProceedingJoinPoint joinPoint, Method method) {
+        if ("login".equals(method.getName())) {
+            Object[] args = joinPoint.getArgs();
+            if (args.length > 0 && args[0] instanceof ru.camp.server.dto.UserLoginRequest loginRequest) {
+                String usernameOrEmail = loginRequest.getUsernameOrEmail();
+                User user = userService.findByUsername(usernameOrEmail);
+                if (user == null) {
+                    user = userService.findByEmail(usernameOrEmail);
+                }
+                return user;
+            }
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
+            String username = authentication.getName();
+            return userService.findByUsername(username);
+        }
+
+        return null;
     }
 
     private String generateDescription(ProceedingJoinPoint joinPoint, Method method) {
@@ -73,8 +87,18 @@ public class ActivityLogAspect {
             case "create" -> "Создание новой записи";
             case "update" -> "Обновление записи (ID: " + (args.length > 0 ? args[0] : "") + ")";
             case "delete" -> "Удаление записи (ID: " + (args.length > 0 ? args[0] : "") + ")";
-            case "login" -> "Вход в систему";
-            case "register" -> "Регистрация пользователя";
+            case "login" -> {
+                if (args.length > 0 && args[0] instanceof ru.camp.server.dto.UserLoginRequest loginRequest) {
+                    yield "Вход в систему: " + loginRequest.getUsernameOrEmail();
+                }
+                yield "Вход в систему";
+            }
+            case "register" -> {
+                if (args.length > 0 && args[0] instanceof ru.camp.server.dto.UserRegistrationRequest registerRequest) {
+                    yield "Регистрация пользователя: " + registerRequest.getUsername();
+                }
+                yield "Регистрация пользователя";
+            }
             case "logout" -> "Выход из системы";
             default -> "Выполнение операции: " + methodName;
         };

@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { toast } from 'svelte-sonner';
+import {PUBLIC_API_URL} from "$env/static/public";
 
 export type UserRole = 'ADMIN' | 'PARENT' | 'EMPLOYEE' | 'USER';
 
@@ -75,9 +76,28 @@ export function loginUser(user: UserSession) {
 }
 
 export async function logoutUser(message?: string) {
-    userStore.set(null);
-    if (message) {
-        toast.error(message);
+    try {
+        const user = localStorage.getItem('user');
+        const token = (user != null) ? JSON.parse(user).accessToken : undefined;
+        if (token) {
+            await fetch(`${PUBLIC_API_URL}/api/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Ошибка при логауте на сервере:', error);
+    } finally {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userRole');
+        userStore.set(null);
+        if (message) {
+            toast.error(message);
+        }
+        await goto('/login');
     }
-    await goto('/login');
-}
+};
