@@ -1,7 +1,6 @@
 package ru.camp.server.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.dto.UserRegistrationRequest;
 import ru.camp.server.model.*;
@@ -33,7 +32,6 @@ public class UserService {
     @Value("${frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
-    @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, ChildRepository childRepository, EmployeeRepository employeeRepository, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

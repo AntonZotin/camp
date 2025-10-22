@@ -1,6 +1,5 @@
 package ru.camp.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.Schedule;
 import ru.camp.server.repository.ScheduleRepository;
@@ -10,7 +9,6 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
-    @Autowired
     public ScheduleService(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }

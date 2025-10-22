@@ -1,6 +1,5 @@
 package ru.camp.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.Payment;
 import ru.camp.server.repository.PaymentRepository;
@@ -10,7 +9,6 @@ import java.util.List;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
 
-    @Autowired
     public PaymentService(PaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
     }

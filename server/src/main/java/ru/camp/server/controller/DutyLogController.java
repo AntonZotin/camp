@@ -1,6 +1,5 @@
 package ru.camp.server.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.aspect.LogActivity;
@@ -14,7 +13,6 @@ import java.util.List;
 public class DutyLogController {
     private final DutyLogService dutyLogService;
 
-    @Autowired
     public DutyLogController(DutyLogService dutyLogService) {
         this.dutyLogService = dutyLogService;
     }

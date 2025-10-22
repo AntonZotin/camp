@@ -2,7 +2,6 @@ package ru.camp.server.controller;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,6 @@ public class AdminUserController {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    @Autowired
     public AdminUserController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;

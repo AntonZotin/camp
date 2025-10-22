@@ -1,6 +1,5 @@
 package ru.camp.server.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.aspect.LogActivity;
@@ -15,7 +14,6 @@ import java.util.List;
 public class VoucherController {
     private final VoucherService voucherService;
 
-    @Autowired
     public VoucherController(VoucherService voucherService) {
         this.voucherService = voucherService;
     }

@@ -1,6 +1,5 @@
 package ru.camp.server.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.aspect.LogActivity;
@@ -14,7 +13,6 @@ import java.util.List;
 public class CampSessionController {
     private final CampSessionService campSessionService;
 
-    @Autowired
     public CampSessionController(CampSessionService campSessionService) {
         this.campSessionService = campSessionService;
     }

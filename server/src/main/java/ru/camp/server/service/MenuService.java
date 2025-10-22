@@ -1,6 +1,5 @@
 package ru.camp.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.Menu;
 import ru.camp.server.repository.MenuRepository;
@@ -10,7 +9,6 @@ import java.util.List;
 public class MenuService {
     private final MenuRepository menuRepository;
 
-    @Autowired
     public MenuService(MenuRepository menuRepository) {
         this.menuRepository = menuRepository;
     }

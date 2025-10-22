@@ -51,7 +51,7 @@ function initializeAuthInterceptor() {
             return response;
         } catch (error) {
             if (error instanceof TypeError && error.message === 'Failed to fetch') {
-                await logoutUser('Ваша сессия истекла. Пожалуйста, войдите снова.');
+                await logoutUser('Ваша сессия истекла. Пожалуйста, войдите снова.', true);
             }
             throw error;
         }
@@ -75,18 +75,20 @@ export function loginUser(user: UserSession) {
     toast.success('Вы успешно вошли в систему');
 }
 
-export async function logoutUser(message?: string) {
+export async function logoutUser(message?: string, skipServerRequest = false) {
     try {
-        const user = localStorage.getItem('user');
-        const token = (user != null) ? JSON.parse(user).accessToken : undefined;
-        if (token) {
-            await fetch(`${PUBLIC_API_URL}/api/auth/logout`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+        if (!skipServerRequest) {
+            const user = localStorage.getItem('user');
+            const token = (user != null) ? JSON.parse(user).accessToken : undefined;
+            if (token) {
+                await fetch(`${PUBLIC_API_URL}/api/auth/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
         }
     } catch (error) {
         console.error('Ошибка при логауте на сервере:', error);

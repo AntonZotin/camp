@@ -1,6 +1,5 @@
 package ru.camp.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.Child;
 import ru.camp.server.repository.ChildRepository;
@@ -10,7 +9,6 @@ import java.util.List;
 public class ChildService {
     private final ChildRepository childRepository;
 
-    @Autowired
     public ChildService(ChildRepository childRepository) {
         this.childRepository = childRepository;
     }

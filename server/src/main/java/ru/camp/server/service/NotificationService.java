@@ -1,6 +1,5 @@
 package ru.camp.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.Notification;
 import ru.camp.server.repository.NotificationRepository;
@@ -14,7 +13,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final JavaMailSender mailSender;
 
-    @Autowired
     public NotificationService(NotificationRepository notificationRepository, JavaMailSender mailSender) {
         this.notificationRepository = notificationRepository;
         this.mailSender = mailSender;

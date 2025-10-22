@@ -1,6 +1,5 @@
 package ru.camp.server.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.camp.server.aspect.LogActivity;
@@ -18,7 +17,6 @@ import ru.camp.server.dto.ResetPasswordRequest;
 public class AuthController {
     private final UserService userService;
 
-    @Autowired
     public AuthController(UserService userService) {
         this.userService = userService;
     }

@@ -1,6 +1,5 @@
 package ru.camp.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.MedicalVisit;
 import ru.camp.server.repository.MedicalVisitRepository;
@@ -10,7 +9,6 @@ import java.util.List;
 public class MedicalVisitService {
     private final MedicalVisitRepository medicalVisitRepository;
 
-    @Autowired
     public MedicalVisitService(MedicalVisitRepository medicalVisitRepository) {
         this.medicalVisitRepository = medicalVisitRepository;
     }

@@ -2,7 +2,6 @@ package ru.camp.server.controller;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +33,6 @@ public class AdminExportController {
     private final PaymentRepository paymentRepository;
     private final ScheduleRepository scheduleRepository;
 
-    @Autowired
     public AdminExportController(ActivityLogRepository activityLogRepository,
                                  UserRepository userRepository,
                                  VoucherRepository voucherRepository,

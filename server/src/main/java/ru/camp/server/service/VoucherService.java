@@ -1,6 +1,5 @@
 package ru.camp.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.Voucher;
 import ru.camp.server.repository.VoucherRepository;
@@ -19,7 +18,6 @@ public class VoucherService {
     private final ChildRepository childRepository;
     private final CampSessionRepository campSessionRepository;
 
-    @Autowired
     public VoucherService(VoucherRepository voucherRepository, ChildRepository childRepository, CampSessionRepository campSessionRepository) {
         this.voucherRepository = voucherRepository;
         this.childRepository = childRepository;
