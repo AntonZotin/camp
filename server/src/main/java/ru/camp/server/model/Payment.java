@@ -1,5 +1,6 @@
 package ru.camp.server.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,4 +38,24 @@ public class Payment {
 
     @Column(length = 500)
     private String comment;
+
+    @JsonProperty("parentId")
+    public void setParentId(Long parentId) {
+        if (parentId != null) {
+            this.parent = new User();
+            this.parent.setId(parentId);
+        } else {
+            this.parent = null;
+        }
+    }
+
+    @JsonProperty("voucherId")
+    public void setVoucherId(Long voucherId) {
+        if (voucherId != null) {
+            this.voucher = new Voucher();
+            this.voucher.setId(voucherId);
+        } else {
+            this.voucher = null;
+        }
+    }
 } 

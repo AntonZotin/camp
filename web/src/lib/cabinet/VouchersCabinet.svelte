@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 	import type {Voucher} from "$lib/models";
 	import { fade, fly } from 'svelte/transition';
-	import { Ticket, Loader, AlertCircle, Plus, Eye, Trash2, X, Calendar, User, Clock } from 'lucide-svelte';
+	import {Ticket, Loader, AlertCircle, Plus, Eye, Trash2, X, Calendar, User, Clock, CreditCard} from 'lucide-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { UserSession } from '$lib/stores/userStore';
 	import {toast} from "svelte-sonner";
+	import {goto} from "$app/navigation";
 	export let user: UserSession;
 
 	let vouchers: Voucher[] = [];
@@ -55,7 +56,15 @@
 		selectedVoucher = null;
 	}
 
+	function canPay(voucher: Voucher): boolean {
+		return voucher.status === 'CONFIRMED';
+	}
+
 	onMount(() => { loadVouchers(); });
+
+	function gotoPayment(id: number) {
+		goto(`/cabinet/payment/${id}`);
+	}
 </script>
 
 <div class="vouchers-cabinet">
@@ -97,6 +106,11 @@
 							<button class="icon-btn view" title="Просмотреть детали" on:click={() => showDetails(voucher)}>
 								<Eye size={16} />
 							</button>
+							{#if canPay(voucher)}
+								<button class="icon-btn pay" title="Оплатить путёвку" on:click={() => gotoPayment(voucher.id)}>
+									<CreditCard size={16} />
+								</button>
+							{/if}
 							<button class="icon-btn delete" title="Удалить" on:click={() => deleteVoucher(voucher.id)}>
 								<Trash2 size={16} />
 							</button>
@@ -457,6 +471,14 @@
 		flex: 1;
 		text-align: right;
 		color: var(--text-primary);
+	}
+
+	.icon-btn.pay {
+		color: var(--success);
+	}
+
+	.icon-btn.pay:hover {
+		background: var(--bg-hover);
 	}
 
 	@media (max-width: 768px) {

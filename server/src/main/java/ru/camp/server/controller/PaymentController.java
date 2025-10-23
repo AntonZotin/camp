@@ -37,14 +37,22 @@ public class PaymentController {
 
     @PostMapping
     @LogActivity(action = "CREATE_PAYMENT", description = "Создание платежа")
-    public ResponseEntity<Payment> create(@RequestBody Payment payment) {
-        return ResponseEntity.ok(paymentService.create(payment));
+    public ResponseEntity<?> create(@RequestBody Payment payment) {
+        try {
+            return ResponseEntity.ok(paymentService.create(payment));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
     @LogActivity(action = "UPDATE_PAYMENT", description = "Обновление платежа")
-    public ResponseEntity<Payment> update(@PathVariable Long id, @RequestBody Payment payment) {
-        return ResponseEntity.ok(paymentService.update(id, payment));
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Payment payment) {
+        try {
+            return ResponseEntity.ok(paymentService.update(id, payment));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

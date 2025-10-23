@@ -31,7 +31,7 @@
 			case 'ADMIN':
 				return 'Администратор';
 			case 'PARENT':
-				tab = 'children';
+				tab = 'vouchers';
 				return 'Родитель';
 			case 'EMPLOYEE':
 				tab = 'schedule';
@@ -79,13 +79,13 @@
 							</a>
 						{/if}
 						{#if user.role === 'PARENT'}
-							<button class="menu-item" class:active={tab==='children'} on:click={() => tab='children'}>
-								<Users size={22} />
-								<span>Мои дети</span>
-							</button>
 							<button class="menu-item" class:active={tab==='vouchers'} on:click={() => tab='vouchers'}>
 								<HeartHandshake size={22} />
 								<span>Мои путёвки</span>
+							</button>
+							<button class="menu-item" class:active={tab==='children'} on:click={() => tab='children'}>
+								<Users size={22} />
+								<span>Мои дети</span>
 							</button>
 						{/if}
 						{#if user.role === 'EMPLOYEE'}

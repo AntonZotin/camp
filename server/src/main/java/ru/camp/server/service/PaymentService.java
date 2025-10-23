@@ -2,15 +2,23 @@ package ru.camp.server.service;
 
 import org.springframework.stereotype.Service;
 import ru.camp.server.model.Payment;
+import ru.camp.server.model.Voucher;
+import ru.camp.server.model.VoucherStatus;
 import ru.camp.server.repository.PaymentRepository;
+import ru.camp.server.repository.VoucherRepository;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final VoucherRepository voucherRepository;
 
-    public PaymentService(PaymentRepository paymentRepository) {
+    public PaymentService(PaymentRepository paymentRepository, VoucherRepository voucherRepository) {
         this.paymentRepository = paymentRepository;
+        this.voucherRepository = voucherRepository;
     }
 
     public List<Payment> getAll() {
@@ -22,7 +30,16 @@ public class PaymentService {
     }
 
     public Payment create(Payment payment) {
-        return paymentRepository.save(payment);
+        Voucher voucher = voucherRepository.findById(payment.getVoucher().getId()).orElse(null);
+        if (voucher != null) {
+            payment.setDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+            Payment paid = paymentRepository.save(payment);
+            voucher.setStatus(VoucherStatus.PAID);
+            voucherRepository.save(voucher);
+            return paid;
+        } else {
+            throw new RuntimeException("Not found");
+        }
     }
 
     public Payment update(Long id, Payment payment) {
