@@ -28,6 +28,6 @@
 
   .theme-toggle:hover {
     background: var(--bg-hover);
-    transform: scale(1.1);
+    transform: translateY(-2px);
   }
 </style> 

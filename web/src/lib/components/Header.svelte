@@ -374,9 +374,10 @@
 
   .icon-button {
     position: relative;
-    padding: 0.75rem;
+    padding: 0.5rem;
     background: transparent;
-    border: 1px solid var(--border);
+    border: none;
+    border-radius: 50%;
     color: var(--text-primary);
   }
 
