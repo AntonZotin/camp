@@ -2,12 +2,14 @@ package ru.camp.server.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "notifications")
 public class Notification {
@@ -33,4 +35,11 @@ public class Notification {
 
     private LocalDateTime createdAt;
     private LocalDateTime sentAt;
+
+    public Notification(User recipient, String type, String subject, String message) {
+        this.recipient = recipient;
+        this.type = type;
+        this.subject = subject;
+        this.message = message;
+    }
 } 

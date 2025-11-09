@@ -39,12 +39,9 @@ public class PaymentService {
             Payment paid = paymentRepository.save(payment);
             voucher.setStatus(VoucherStatus.PAID);
             voucherRepository.save(voucher);
-            Notification notification = new Notification();
-            notification.setRecipient(payment.getParent());
-            notification.setType("email");
-            notification.setSubject("Оплата путёвки");
-            notification.setMessage("Оплата путёвки прошла успешно");
-            notificationService.create(notification);
+            notificationService.create(new Notification(
+                payment.getParent(), "email", "Оплата путёвки", "Оплата путёвки прошла успешно"
+            ));
             return paid;
         } else {
             throw new RuntimeException("Not found");
