@@ -370,7 +370,6 @@
 		color: var(--text-primary);
 	}
 
-	/* Модальное окно */
 	.modal-backdrop {
 		position: fixed;
 		top: 0;

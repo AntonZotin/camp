@@ -372,7 +372,6 @@
     transition: var(--transition);
   }
 
-  /* Стили для кнопки уведомлений */
   .icon-button {
     position: relative;
     padding: 0.75rem;
@@ -409,7 +408,6 @@
     100% { transform: scale(1); }
   }
 
-  /* Стили модального окна */
   .modal-overlay {
     position: fixed;
     top: 0;
