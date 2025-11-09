@@ -23,6 +23,12 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getAll());
     }
 
+    @GetMapping("/user/{userId}")
+    @LogActivity(action = "VIEW_NOTIFICATION_BY_USER", description = "Просмотр уведомлений пользователя")
+    public ResponseEntity<List<Notification>> getByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(notificationService.getByUserId(userId));
+    }
+
     @GetMapping("/{id}")
     @LogActivity(action = "VIEW_NOTIFICATION", description = "Просмотр уведомления")
     public ResponseEntity<Notification> getById(@PathVariable Long id) {

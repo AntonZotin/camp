@@ -42,6 +42,9 @@ public class PaymentService {
             notificationService.create(new Notification(
                 payment.getParent(), "email", "Оплата путёвки", "Оплата путёвки прошла успешно"
             ));
+            notificationService.create(new Notification(
+                payment.getParent(), "internal", "Оплата путёвки", "Оплата путёвки прошла успешно"
+            ));
             return paid;
         } else {
             throw new RuntimeException("Not found");

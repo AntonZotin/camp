@@ -27,6 +27,10 @@ public class NotificationService {
         return notificationRepository.findById(id).orElse(null);
     }
 
+    public List<Notification> getByUserId(Long userId) {
+        return notificationRepository.findByRecipient_Id(userId);
+    }
+
     public Notification create(Notification notification) {
         LocalDateTime currentTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         notification.setCreatedAt(currentTime);
