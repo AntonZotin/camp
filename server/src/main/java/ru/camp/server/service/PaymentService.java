@@ -1,6 +1,7 @@
 package ru.camp.server.service;
 
 import org.springframework.stereotype.Service;
+import ru.camp.server.model.Notification;
 import ru.camp.server.model.Payment;
 import ru.camp.server.model.Voucher;
 import ru.camp.server.model.VoucherStatus;
@@ -15,10 +16,12 @@ import java.util.List;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final VoucherRepository voucherRepository;
+    private final NotificationService notificationService;
 
-    public PaymentService(PaymentRepository paymentRepository, VoucherRepository voucherRepository) {
+    public PaymentService(PaymentRepository paymentRepository, VoucherRepository voucherRepository, NotificationService notificationService) {
         this.paymentRepository = paymentRepository;
         this.voucherRepository = voucherRepository;
+        this.notificationService = notificationService;
     }
 
     public List<Payment> getAll() {
@@ -36,6 +39,12 @@ public class PaymentService {
             Payment paid = paymentRepository.save(payment);
             voucher.setStatus(VoucherStatus.PAID);
             voucherRepository.save(voucher);
+            Notification notification = new Notification();
+            notification.setRecipient(payment.getParent());
+            notification.setType("email");
+            notification.setSubject("Оплата путёвки");
+            notification.setMessage("Оплата путёвки прошла успешно");
+            notificationService.create(notification);
             return paid;
         } else {
             throw new RuntimeException("Not found");

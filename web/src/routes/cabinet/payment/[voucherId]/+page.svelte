@@ -265,7 +265,7 @@
 					<p>Статус путёвки изменён на "Оплачено".</p>
 					<div class="success-actions">
 						<a href="/cabinet" class="btn-primary">Вернуться в кабинет</a>
-						<a href="/cabinet/vouchers" class="btn-secondary">К моим путёвкам</a>
+						<a href="/cabinet" class="btn-secondary">К моим путёвкам</a>
 					</div>
 				</div>
 			{/if}
