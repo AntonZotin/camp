@@ -4,7 +4,7 @@
   import {userStore, logoutUser, type UserSession} from '$lib/stores/userStore';
   import { goto } from '$app/navigation';
   import { get } from 'svelte/store';
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte';
   import type { Notification as NotificationType } from '$lib/models';
   import {PUBLIC_API_URL} from "$env/static/public";
   import {toast} from "svelte-sonner";
@@ -19,10 +19,6 @@
   let unreadCount: number = 0;
   let showNotifications: boolean = false;
   let loading: boolean = false;
-
-  const dispatch = createEventDispatcher<{
-    notificationRead: { notificationId: number };
-  }>();
 
   async function handleLogout(): Promise<void> {
     await logoutUser();
@@ -97,11 +93,12 @@
         if (!res.ok) {
           toast.error('Ошибка обновления уведомления');
         } else {
-          notification.status = 'sent';
-          notification.sentAt = updatedNotification.sentAt;
+          notifications = notifications.map(n =>
+            n.id === notification.id
+              ? { ...n, status: 'sent', sentAt: updatedNotification.sentAt }
+              : n
+          );
           calculateUnreadCount();
-
-          dispatch('notificationRead', { notificationId: notification.id });
         }
       } catch (error) {
         console.error('Ошибка обновления уведомления:', error);
