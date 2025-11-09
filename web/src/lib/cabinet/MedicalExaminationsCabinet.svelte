@@ -14,7 +14,6 @@
 	let medicalCard: any = null;
 	let newVisit = {
 		description: '',
-		diagnosis: '',
 		recommendations: '',
 		medications: ''
 	};
@@ -104,7 +103,6 @@
 		medicalCard = null;
 		newVisit = {
 			description: '',
-			diagnosis: '',
 			recommendations: '',
 			medications: ''
 		};
@@ -227,16 +225,6 @@
 					placeholder="Опишите состояние ребёнка, жалобы, результаты осмотра..."
 					rows="4"
 				></textarea>
-			</div>
-
-			<div class="form-section">
-				<label for="diagnosis">Диагноз</label>
-				<input
-					id="diagnosis"
-					type="text"
-					bind:value={newVisit.diagnosis}
-					placeholder="Укажите диагноз..."
-				/>
 			</div>
 
 			<div class="form-section">
