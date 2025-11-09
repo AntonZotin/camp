@@ -3,18 +3,19 @@
 	import { userStore, logoutUser, type UserRole } from '$lib/stores/userStore';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { User, LogOut, Shield, Users, HeartHandshake, Calendar, Activity, Settings } from 'lucide-svelte';
+	import { User, LogOut, Shield, Users, HeartHandshake, Calendar, Activity, Settings, Stethoscope } from 'lucide-svelte';
 	import { get } from 'svelte/store';
 	import ChildrenCabinet from '$lib/cabinet/ChildrenCabinet.svelte';
 	import VouchersCabinet from '$lib/cabinet/VouchersCabinet.svelte';
 	import ScheduleCabinet from '$lib/cabinet/ScheduleCabinet.svelte';
 	import DutiesCabinet from '$lib/cabinet/DutiesCabinet.svelte';
 	import SettingsCabinet from '$lib/cabinet/SettingsCabinet.svelte';
+	import MedicalExaminationsCabinet from '$lib/cabinet/MedicalExaminationsCabinet.svelte';
 
 	let user = get(userStore);
 	const unsubUser = userStore.subscribe((u) => (user = u));
 
-	let tab: 'children' | 'vouchers' | 'schedule' | 'duties' | 'settings';
+	let tab: 'children' | 'vouchers' | 'schedule' | 'duties' | 'settings' | 'medical';
 
 	onMount(() => {
 		if (!user) goto('/login');
@@ -97,6 +98,10 @@
 								<Activity size={22} />
 								<span>Дежурства</span>
 							</button>
+							<button class="menu-item" class:active={tab==='medical'} on:click={() => tab='medical'}>
+								<Stethoscope size={22} />
+								<span>Медосмотры</span>
+							</button>
 						{/if}
 						<button class="menu-item" class:active={tab==='settings'} on:click={() => tab='settings'}>
 							<Settings size={22} />
@@ -117,6 +122,8 @@
 							<ScheduleCabinet {user} />
 						{:else if tab === 'duties' && user.role === 'EMPLOYEE'}
 							<DutiesCabinet {user} />
+						{:else if tab === 'medical' && user.role === 'EMPLOYEE'}
+							<MedicalExaminationsCabinet {user} />
 						{:else if tab === 'settings'}
 							<SettingsCabinet {user} />
 						{/if}

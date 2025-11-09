@@ -56,4 +56,10 @@ public class MedicalCardController {
         medicalCardService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/child/{childId}")
+    @LogActivity(action = "VIEW_MEDICAL_CARD_BY_CHILD", description = "Просмотр медицинской карты ребенка")
+    public ResponseEntity<MedicalCard> getByChildId(@PathVariable Long childId) {
+        return ResponseEntity.ok(medicalCardService.getByChildId(childId));
+    }
 } 

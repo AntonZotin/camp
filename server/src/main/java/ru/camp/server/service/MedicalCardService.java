@@ -33,4 +33,8 @@ public class MedicalCardService {
     public void delete(Long id) {
         medicalCardRepository.deleteById(id);
     }
+
+    public MedicalCard getByChildId(Long childId) {
+        return medicalCardRepository.findByChild_Id(childId).orElse(null);
+    }
 } 
